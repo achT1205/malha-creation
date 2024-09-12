@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B397BFA2-E8F7-47E5-ADC6-3F22ED6992E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingBlocks", "{7658EEA2-1D9D-40DC-8B07-460D9B40ADB7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "YarpApiGateway", "YarpApiGateway", "{B03FCB3D-93E5-4DD1-BEB2-F0B04185414A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductCatalog.API", "Services\ProductCatalog\ProductCatalog.API\ProductCatalog.API.csproj", "{7EFDE2EB-FFA7-4C91-B420-81EB45629BB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks", "BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj", "{FDDEA7B3-B6C0-46C1-B3E8-BEE405DF84BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YarpApiGateway", "YarpApiGateway\YarpApiGateway\YarpApiGateway.csproj", "{3C204AF4-3E68-46AD-BFD1-BE9A656CFC54}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{FA2FDDD1-0461-4C13-87E9-0F277C3A164E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EFDE2EB-FFA7-4C91-B420-81EB45629BB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EFDE2EB-FFA7-4C91-B420-81EB45629BB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EFDE2EB-FFA7-4C91-B420-81EB45629BB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EFDE2EB-FFA7-4C91-B420-81EB45629BB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDDEA7B3-B6C0-46C1-B3E8-BEE405DF84BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDDEA7B3-B6C0-46C1-B3E8-BEE405DF84BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDDEA7B3-B6C0-46C1-B3E8-BEE405DF84BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDDEA7B3-B6C0-46C1-B3E8-BEE405DF84BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C204AF4-3E68-46AD-BFD1-BE9A656CFC54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C204AF4-3E68-46AD-BFD1-BE9A656CFC54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C204AF4-3E68-46AD-BFD1-BE9A656CFC54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C204AF4-3E68-46AD-BFD1-BE9A656CFC54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA2FDDD1-0461-4C13-87E9-0F277C3A164E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA2FDDD1-0461-4C13-87E9-0F277C3A164E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA2FDDD1-0461-4C13-87E9-0F277C3A164E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA2FDDD1-0461-4C13-87E9-0F277C3A164E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7EFDE2EB-FFA7-4C91-B420-81EB45629BB8} = {B397BFA2-E8F7-47E5-ADC6-3F22ED6992E5}
+		{FDDEA7B3-B6C0-46C1-B3E8-BEE405DF84BF} = {7658EEA2-1D9D-40DC-8B07-460D9B40ADB7}
+		{3C204AF4-3E68-46AD-BFD1-BE9A656CFC54} = {B03FCB3D-93E5-4DD1-BEB2-F0B04185414A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A6D77462-AB74-433B-A370-164743E60C39}
+	EndGlobalSection
+EndGlobal
