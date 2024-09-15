@@ -1,8 +1,6 @@
-﻿namespace Catalog.API.Models;
-
-public class Occasion
+﻿namespace Catalog.API.Dtos;
+public class OccasionDto
 {
-    public Guid Id { get; set; }
     public string Name { get; set; } = default!;
     public string Description { get; set; } = default!;
 }
