@@ -1,6 +1,14 @@
 services:
+
+  mc-catalogdb:
+    image: postgres
+
   productcatalog.api:
     image: ${DOCKER_REGISTRY-}productcatalogapi
     build:
       context: .
       dockerfile: Services/ProductCatalog/ProductCatalog.API/Dockerfile
+
+
+volumes:
+  postgres_mc_catalog:
