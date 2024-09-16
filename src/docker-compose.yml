@@ -1,14 +1,29 @@
 services:
-
   mc-catalogdb:
     image: postgres
 
-  productcatalog.api:
-    image: ${DOCKER_REGISTRY-}productcatalogapi
+  catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
     build:
       context: .
-      dockerfile: Services/ProductCatalog/ProductCatalog.API/Dockerfile
+      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+
+  messagebroker:
+    image: rabbitmq:management
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 volumes:
-  postgres_mc_catalog:
+  postgres-mccatalog:

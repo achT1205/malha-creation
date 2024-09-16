@@ -1,4 +1,6 @@
-﻿namespace Catalog.API.Products.Commands.CreateProduct;
+﻿using BuildingBlocks.Messaging.Events;
+
+namespace Catalog.API.Products.Commands.CreateProduct;
 
 public record CreateClothingProductCommand(Product Product)
     : ICommand<CreateClothingProductResult>;
@@ -15,7 +17,7 @@ public class CreateClothingProductCommandValidation : AbstractValidator<CreateCl
         RuleFor(x => x.Product.Price).GreaterThan(0).WithMessage("Price must be greater than 0");
     }
 }
-public class CreateClothingProductCommandHandler(IDocumentSession session) : ICommandHandler<CreateClothingProductCommand, CreateClothingProductResult>
+public class CreateClothingProductCommandHandler(IDocumentSession session, IPublishEndpoint publishEndpoint) : ICommandHandler<CreateClothingProductCommand, CreateClothingProductResult>
 {
     public async Task<CreateClothingProductResult> Handle(CreateClothingProductCommand command, CancellationToken cancellationToken)
     {
@@ -35,6 +37,10 @@ public class CreateClothingProductCommandHandler(IDocumentSession session) : ICo
             Colors = command.Product.Colors,
             Sizes = command.Product.Sizes,
         };
+
+        var eventMessage = command.Product.Adapt<ProductCreatedEvent>();
+
+        await publishEndpoint.Publish(eventMessage, cancellationToken);
 
         session.Store(Product);
         await session.SaveChangesAsync(cancellationToken);

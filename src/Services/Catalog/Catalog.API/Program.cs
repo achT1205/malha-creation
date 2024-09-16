@@ -1,3 +1,6 @@
+using Weasel.Core;
+using BuildingBlocks.Messaging.MassTransit;
+
 var builder = WebApplication.CreateBuilder(args);
 
 //Add service to the dependence injection container (DI)
@@ -15,9 +18,17 @@ builder.Services.AddCarter();
 builder.Services.AddMarten((options) =>
 {
     options.Connection(builder.Configuration.GetConnectionString("Database")!);
+
+    if (builder.Environment.IsDevelopment())
+    {
+        options.AutoCreateSchemaObjects = AutoCreate.All;
+    }
 }).UseLightweightSessions();
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
+//Async Communication Services
+builder.Services.AddMessageBroker(builder.Configuration);
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(builder.Configuration.GetConnectionString("Database")!);
