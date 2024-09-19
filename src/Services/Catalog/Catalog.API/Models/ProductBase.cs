@@ -1,6 +1,7 @@
-﻿namespace Catalog.API.Dtos;
-public class CreateProductDto
+﻿namespace Catalog.API.Models;
+public class ProductBase
 {
+    public Guid Id { get; set; }  // Identifiant unique du produit
     public string Name { get; set; } = default!; // Nom du produit
     public string NameEn { get; set; } = default!; // Nom du produit
     public string CoverImage { get; set; } = default!; // Image de couverture
@@ -10,23 +11,7 @@ public class CreateProductDto
     public string Material { get; set; } = default!; // Matériau (e.g., coton, cuir, métal)
     public bool IsHandmade { get; set; }  // Indique si le produit est fait main
     public DateTime CreatedAt { get; set; }  // Date de création
+    public DateTime UpdatedAt { get; set; }  // Date de mise à jour
     public string Collection { get; set; } = default!; // Collection associée
     public List<string> Categories { get; set; } = new(); // Liste des catégories
-    public List<ColorVariantDto> ColorVariants { get; set; } = new();
-}
-
-public class ColorVariantDto
-{
-    public string Color { get; set; } = default!;
-    public decimal Price { get; set; }
-    public string CoverImage { get; set; } = default!;
-    public List<string> Images { get; set; } = new();
-    public List<SizeVariantDto> Sizes { get; set; } = new();
-}
-
-public class SizeVariantDto
-{
-    public string Size { get; set; } = default!;
-    public decimal Price { get; set; }
-    public int Quantity { get; set; }
 }

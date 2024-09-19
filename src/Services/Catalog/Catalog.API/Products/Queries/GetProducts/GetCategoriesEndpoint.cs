@@ -1,5 +1,5 @@
 ﻿namespace Catalog.API.Products.Queries.GetProducts;
-public record GetProductsResponse(IEnumerable<Product> Products);
+public record GetProductsResponse(IEnumerable<object> Products);
 public class GetProductsEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

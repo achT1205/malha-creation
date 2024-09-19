@@ -14,7 +14,8 @@ public class DeleteProductCommandHandler(IDocumentSession session) : ICommandHan
 {
     public async Task<DeleteProductResult> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
     {
-        var product = await session.LoadAsync<Product>(command.Id, cancellationToken);
+        var product = new object();
+         product = await session.LoadAsync<Product>(command.Id, cancellationToken);
         if (product == null)
         {
             throw new ProductNotFoundException(command.Id);
