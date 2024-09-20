@@ -7,15 +7,8 @@ public class UpdateProductEndpoint : ICarterModule
     {
         app.MapPost("/products", async (CreateProductRequest request, ISender sender) =>
         {
-            var type = request.Product.ProductType.ToLower();
             var command = request.Adapt<CreateProductCommand>();
-            //if (type == "clothing")
-               
-            //else if (type == "accessory")
-            //    command = request.Adapt<CreateAccessoryProductCommand>();
-            //else throw new BadRequestException("Invalid Clothing Product Data");
             var result = await sender.Send(command);
-
             var response = result.Adapt<CreateProductResponse>();
             return Results.Created($"/products/{response.Id}", response);
         })

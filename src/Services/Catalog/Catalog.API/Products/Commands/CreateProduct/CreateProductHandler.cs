@@ -12,7 +12,7 @@ public class CreateProductCommandValidation : AbstractValidator<CreateProductCom
         RuleFor(x => x.Product.Name).NotEmpty().WithMessage("Name is required.");
         RuleFor(x => x.Product.NameEn).NotEmpty().WithMessage("NameEn is required.");
         RuleFor(x => x.Product.NameEn)
-            .Matches(@"^[a-zA-Z0-9]*$")
+            .Matches(@"^[a-zA-Z0-9 \-]*$")
             .WithMessage("The field must not contain special characters.");
         RuleFor(x => x.Product.ProductType).NotEmpty().WithMessage("The ProductType is required.");
         RuleFor(x => x.Product.ProductType.ToLower() == "clothing" || x.Product.ProductType.ToLower() == "accessory").NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
@@ -20,7 +20,6 @@ public class CreateProductCommandValidation : AbstractValidator<CreateProductCom
         RuleFor(x => x.Product.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
         RuleFor(x => x.Product.ColorVariants.Count()).GreaterThan(0).WithMessage("ColorVariants is required.");
         RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
-        RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.CoverImage).NotEmpty().WithMessage("The CoverImage is required."));
         RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0."));
         When(x => x.Product.ProductType.ToLower() == "clothing", () =>
         {
@@ -39,6 +38,14 @@ public class CreateProductCommandHandler(IDocumentSession session, IPublishEndpo
 {
     public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
+        var products = await session.Query<Product>()
+            .Where(_ => _.NameEn == command.Product.NameEn
+            || _.Name == command.Product.Name).ToListAsync();
+        if (products.Any())
+        {
+            throw new ProductAlreadyExistsFoundException("A product with the same name already exists.");
+        }
+
         var product = CreateProduct(command.Product);
         var eventMessage = product.Adapt<ProductCreatedEvent>();
         await publishEndpoint.Publish(eventMessage, cancellationToken);
@@ -51,27 +58,29 @@ public class CreateProductCommandHandler(IDocumentSession session, IPublishEndpo
 
     private Product CreateProduct(Product product)
     {
+        var productType = product.ProductType.ToLower();
         return new Product
         {
             Name = product.Name,
             NameEn = product.NameEn,
             CoverImage = product.CoverImage,
-            ProductType = product.ProductType,
+            ProductType = productType,
             ForOccasion = product.ForOccasion,
             Description = product.Description,
             Material = product.Material,
             IsHandmade = product.IsHandmade,
             Collection = product.Collection,
             Categories = product.Categories,
+            CreatedAt = DateTime.Now,
+            Colors = product.ColorVariants.Select(cv => cv.Color.ToLower()).ToList(),
             ColorVariants = product.ColorVariants.Select(cv => new ColorVariant
             {
                 Color = cv.Color,
-                CoverImage = cv.CoverImage,
                 Images = cv.Images,
                 Slug = SlugHelper.GenerateSlug(product.NameEn, cv.Color),
-                Price = product.ProductType == "accessory" ? cv.Price : null,
-                Quantity = product.ProductType == "accessory" ? cv.Quantity : null,
-                Sizes = product.ProductType == "clothing" ?  
+                Price = productType == "accessory" ? cv.Price : null,
+                Quantity = productType == "accessory" ? cv.Quantity : null,
+                Sizes = productType == "clothing" ?
                 cv.Sizes?.Select(s => new SizeVariant
                 {
                     Size = s.Size,

@@ -12,7 +12,7 @@ public class UpdateProductCommandValidation : AbstractValidator<UpdateProductCom
         RuleFor(x => x.Product.Id).NotEmpty().WithMessage("Product ID is required");
         RuleFor(x => x.Product.NameEn).NotEmpty().WithMessage("NameEn is required.");
         RuleFor(x => x.Product.NameEn)
-            .Matches(@"^[a-zA-Z0-9]*$")
+            .Matches(@"^[a-zA-Z0-9 \-]*$")
             .WithMessage("The field must not contain special characters.");
         RuleFor(x => x.Product.ProductType).NotEmpty().WithMessage("The ProductType is required.");
         RuleFor(x => x.Product.ProductType.ToLower() == "clothing" || x.Product.ProductType.ToLower() == "accessory").NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
@@ -20,7 +20,6 @@ public class UpdateProductCommandValidation : AbstractValidator<UpdateProductCom
         RuleFor(x => x.Product.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
         RuleFor(x => x.Product.ColorVariants.Count()).GreaterThan(0).WithMessage("ColorVariants is required.");
         RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
-        RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.CoverImage).NotEmpty().WithMessage("The CoverImage is required."));
         RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0."));
         When(x => x.Product.ProductType.ToLower() == "clothing", () =>
         {
@@ -40,31 +39,44 @@ public class UpdateProductCommandHandler(IDocumentSession session, IPublishEndpo
     public async Task<UpdateProductResult> Handle(UpdateProductCommand command, CancellationToken cancellationToken)
     {
 
+        var products = await session.Query<Product>()
+        .Where(_ => (
+        _.NameEn == command.Product.NameEn || _.Name == command.Product.Name)
+        && _.Id != command.Product.Id
+        ).ToListAsync();
+        if (products.Any())
+        {
+            throw new ProductAlreadyExistsFoundException("A product with the same name already exists.");
+        }
+
         var product = await session.LoadAsync<Product>(command.Product.Id, cancellationToken);
         if (product == null)
         {
             throw new ProductNotFoundException(command.Product.Id);
         }
 
+        var productType = product.ProductType.ToLower();
+
         product.Name = command.Product.Name;
         product.NameEn = command.Product.NameEn;
         product.CoverImage = command.Product.CoverImage;
-        product.ProductType = command.Product.ProductType;
+        product.ProductType = productType;
         product.ForOccasion = command.Product.ForOccasion;
         product.Description = command.Product.Description;
         product.Material = command.Product.Material;
         product.IsHandmade = command.Product.IsHandmade;
         product.Collection = command.Product.Collection;
         product.Categories = command.Product.Categories;
+        product.UpdatedAt = DateTime.Now;
+        product.Colors = product.ColorVariants.Select(cv => cv.Color.ToLower()).ToList();
         product.ColorVariants = command.Product.ColorVariants.Select(cv => new ColorVariant
         {
             Color = cv.Color,
-            CoverImage = cv.CoverImage,
             Images = cv.Images,
             Slug = SlugHelper.GenerateSlug(command.Product.NameEn, cv.Color),
-            Price = command.Product.ProductType == "accessory" ? cv.Price : null,
-            Quantity = command.Product.ProductType == "accessory" ? cv.Quantity : null,
-            Sizes = product.ProductType == "clothing" ?
+            Price = productType == "accessory" ? cv.Price : null,
+            Quantity = productType == "accessory" ? cv.Quantity : null,
+            Sizes = productType == "clothing" ?
             cv.Sizes?.Select(s => new SizeVariant
             {
                 Size = s.Size,
@@ -72,7 +84,8 @@ public class UpdateProductCommandHandler(IDocumentSession session, IPublishEndpo
                 Quantity = s.Quantity
             }).ToList() : null
         }).ToList();
-        var eventMessage = product.Adapt<ProductCreatedEvent>();
+        
+        var eventMessage = product.Adapt<ProductUpdatedEvent>();
         await publishEndpoint.Publish(eventMessage, cancellationToken);
 
         session.Store(product);

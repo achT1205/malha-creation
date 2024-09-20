@@ -1,4 +1,6 @@
 ﻿
+using BuildingBlocks.Messaging.Events;
+
 namespace Catalog.API.Products.Commands.DeleteProduct;
 public record DeleteProductCommand(Guid Id):ICommand<DeleteProductResult>;
 public record DeleteProductResult(bool IsSuccess);
@@ -10,16 +12,19 @@ public class DeleteProductCommandValidator : AbstractValidator<DeleteProductComm
         RuleFor(x => x.Id).NotEmpty().WithMessage("Product ID is required");
     }
 }
-public class DeleteProductCommandHandler(IDocumentSession session) : ICommandHandler<DeleteProductCommand, DeleteProductResult>
+public class DeleteProductCommandHandler(IDocumentSession session, IPublishEndpoint publishEndpoint) : ICommandHandler<DeleteProductCommand, DeleteProductResult>
 {
     public async Task<DeleteProductResult> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
     {
-        var product = new object();
-         product = await session.LoadAsync<Product>(command.Id, cancellationToken);
+        var product = await session.LoadAsync<Product>(command.Id, cancellationToken);
         if (product == null)
         {
             throw new ProductNotFoundException(command.Id);
         }
+
+        var eventMessage = product.Adapt<ProductDeletedEvent>();
+        await publishEndpoint.Publish(eventMessage, cancellationToken);
+
         session.Delete<Product>(command.Id);
         await session.SaveChangesAsync(cancellationToken);
         return new DeleteProductResult(true);
