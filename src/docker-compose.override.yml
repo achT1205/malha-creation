@@ -11,6 +11,18 @@ services:
     volumes:
       - postgres-mccatalog:/var/lib/postgresql/data/
 
+  mc-stockdb:
+    container_name: mc-stockdb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=MCStockDb
+    restart: always
+    ports:
+        - "5432:5432"
+    volumes:
+      - postgres-mcstock:/var/lib/postgresql/data/
+
   messagebroker:
     container_name: messagebroker
     hostname: ecommerce-mq
@@ -24,11 +36,6 @@ services:
 
 
 
-
-
-
-
-
   catalog.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -37,9 +44,26 @@ services:
       - ConnectionStrings__Database=Server=mc-catalogdb;Port=5432;Database=MCCatalogDb;User Id=postgres;Password=postgres;Include Error Detail=true
     depends_on:
       - mc-catalogdb
+      - messagebroker
     ports:
       - "4000:8080"
       - "4040:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  
+  inventory.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__Database=Server=mc-stockdb;Port=5432;Database=MCStockDb;User Id=postgres;Password=postgres;Include Error Detail=true
+    depends_on:
+      - mc-stockdb
+      - messagebroker
+    ports:
+      - "8080"
+      - "8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro

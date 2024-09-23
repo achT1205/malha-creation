@@ -2,6 +2,9 @@ services:
   mc-catalogdb:
     image: postgres
 
+  mc-stockdb:
+    image: postgres
+
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
     build:
@@ -11,19 +14,12 @@ services:
   messagebroker:
     image: rabbitmq:management
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  inventory.api:
+    image: ${DOCKER_REGISTRY-}inventoryapi
+    build:
+      context: .
+      dockerfile: Services/Inventory/Inventory.API/Dockerfile
 
 volumes:
   postgres-mccatalog:
+  postgres-mcstock:  

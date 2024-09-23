@@ -15,19 +15,19 @@ public class CreateProductCommandValidation : AbstractValidator<CreateProductCom
             .Matches(@"^[a-zA-Z0-9 \-]*$")
             .WithMessage("The field must not contain special characters.");
         RuleFor(x => x.Product.ProductType).NotEmpty().WithMessage("The ProductType is required.");
-        RuleFor(x => x.Product.ProductType.ToLower() == "clothing" || x.Product.ProductType.ToLower() == "accessory").NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
+        RuleFor(x => x.Product.ProductType == ProductType.Clothing || x.Product.ProductType == ProductType.Accessory).NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
         RuleFor(x => x.Product.Categories).NotEmpty().WithMessage("The Category is required.");
         RuleFor(x => x.Product.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
         RuleFor(x => x.Product.ColorVariants.Count()).GreaterThan(0).WithMessage("ColorVariants is required.");
         RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
         RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0."));
-        When(x => x.Product.ProductType.ToLower() == "clothing", () =>
+        When(x => x.Product.ProductType == ProductType.Clothing, () =>
         {
             RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Sizes).NotNull().WithMessage("The Sizes can not be null."));
             RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Size).NotEmpty().WithMessage("Size is required for clothing products.")));
             RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero.")));
         });
-        When(x => x.Product.ProductType.ToLower() == "accessory", () =>
+        When(x => x.Product.ProductType == ProductType.Accessory, () =>
         {
             RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero."));
         });
@@ -48,6 +48,7 @@ public class CreateProductCommandHandler(IDocumentSession session, IPublishEndpo
 
         var product = CreateProduct(command.Product);
         var eventMessage = product.Adapt<ProductCreatedEvent>();
+        eventMessage.ProductType = product.ProductType.ToString();
         await publishEndpoint.Publish(eventMessage, cancellationToken);
 
         session.Store(product);
@@ -58,7 +59,7 @@ public class CreateProductCommandHandler(IDocumentSession session, IPublishEndpo
 
     private Product CreateProduct(Product product)
     {
-        var productType = product.ProductType.ToLower();
+        var productType = product.ProductType;
         return new Product
         {
             Name = product.Name,
@@ -78,9 +79,9 @@ public class CreateProductCommandHandler(IDocumentSession session, IPublishEndpo
                 Color = cv.Color,
                 Images = cv.Images,
                 Slug = SlugHelper.GenerateSlug(product.NameEn, cv.Color),
-                Price = productType == "accessory" ? cv.Price : null,
-                Quantity = productType == "accessory" ? cv.Quantity : null,
-                Sizes = productType == "clothing" ?
+                Price = productType == ProductType.Accessory ? cv.Price : null,
+                Quantity = productType == ProductType.Accessory ? cv.Quantity : null,
+                Sizes = productType == ProductType.Clothing ?
                 cv.Sizes?.Select(s => new SizeVariant
                 {
                     Size = s.Size,

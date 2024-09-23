@@ -13,3 +13,4 @@ global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 global using BuildingBlocks.Exceptions;
 global using Catalog.API.Exceptions;
 global using MassTransit;
+global using BuildingBlocks.Enums;

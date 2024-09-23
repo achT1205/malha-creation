@@ -5,7 +5,7 @@ public class UpdateProductDto
     public string Name { get; set; } = default!; // Nom du produit
     public string NameEn { get; set; } = default!; // Nom du produit
     public string CoverImage { get; set; } = default!; // Image de couverture
-    public string ProductType { get; set; } = default!;// Type de produit (Clothing, Accessory)
+    public ProductType ProductType { get; set; }// Type de produit (Clothing, Accessory)
     public string ForOccasion { get; set; } = default!; // Occasion (e.g., casual, formal)
     public string Description { get; set; } = default!; // Description détaillée
     public string Material { get; set; } = default!; // Matériau (e.g., coton, cuir, métal)
