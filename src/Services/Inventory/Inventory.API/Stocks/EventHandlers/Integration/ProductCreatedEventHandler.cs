@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Messaging.Events;
+using Inventory.API.Exceptions;
 using Inventory.API.Stocks.Commands.CreateStock;
 using MassTransit;
 
@@ -11,29 +12,43 @@ public class ProductCreatedEventHandler(ISender sender, ILogger<ProductCreatedEv
 
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
 
-        var command = MapToCreateProductCommand(context.Message);
-        await sender.Send(command);
-
-        throw new NotImplementedException();
+        try
+        {
+            var command = MapToCreateProductCommand(context.Message);
+            await sender.Send(command);
+        }
+        catch (Exception ex)
+        {
+            throw new ProductCreatedEventHandlerException(ex.Message);
+        }
     }
 
     private CreateStockCommand MapToCreateProductCommand(ProductCreatedEvent message)
     {
-        var stock = new Stock { ProductId = message.Id };
+        var stock = new StockDto
+        {
+            ProductId = message.Id,
+            ProductType = message.ProductType,
+            ColorVariants = new List<ColorVariant>()
+        };
 
         if (message.ProductType.ToLower() == "clothing")
         {
-            stock.ColorVariants = (List<ColorVariant>)message.ColorVariants.Select(cv =>
-            cv.Sizes?.Select(
-                size =>
-                new ColorVariant
-                {
-                    Color = cv.Color,
-                    Quantity = size.Quantity,
-                    Size = size.Size
-                }
-                )
-            );
+            foreach (var cv in message.ColorVariants)
+            {
+                if (cv.Sizes != null)
+                    foreach (var size in cv.Sizes)
+                    {
+                        stock.ColorVariants.Add(
+                             new ColorVariant
+                             {
+                                 Color = cv.Color,
+                                 Quantity = size.Quantity,
+                                 Size = size.Size,
+                             });
+                    }
+
+            }
         }
         else
         {
@@ -43,8 +58,6 @@ public class ProductCreatedEventHandler(ISender sender, ILogger<ProductCreatedEv
                 Quantity = cv.Quantity.Value,
             }).ToList();
         }
-
-
         return new CreateStockCommand(stock);
     }
 }

@@ -1,7 +1,29 @@
-﻿namespace Inventory.API.Stocks.Commands.CreateStock;
+﻿using BuildingBlocks.Enums;
 
-public record CreateStockCommand(Stock Stock) : ICommand<CreateStockResuslt>;
+namespace Inventory.API.Stocks.Commands.CreateStock;
+
+public record CreateStockCommand(StockDto Stock) : ICommand<CreateStockResuslt>;
 public record CreateStockResuslt(Guid Id);
+
+public class CreateStockCommandValidation : AbstractValidator<CreateStockCommand>
+{
+    public CreateStockCommandValidation()
+    {
+        RuleFor(x => x.Stock.ProductId).NotEmpty().WithMessage("ProductId is required.");
+        RuleForEach(x => x.Stock.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.LowStockThreshold).NotEmpty().WithMessage("The LowStockThreshold is required."));
+        When(x => x.Stock.ProductType == ProductType.Clothing.ToString(), () =>
+        {
+            RuleForEach(x => x.Stock.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
+            RuleForEach(x => x.Stock.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Quantity).NotEmpty().WithMessage("The Quantity name is required."));
+            RuleForEach(x => x.Stock.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Size).NotEmpty().WithMessage("The Sise name is required."));
+        });
+        When(x => x.Stock.ProductType == ProductType.Accessory.ToString(), () =>
+        {
+            RuleForEach(x => x.Stock.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
+            RuleForEach(x => x.Stock.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Quantity).NotEmpty().WithMessage("The Quantity name is required."));
+        });
+    }
+}
 public class CreateStockCommandHandler(IDocumentSession session) : ICommandHandler<CreateStockCommand, CreateStockResuslt>
 {
     public async Task<CreateStockResuslt> Handle(CreateStockCommand command, CancellationToken cancellationToken)
@@ -9,7 +31,6 @@ public class CreateStockCommandHandler(IDocumentSession session) : ICommandHandl
         var stock = new Stock
         {
             ProductId = command.Stock.ProductId,
-            CreatedAt = command.Stock.CreatedAt,
             ColorVariants = command.Stock.ColorVariants.Select(cv =>
             new ColorVariant
             {
@@ -19,7 +40,7 @@ public class CreateStockCommandHandler(IDocumentSession session) : ICommandHandl
                 Size = cv.Size,
 
             }).ToList(),
-        };
+        }; 
         session.Store(stock);
 
         await session.SaveChangesAsync(cancellationToken);

@@ -14,7 +14,7 @@ public class CreateProductCommandValidation : AbstractValidator<CreateProductCom
         RuleFor(x => x.Product.NameEn)
             .Matches(@"^[a-zA-Z0-9 \-]*$")
             .WithMessage("The field must not contain special characters.");
-        RuleFor(x => x.Product.ProductType).NotEmpty().WithMessage("The ProductType is required.");
+        RuleFor(x => x.Product.ProductType).IsInEnum().WithMessage("The ProductType is required.");
         RuleFor(x => x.Product.ProductType == ProductType.Clothing || x.Product.ProductType == ProductType.Accessory).NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
         RuleFor(x => x.Product.Categories).NotEmpty().WithMessage("The Category is required.");
         RuleFor(x => x.Product.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
@@ -47,12 +47,13 @@ public class CreateProductCommandHandler(IDocumentSession session, IPublishEndpo
         }
 
         var product = CreateProduct(command.Product);
-        var eventMessage = product.Adapt<ProductCreatedEvent>();
-        eventMessage.ProductType = product.ProductType.ToString();
-        await publishEndpoint.Publish(eventMessage, cancellationToken);
 
         session.Store(product);
         await session.SaveChangesAsync(cancellationToken);
+
+        var eventMessage = product.Adapt<ProductCreatedEvent>();
+        eventMessage.ProductType = product.ProductType.ToString();
+        await publishEndpoint.Publish(eventMessage, cancellationToken);
 
         return new CreateProductResult(product.Id);
     }
