@@ -1,16 +1,15 @@
 ﻿using BuildingBlocks.Enums;
 
-namespace Inventory.API.Stocks.Commands.CreateStock;
+namespace Inventory.API.Stocks.Commands.UpdateStock;
 
-public record CreateStockCommand(StockDto Stock) : ICommand<CreateStockResuslt>;
-public record CreateStockResuslt(Guid Id);
+public record UpdateStockCommand(Stock Stock) : ICommand<UpdateStockResuslt>;
+public record UpdateStockResuslt(bool IsSuccess);
 
-public class CreateStockCommandValidation : AbstractValidator<CreateStockCommand>
+public class UpdateStockCommandValidation : AbstractValidator<UpdateStockCommand>
 {
-    public CreateStockCommandValidation()
+    public UpdateStockCommandValidation()
     {
-        RuleFor(x => x.Stock.ProductId).NotEmpty().WithMessage("ProductId is required.");
-        RuleForEach(x => x.Stock.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.LowStockThreshold).NotEmpty().WithMessage("The LowStockThreshold is required."));
+        RuleFor(x => x.Stock.Id).NotEmpty().WithMessage("Stock Id is required.");
         RuleFor(x => x.Stock.ProductType).NotEmpty().WithMessage("ProductType is required.");
         When(x => x.Stock.ProductType == ProductType.Clothing.ToString(), () =>
         {
@@ -25,22 +24,18 @@ public class CreateStockCommandValidation : AbstractValidator<CreateStockCommand
         });
     }
 }
-public class CreateStockCommandHandler(IDocumentSession session) : ICommandHandler<CreateStockCommand, CreateStockResuslt>
+public class UpdateStockCommandHandler(IDocumentSession session) : ICommandHandler<UpdateStockCommand, UpdateStockResuslt>
 {
-    public async Task<CreateStockResuslt> Handle(CreateStockCommand command, CancellationToken cancellationToken)
+    public async Task<UpdateStockResuslt> Handle(UpdateStockCommand command, CancellationToken cancellationToken)
     {
-        var exists = await session.Query<Stock>()
-            .Where(_ => _.ProductId == command.Stock.ProductId).FirstOrDefaultAsync();
-        if (exists != null)
+
+        var stock = await session.LoadAsync<Stock>(command.Stock.Id, cancellationToken);
+        if (stock == null)
         {
-            throw new StockAlreadyExistsFoundException($"There is already a stock with the same productId {command.Stock.ProductId}");
+            throw new StockNotFoundException($"Stock with the ID {command.Stock.Id} is not found");
         }
 
-        var stock = new Stock
-        {
-            ProductId = command.Stock.ProductId,
-            ProductType = command.Stock.ProductType,
-            ColorVariants = command.Stock.ColorVariants.Select(cv =>
+        stock.ColorVariants = command.Stock.ColorVariants.Select(cv =>
             new ColorVariant
             {
                 Color = cv.Color,
@@ -48,12 +43,12 @@ public class CreateStockCommandHandler(IDocumentSession session) : ICommandHandl
                 LowStockThreshold = cv.LowStockThreshold,
                 Size = cv.Size,
 
-            }).ToList(),
-        };
+            }).ToList();
+
         session.Store(stock);
 
         await session.SaveChangesAsync(cancellationToken);
 
-        return new CreateStockResuslt(stock.Id);
+        return new UpdateStockResuslt(true);
     }
 }

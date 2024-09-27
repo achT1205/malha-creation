@@ -7,18 +7,6 @@ public record ProductCreatedEvent : IntegrationEvent
     public List<ColorItem> ColorVariants { get; set; } = new();
 }
 
-public record ProductUpdatedEvent : IntegrationEvent
-{
-    public Guid Id { get; set; }  // Identifiant unique du produit
-    public List<ColorItem> ColorVariants { get; set; } = new();
-}
-
-
-public record ProductDeletedEvent : IntegrationEvent
-{
-    public Guid Id { get; set; }  // Identifiant unique du produit
-}
-
 public class ColorItem
 {
     public int? Quantity { get; set; }  // Quantité disponible pour cette couleur

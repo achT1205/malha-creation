@@ -14,7 +14,6 @@ public class UpdateProductCommandValidation : AbstractValidator<UpdateProductCom
         RuleFor(x => x.Product.NameEn)
             .Matches(@"^[a-zA-Z0-9 \-]*$")
             .WithMessage("The field must not contain special characters.");
-        RuleFor(x => x.Product.ProductType).NotEmpty().WithMessage("The ProductType is required.");
         RuleFor(x => x.Product.ProductType == ProductType.Clothing || x.Product.ProductType == ProductType.Accessory).NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
         RuleFor(x => x.Product.Categories).NotEmpty().WithMessage("The Category is required.");
         RuleFor(x => x.Product.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
@@ -23,11 +22,11 @@ public class UpdateProductCommandValidation : AbstractValidator<UpdateProductCom
         RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0."));
         When(x => x.Product.ProductType == ProductType.Clothing, () =>
         {
-            RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Sizes).NotNull().WithMessage("The Sizes can not be null."));
+            RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Sizes).NotEmpty().WithMessage("The Sizes can not be null."));
             RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Size).NotEmpty().WithMessage("Size is required for clothing products.")));
-            RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero.")));
-        });
-        When(x => x.Product.ProductType == ProductType.Accessory, () =>
+            RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero.")));  
+        })
+        .Otherwise(() =>
         {
             RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero."));
         });
@@ -60,7 +59,6 @@ public class UpdateProductCommandHandler(IDocumentSession session, IPublishEndpo
         product.Name = command.Product.Name;
         product.NameEn = command.Product.NameEn;
         product.CoverImage = command.Product.CoverImage;
-        product.ProductType = productType;
         product.ForOccasion = command.Product.ForOccasion;
         product.Description = command.Product.Description;
         product.Material = command.Product.Material;
@@ -84,7 +82,7 @@ public class UpdateProductCommandHandler(IDocumentSession session, IPublishEndpo
                 Quantity = s.Quantity
             }).ToList() : null
         }).ToList();
-        
+
         var eventMessage = product.Adapt<ProductUpdatedEvent>();
         await publishEndpoint.Publish(eventMessage, cancellationToken);
 

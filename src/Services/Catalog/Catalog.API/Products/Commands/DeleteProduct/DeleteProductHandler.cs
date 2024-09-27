@@ -2,7 +2,7 @@
 using BuildingBlocks.Messaging.Events;
 
 namespace Catalog.API.Products.Commands.DeleteProduct;
-public record DeleteProductCommand(Guid Id):ICommand<DeleteProductResult>;
+public record DeleteProductCommand(Guid Id) : ICommand<DeleteProductResult>;
 public record DeleteProductResult(bool IsSuccess);
 
 public class DeleteProductCommandValidator : AbstractValidator<DeleteProductCommand>
@@ -22,7 +22,7 @@ public class DeleteProductCommandHandler(IDocumentSession session, IPublishEndpo
             throw new ProductNotFoundException(command.Id);
         }
 
-        var eventMessage = product.Adapt<ProductDeletedEvent>();
+        var eventMessage = new ProductDeletedEvent { ProductId = command.Id };
         await publishEndpoint.Publish(eventMessage, cancellationToken);
 
         session.Delete<Product>(command.Id);

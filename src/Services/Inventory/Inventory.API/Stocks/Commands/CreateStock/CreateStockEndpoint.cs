@@ -1,7 +1,7 @@
 ﻿namespace Inventory.API.Stocks.Commands.CreateStock;
 public record CreateStockRequest(StockDto Stock);
 public record CreateStockResponse(Guid Id);
-public class CreateStockEndpoint : ICarterModule
+public class UpdateStockEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
@@ -16,6 +16,6 @@ public class CreateStockEndpoint : ICarterModule
         .Produces<CreateStockResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Create Stock")
-        .WithDescription("Create a new Stock an existing product based on its type (clothing or accessory).");
+        .WithDescription("Create a new Stock base on an existing product.");
     }
 }

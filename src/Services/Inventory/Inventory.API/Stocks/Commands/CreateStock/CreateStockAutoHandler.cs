@@ -2,12 +2,12 @@
 
 namespace Inventory.API.Stocks.Commands.CreateStock;
 
-public record CreateStockCommand(StockDto Stock) : ICommand<CreateStockResuslt>;
-public record CreateStockResuslt(Guid Id);
+public record CreateStockAutoCommand(StockDto Stock) : ICommand<CreateStockAutoResuslt>;
+public record CreateStockAutoResuslt(Guid Id);
 
-public class CreateStockCommandValidation : AbstractValidator<CreateStockCommand>
+public class CreateStockAutoCommandValidation : AbstractValidator<CreateStockAutoCommand>
 {
-    public CreateStockCommandValidation()
+    public CreateStockAutoCommandValidation()
     {
         RuleFor(x => x.Stock.ProductId).NotEmpty().WithMessage("ProductId is required.");
         RuleForEach(x => x.Stock.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.LowStockThreshold).NotEmpty().WithMessage("The LowStockThreshold is required."));
@@ -25,17 +25,10 @@ public class CreateStockCommandValidation : AbstractValidator<CreateStockCommand
         });
     }
 }
-public class CreateStockCommandHandler(IDocumentSession session) : ICommandHandler<CreateStockCommand, CreateStockResuslt>
+public class CreateStockAutoCommandHandler(IDocumentSession session) : ICommandHandler<CreateStockAutoCommand, CreateStockAutoResuslt>
 {
-    public async Task<CreateStockResuslt> Handle(CreateStockCommand command, CancellationToken cancellationToken)
+    public async Task<CreateStockAutoResuslt> Handle(CreateStockAutoCommand command, CancellationToken cancellationToken)
     {
-        var exists = await session.Query<Stock>()
-            .Where(_ => _.ProductId == command.Stock.ProductId).FirstOrDefaultAsync();
-        if (exists != null)
-        {
-            throw new StockAlreadyExistsFoundException($"There is already a stock with the same productId {command.Stock.ProductId}");
-        }
-
         var stock = new Stock
         {
             ProductId = command.Stock.ProductId,
@@ -54,6 +47,6 @@ public class CreateStockCommandHandler(IDocumentSession session) : ICommandHandl
 
         await session.SaveChangesAsync(cancellationToken);
 
-        return new CreateStockResuslt(stock.Id);
+        return new CreateStockAutoResuslt(stock.Id);
     }
 }

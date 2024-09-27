@@ -5,6 +5,7 @@ public class Stock
     public Guid ProductId { get; set; }  // Clé étrangère vers la table des produits
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;// Date d'ajout de l'entrée de stock
     public DateTime UpdatedAt { get; set; }  // Date de dernière mise à jour
+    public string ProductType { get; set; } = default!;// Type de produit (Clothing, Accessory)
     public List<ColorVariant> ColorVariants { get; set; } = new();  // Redéfinit les variantes pour avoir des prix directs
 
 }

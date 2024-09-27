@@ -1,12 +1,12 @@
 ﻿using BuildingBlocks.Messaging.Events;
-using Inventory.API.Stocks.Commands.CreateStock;
+using Inventory.API.Stocks.Commands.UpdateStock;
 using MassTransit;
 
 namespace Inventory.API.Stocks.EventHandlers.Integration;
-public class ProductCreatedEventHandler(ISender sender, ILogger<ProductCreatedEventHandler> logger)
-    : IConsumer<ProductCreatedEvent>
+public class ProductUpdatedEventHandler(ISender sender, ILogger<ProductUpdatedEventHandler> logger)
+    : IConsumer<ProductUpdatedEvent>
 {
-    public async Task Consume(ConsumeContext<ProductCreatedEvent> context)
+    public async Task Consume(ConsumeContext<ProductUpdatedEvent> context)
     {
 
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
@@ -18,13 +18,13 @@ public class ProductCreatedEventHandler(ISender sender, ILogger<ProductCreatedEv
         }
         catch (Exception ex)
         {
-            throw new ProductCreatedEventHandlerException(ex.Message);
+            throw new ProductUpdatedEventHandlerException(ex.Message);
         }
     }
 
-    private CreateStockAutoCommand MapToCreateProductCommand(ProductCreatedEvent message)
+    private UpdateStockAutoCommand MapToCreateProductCommand(ProductUpdatedEvent message)
     {
-        var stock = new StockDto
+        var stock = new Stock
         {
             ProductId = message.Id,
             ProductType = message.ProductType,
@@ -57,6 +57,6 @@ public class ProductCreatedEventHandler(ISender sender, ILogger<ProductCreatedEv
                 Quantity = cv.Quantity.Value,
             }).ToList();
         }
-        return new CreateStockAutoCommand(stock);
+        return new UpdateStockAutoCommand(stock);
     }
 }
