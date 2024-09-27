@@ -7,7 +7,7 @@ public class GetStocksQueryHandler(IDocumentSession session) : IQueryHandler<Get
     public async  Task<GetStocksResult>  Handle(GetStocksQuery query, CancellationToken cancellationToken)
     {
         var stocks = await session.Query<Stock>().ToListAsync(cancellationToken);
-
         return new GetStocksResult(stocks);
+
     }
 }
