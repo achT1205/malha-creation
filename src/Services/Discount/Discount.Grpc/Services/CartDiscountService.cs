@@ -14,8 +14,8 @@ public class CartDiscountService(DiscountContext dbContext, ILogger<CartDiscount
     {
         var coupon = await dbContext.CartCoupons.FirstOrDefaultAsync(_ => _.CouponCode == request.CouponCode);
         if (coupon == null)
-            coupon = new CartCoupon { CouponCode = "No Discount", discountRate = 0, Description = "" };
-        logger.LogInformation("Cart Discount is retrieved : {code}, rate : {amount}", coupon.CouponCode, coupon.discountRate);
+            coupon = new CartCoupon { CouponCode = "No Discount", DiscountRate = 0, Description = "" };
+        logger.LogInformation("Cart Discount is retrieved : {code}, rate : {amount}", coupon.CouponCode, coupon.DiscountRate);
         var couponModel = coupon.Adapt<CartCouponModel>();
         return couponModel;
     }

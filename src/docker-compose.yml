@@ -5,6 +5,12 @@ services:
   mc-stockdb:
     image: postgres
 
+  mc-cartdb:
+    image: postgres
+
+  mc-distributedcache:
+    image: redis
+
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
     build:
@@ -26,7 +32,15 @@ services:
       context: .
       dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
+  cart.api:
+    image: ${DOCKER_REGISTRY-}cartapi
+    build:
+      context: .
+      dockerfile: Services/Cart/Cart.API/Dockerfile
+
 volumes:
   postgres-mccatalog:
-  postgres-mcstock:  
+  postgres-mcstock: 
+  postgres-mccart: 
+
 

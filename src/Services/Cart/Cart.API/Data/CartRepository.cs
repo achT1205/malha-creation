@@ -5,6 +5,11 @@ public class CartRepository(IDocumentSession session) : ICartRepository
 {
     public async Task<bool> DeleteCart(Guid userId, CancellationToken cancellationToken = default)
     {
+        var cart = await session.LoadAsync<ShoppingCart>(userId, cancellationToken);
+        if (cart == null)
+        {
+            throw new CartNotFoundException(userId.ToString());
+        }
         session.Delete<ShoppingCart>(userId);
         await session.SaveChangesAsync();
         return true;

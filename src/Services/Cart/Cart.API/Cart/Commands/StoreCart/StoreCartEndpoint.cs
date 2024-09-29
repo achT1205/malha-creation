@@ -11,7 +11,7 @@ public class StoreCartEndpoint : ICarterModule
             var result = await sender.Send(command);
 
             var response = result.Adapt<StoreCartResponse>();
-            return Results.Created($"/cartss/{response.UserId}", response);
+            return Results.Created($"/carts/{response.UserId}", response);
         })
          .WithName("StoreCart")
          .Produces<StoreCartResponse>(StatusCodes.Status201Created)

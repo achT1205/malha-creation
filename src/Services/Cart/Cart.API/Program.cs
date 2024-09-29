@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using BuildingBlocks.Messaging.MassTransit;
 using BuildingBlocks.Behaviors;
 using BuildingBlocks.Exceptions.Handler;
+using Discount.Grpc;
+using CartDiscount.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,25 +30,40 @@ builder.Services.AddMarten((options) =>
 }).UseLightweightSessions();
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
-//builder.Services.Decorate<ICartRepository, CachedCartRepository>();
+builder.Services.Decorate<ICartRepository, CachedCartRepository>();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
 });
 //Grpc Services
-//builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
-//{
-//    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
-//})
-//.ConfigurePrimaryHttpMessageHandler(() =>
-//{
-//    var handler = new HttpClientHandler
-//    {
-//        ServerCertificateCustomValidationCallback =
-//       HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-//    };
-//    return handler;
-//});
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
+{
+    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+})
+.ConfigurePrimaryHttpMessageHandler(() =>
+{
+    var handler = new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback =
+       HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    };
+    return handler;
+});
+
+builder.Services.AddGrpcClient<CartDiscountProtoService.CartDiscountProtoServiceClient>(options =>
+{
+    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+})
+.ConfigurePrimaryHttpMessageHandler(() =>
+{
+    var handler = new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback =
+       HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    };
+    return handler;
+});
+
 
 //Async Communication Services
 builder.Services.AddMessageBroker(builder.Configuration);
