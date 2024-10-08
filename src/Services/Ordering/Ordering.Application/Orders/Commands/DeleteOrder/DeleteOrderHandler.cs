@@ -5,13 +5,9 @@ public class DeleteOrderCommandHandler(IApplicationDbContext dbContext)
 {
     public async Task<DeleteOrderResult> Handle(DeleteOrderCommand command, CancellationToken cancellationToken)
     {
-        //Delete Order entity from command object
-        //save to database
-        //return result
 
-        var orderId = OrderId.Of(command.OrderId);
         var order = await dbContext.Orders
-            .FindAsync([orderId], cancellationToken: cancellationToken);
+             .SingleOrDefaultAsync(o => o.Id.Value == command.OrderId, cancellationToken);
 
         if (order is null)
         {
@@ -19,7 +15,9 @@ public class DeleteOrderCommandHandler(IApplicationDbContext dbContext)
         }
 
         dbContext.Orders.Remove(order);
+
         await dbContext.SaveChangesAsync(cancellationToken);
+
 
         return new DeleteOrderResult(true);
     }

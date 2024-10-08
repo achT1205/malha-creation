@@ -41,6 +41,19 @@ services:
     ports:
       - "6379:6379"
 
+  mc-orderdb:
+    container_name: mc-orderdb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=MCOrderDb
+    restart: always
+    ports:
+        - "5435:5432"
+    volumes:
+      - postgres-mcorder:/var/lib/postgresql/data/
+
+
   messagebroker:
     container_name: messagebroker
     hostname: ecommerce-mq

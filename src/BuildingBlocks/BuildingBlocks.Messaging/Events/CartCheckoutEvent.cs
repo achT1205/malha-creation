@@ -1,9 +1,11 @@
-﻿namespace BuildingBlocks.Messaging.Events;
+﻿using BuildingBlocks.Messaging.Models;
+
+namespace BuildingBlocks.Messaging.Events;
 
 public record CartCheckoutEvent : IntegrationEvent
 {
     public Guid UserId { get; set; } = default!;
-    public decimal TotalPrice { get; set; } = default!;
+    public Basket Cart { get; set; } = default!;
 
     // Shipping and BillingAddress
     public string FirstName { get; set; } = default!;

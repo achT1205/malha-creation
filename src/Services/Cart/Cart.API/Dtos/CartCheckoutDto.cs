@@ -3,7 +3,6 @@
 public class CartCheckoutDto
 {
     public Guid UserId { get; set; } = default!;
-    public decimal TotalPrice { get; set; } = default!;
 
     // Shipping and BillingAddress
     public string FirstName { get; set; } = default!;

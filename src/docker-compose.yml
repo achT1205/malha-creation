@@ -11,6 +11,9 @@ services:
   mc-distributedcache:
     image: redis
 
+  mc-orderdb:
+    image: postgres
+
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
     build:
@@ -42,5 +45,4 @@ volumes:
   postgres-mccatalog:
   postgres-mcstock: 
   postgres-mccart: 
-
-
+  postgres-mcorder: 

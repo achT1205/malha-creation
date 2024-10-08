@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Messaging.Events;
+using BuildingBlocks.Messaging.Models;
 using MassTransit;
 
 namespace Cart.API.Cart.Commands.CheckoutCart;
@@ -30,7 +31,7 @@ public class CheckoutCartCommandHandler
         }
 
         var eventMessage = command.CartCheckoutDto.Adapt<CartCheckoutEvent>();
-        eventMessage.TotalPrice = Cart.TotalPrice;
+        eventMessage.Cart = Cart.Adapt<Basket>();
 
         await publishEndpoint.Publish(eventMessage, cancellationToken);
 
