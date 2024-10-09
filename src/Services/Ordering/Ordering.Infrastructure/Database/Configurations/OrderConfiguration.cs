@@ -16,6 +16,16 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
                         orderId => orderId.Value,
                         dbId => OrderId.Of(dbId));
 
+        builder.Property(e => e.OrderCode)
+              .HasConversion(
+                  v => v.Value,
+                  v => OrderCode.Of(v));
+
+        builder.Property(e => e.CustomerId)
+              .HasConversion(
+                  v => v.Value,
+                  v => CustomerId.Of(v));
+
         builder.HasMany(o => o.OrderItems)
         .WithOne()
         .HasForeignKey(oi => oi.OrderId);

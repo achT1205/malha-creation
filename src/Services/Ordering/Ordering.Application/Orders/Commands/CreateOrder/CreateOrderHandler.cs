@@ -9,10 +9,16 @@ public class CreateOrderCommandHandler(IApplicationDbContext _context)
     {
         var order = CreateNewOrder(command);
 
-        _context.Orders.Add(order);
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync(cancellationToken);
 
-        return new CreateOrderResult(order.Id.Value);
+            return new CreateOrderResult(order.Id.Value);
+        }
+        catch (Exception ex) {
+            throw;
+        }
     }
 
     private Order CreateNewOrder(CreateOrderCommand orderDto)

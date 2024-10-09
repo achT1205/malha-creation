@@ -1,0 +1,1 @@
+Add-Migration Create_Database -OutputDir Database/Migrations -Project Ordering.Infrastructure -StartupProject Ordering.API

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using Ordering.Domain.Abstractions;
 using Ordering.Domain.ValueObjects;
-using Ordering.Domain.Orders.Models;
 
 namespace Ordering.Infrastructure.Database.Configurations;
 
@@ -15,6 +14,16 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
                                    orderItemId => orderItemId.Value,
                                    dbId => OrderItemId.Of(dbId));
 
+        builder.Property(e => e.OrderId)
+              .HasConversion(
+                  v => v.Value,
+                  v => OrderId.Of(v));
+
+        builder.Property(e => e.ProductId)
+            .HasConversion(
+              v => v.Value,
+              v => ProductId.Of(v));
+
         builder.Property(oi => oi.Quantity).IsRequired();
 
         builder.Property(oi => oi.Price).IsRequired();
@@ -22,5 +31,8 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
         builder.Property(oi => oi.Slug).IsRequired();
         builder.Property(oi => oi.Color);
         builder.Property(oi => oi.Size);
+
+
+
     }
 }
