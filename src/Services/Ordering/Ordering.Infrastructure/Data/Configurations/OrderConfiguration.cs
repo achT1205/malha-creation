@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
 using Ordering.Domain.ValueObjects;
-using Ordering.Domain.Orders.Models;
 using Ordering.Domain.Orders.Enums;
 
-namespace Ordering.Infrastructure.Database.Configurations;
+namespace Ordering.Infrastructure.Data.Configurations;
 
 internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
@@ -16,15 +14,21 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
                         orderId => orderId.Value,
                         dbId => OrderId.Of(dbId));
 
-        builder.Property(e => e.OrderCode)
-              .HasConversion(
-                  v => v.Value,
-                  v => OrderCode.Of(v));
+        builder.ComplexProperty(
+            o => o.OrderCode, nameBuilder =>
+            {
+                nameBuilder.Property(n => n.Value)
+                    .HasColumnName(nameof(Order.OrderCode))
+                    .IsRequired();
+            });
 
-        builder.Property(e => e.CustomerId)
-              .HasConversion(
-                  v => v.Value,
-                  v => CustomerId.Of(v));
+        builder.ComplexProperty(
+            o => o.CustomerId, nameBuilder =>
+            {
+                nameBuilder.Property(n => n.Value)
+                    .HasColumnName(nameof(Order.CustomerId))
+                    .IsRequired();
+            });
 
         builder.HasMany(o => o.OrderItems)
         .WithOne()
@@ -108,12 +112,15 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
                });
 
         builder.Property(o => o.Status)
-            .HasDefaultValue(OrderStatus.Draft)
-            .HasConversion(
-                s => s.ToString(),
-                dbStatus => (OrderStatus)Enum.Parse(typeof(OrderStatus), dbStatus));
+            .HasDefaultValue(OrderStatus.Draft) // Default value
+            .HasConversion(s => s.ToString(), // Converts enum to string before storing in the DB
+                dbStatus => (OrderStatus)Enum.Parse(typeof(OrderStatus), dbStatus)) // Converts string back to enum when reading from DB
+            .IsRequired(); // Ensure it's required
 
-        builder.Property(o => o.TotalPrice);
+
+        builder.Property(o => o.TotalPrice)
+            .HasPrecision(18, 2)
+            .IsRequired();
 
     }
 }

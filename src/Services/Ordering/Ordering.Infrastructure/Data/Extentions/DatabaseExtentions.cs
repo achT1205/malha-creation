@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 
-namespace Ordering.Infrastructure.Database.Extentions;
+namespace Ordering.Infrastructure.Data.Extentions;
 
 public static class DatabaseExtentions
 {

@@ -30,7 +30,8 @@ public class BasketCheckoutEventHandler
                  cartItem.ProductId,
                  cartItem.Quantity,
                  cartItem.Color,
-                 cartItem.Size
+                 cartItem.Size,
+                 null
         )).ToList();
 
 

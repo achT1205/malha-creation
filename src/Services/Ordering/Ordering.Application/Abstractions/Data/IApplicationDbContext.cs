@@ -1,11 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-namespace Ordering.Application.Abstractions.Data;
-
-
-public interface IApplicationDbContext
+﻿namespace Ordering.Application.Abstractions.Data
 {
-    DbSet<Order> Orders { get; }
-    DbSet<OrderItem> OrderItems { get; }
+    public interface IApplicationDbContext
+    {
+        DbSet<Order> Orders { get; }
+        DbSet<OrderItem> OrderItems { get; }
 
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    }
 }

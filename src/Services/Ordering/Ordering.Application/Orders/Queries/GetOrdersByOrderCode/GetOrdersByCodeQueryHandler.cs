@@ -11,6 +11,6 @@ public class GetOrdersByCodeQueryHandler(IApplicationDbContext dbContext)
                 .OrderBy(o => o.OrderCode.Value)
                 .ToListAsync(cancellationToken);
 
-        return new GetOrdersByOrderCodeResult(orders);
+        return new GetOrdersByOrderCodeResult(orders.ToOrderDtoList());
     }
 }

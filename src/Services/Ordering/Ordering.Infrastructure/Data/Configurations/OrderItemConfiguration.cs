@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Ordering.Domain.Abstractions;
 using Ordering.Domain.ValueObjects;
 
-namespace Ordering.Infrastructure.Database.Configurations;
+namespace Ordering.Infrastructure.Data.Configurations;
 
 public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 {
@@ -26,7 +25,9 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 
         builder.Property(oi => oi.Quantity).IsRequired();
 
-        builder.Property(oi => oi.Price).IsRequired();
+        builder.Property(oi => oi.Price)
+            .HasPrecision(18, 2)
+            .IsRequired();
         builder.Property(oi => oi.ProductName).IsRequired();
         builder.Property(oi => oi.Slug).IsRequired();
         builder.Property(oi => oi.Color);

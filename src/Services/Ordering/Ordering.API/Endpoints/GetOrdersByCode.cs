@@ -1,9 +1,8 @@
 ﻿using Ordering.Application.Orders.Queries.GetOrdersByOrderCode;
-using Ordering.Domain.Orders.Models;
 
 namespace Ordering.API.Endpoints;
 
-public record GetOrdersByNameResponse(IEnumerable<Order> Orders);
+public record GetOrdersByNameResponse(IEnumerable<OrderDto> Orders);
 
 public class GetOrdersByName : ICarterModule
 {

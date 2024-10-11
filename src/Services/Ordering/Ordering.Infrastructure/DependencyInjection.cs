@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Ordering.Infrastructure.Database;
+using Ordering.Infrastructure.Data;
+using Ordering.Infrastructure.Interceptors;
 
 namespace Ordering.Infrastructure;
 
@@ -10,9 +10,19 @@ public static class DependencyInjection
     this IServiceCollection services,
     IConfiguration configuration) =>
     services
+        .AddServices()
         .AddDatabase(configuration)
         .AddHealthChecks(configuration);
 
+
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        // Add services to the container.
+        //services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+
+        return services;
+    }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
@@ -21,9 +31,7 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseNpgsql(connectionString, npgsqlOptions =>
-                    npgsqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Default))
-                .UseSnakeCaseNamingConvention();
+            options.UseSqlServer(connectionString);
         });
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
@@ -36,7 +44,7 @@ public static class DependencyInjection
     {
         services
             .AddHealthChecks()
-            .AddNpgSql(configuration.GetConnectionString("Database")!);
+            .AddSqlServer(configuration.GetConnectionString("Database")!);
 
         return services;
     }

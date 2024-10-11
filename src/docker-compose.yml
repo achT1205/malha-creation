@@ -12,7 +12,7 @@ services:
     image: redis
 
   mc-orderdb:
-    image: postgres
+    image: mcr.microsoft.com/azure-sql-edge:latest
 
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi

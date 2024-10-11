@@ -12,17 +12,17 @@ public class GetOrdersQueryHandler(IApplicationDbContext dbContext)
 
         var orders = await dbContext.Orders
                        .Include(o => o.OrderItems)
-                       .OrderBy(o => o.OrderCode.Value)
+                       .OrderBy(o => o.CreatedAt)
                        .Skip(pageSize * pageIndex)
                        .Take(pageSize)
                        .ToListAsync(cancellationToken);
 
 
         return new GetOrdersResult(
-            new PaginatedResult<Order>(
+            new PaginatedResult<OrderDto>(
                 pageIndex,
                 pageSize,
                 totalCount,
-                orders));
+                orders.ToOrderDtoList()));
     }
 }

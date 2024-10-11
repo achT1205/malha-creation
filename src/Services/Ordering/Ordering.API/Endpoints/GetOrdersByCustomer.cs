@@ -1,8 +1,7 @@
 ﻿using Ordering.Application.Orders.Queries.GetOrdersByCustomer;
-using Ordering.Domain.Orders.Models;
 
 namespace Ordering.API.Endpoints;
-public record GetOrdersByCustomerResponse(IEnumerable<Order> Orders);
+public record GetOrdersByCustomerResponse(IEnumerable<OrderDto> Orders);
 public class GetOrdersByCustomer : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

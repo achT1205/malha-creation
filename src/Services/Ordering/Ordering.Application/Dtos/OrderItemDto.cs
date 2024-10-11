@@ -1,3 +1,3 @@
 ﻿namespace Ordering.Application.Dtos;
 
-public record OrderItemDto(Guid ProductId, int Quantity, string Color, string Size);
+public record OrderItemDto(Guid ProductId, int Quantity, string Color, string Size, decimal? Price);
