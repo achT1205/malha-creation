@@ -7,7 +7,7 @@ public class DeleteOrderCommandHandler(IApplicationDbContext dbContext)
     {
 
         var order = await dbContext.Orders
-             .SingleOrDefaultAsync(o => o.Id.Value == command.OrderId, cancellationToken);
+             .SingleOrDefaultAsync(o => o.Id == OrderId.Of(command.OrderId), cancellationToken);
 
         if (order is null)
         {

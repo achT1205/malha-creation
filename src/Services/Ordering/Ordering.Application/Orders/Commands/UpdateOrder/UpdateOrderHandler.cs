@@ -1,4 +1,6 @@
 ﻿
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
 namespace Ordering.Application.Orders.Commands.UpdateOrder;
 
 public class UpdateOrderCommandHandler(IApplicationDbContext dbContext)
@@ -7,11 +9,11 @@ public class UpdateOrderCommandHandler(IApplicationDbContext dbContext)
     public async Task<UpdateOrderResult> Handle(UpdateOrderCommand command, CancellationToken cancellationToken)
     {
         var order = await dbContext.Orders
-            .SingleOrDefaultAsync(t => t.Id.Value == command.OrderId, cancellationToken);
+            .SingleOrDefaultAsync(t => t.Id == OrderId.Of(command.Id) , cancellationToken);
 
         if (order is null)
         {
-            throw new OrderNotFoundException(command.OrderId);
+            throw new OrderNotFoundException(command.Id);
         }
 
         UpdateOrderWithNewValues(order, command);
