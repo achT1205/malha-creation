@@ -1,6 +1,10 @@
 ﻿namespace Cart.API.Cart.Commands.StoreCart;
-public record StoreCartRequest(ShoppingCart Cart);
-public record StoreCartResponse(Guid UserId);
+public record StoreCartRequest
+{
+    public Guid UserId { get; set; } = default!;
+    public List<CartItem> Items { get; set; } = new();
+};
+public record StoreCartResponse(ShoppingCart ShoppingCart);
 public class StoreCartEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -11,7 +15,7 @@ public class StoreCartEndpoint : ICarterModule
             var result = await sender.Send(command);
 
             var response = result.Adapt<StoreCartResponse>();
-            return Results.Created($"/carts/{response.UserId}", response);
+            return Results.Created($"/carts/{request.UserId}", response);
         })
          .WithName("StoreCart")
          .Produces<StoreCartResponse>(StatusCodes.Status201Created)

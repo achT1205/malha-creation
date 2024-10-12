@@ -6,6 +6,10 @@ using BuildingBlocks.Behaviors;
 using BuildingBlocks.Exceptions.Handler;
 using Discount.Grpc;
 using CartDiscount.Grpc;
+using Microsoft.Extensions.Configuration;
+using Cart.API.Configs;
+using Cart.API.Services.Interfaces;
+using Cart.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +67,15 @@ builder.Services.AddGrpcClient<CartDiscountProtoService.CartDiscountProtoService
     };
     return handler;
 });
+
+// Bind the ExternalApiSettings from appsettings.json
+builder.Services.Configure<ExternalApiSettings>(builder.Configuration.GetSection("ExternalApiSettings"));
+
+// Register HttpClient
+builder.Services.AddHttpClient();
+
+// Register the external API service
+builder.Services.AddScoped<IProductService, ProductService>();
 
 
 //Async Communication Services

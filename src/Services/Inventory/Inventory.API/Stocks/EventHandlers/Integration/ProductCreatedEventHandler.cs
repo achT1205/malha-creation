@@ -57,6 +57,11 @@ public class ProductCreatedEventHandler(ISender sender, ILogger<ProductCreatedEv
                 Quantity = cv.Quantity.Value,
             }).ToList();
         }
-        return new CreateStockAutoCommand(stock);
+        return new CreateStockAutoCommand
+        {
+            ProductId = stock.ProductId,
+            ProductType = stock.ProductType,
+            ColorVariants = stock.ColorVariants
+        };
     }
 }

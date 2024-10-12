@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Options;
-using Ordering.Application.Abstractions.Models;
-using Ordering.Application.Abstractions.Services;
-using Ordering.Infrastructure.Configs;
+﻿using Cart.API.Configs;
+using Cart.API.Services.ApiResponses;
+using Cart.API.Services.Interfaces;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
-namespace Ordering.Infrastructure.Services;
+namespace Cart.API.Services;
+
 
 public class ProductService : IProductService
 {

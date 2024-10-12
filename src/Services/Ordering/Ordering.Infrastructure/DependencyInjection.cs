@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using Ordering.Application.Abstractions.Services;
+using Ordering.Infrastructure.Configs;
 using Ordering.Infrastructure.Data;
 using Ordering.Infrastructure.Interceptors;
+using Ordering.Infrastructure.Services;
 
 namespace Ordering.Infrastructure;
 
@@ -10,16 +13,25 @@ public static class DependencyInjection
     this IServiceCollection services,
     IConfiguration configuration) =>
     services
-        .AddServices()
+        .AddServices(configuration)
         .AddDatabase(configuration)
         .AddHealthChecks(configuration);
 
 
-    private static IServiceCollection AddServices(this IServiceCollection services)
+    private static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Add services to the container.
         //services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+
+        // Bind the ExternalApiSettings from appsettings.json
+        services.Configure<ExternalApiSettings>(configuration.GetSection("ExternalApiSettings"));
+
+        // Register HttpClient
+        services.AddHttpClient();
+
+        // Register the external API service
+        services.AddScoped<IProductService, ProductService>();
 
         return services;
     }

@@ -57,6 +57,10 @@ public class ProductUpdatedEventHandler(ISender sender, ILogger<ProductUpdatedEv
                 Quantity = cv.Quantity.Value,
             }).ToList();
         }
-        return new UpdateStockAutoCommand(stock);
+        return new UpdateStockAutoCommand { 
+            ProductId = stock.ProductId, 
+            ProductType = stock.ProductType, 
+            ColorVariants = stock.ColorVariants 
+        };
     }
 }

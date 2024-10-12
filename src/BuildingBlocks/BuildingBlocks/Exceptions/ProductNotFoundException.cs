@@ -1,6 +1,6 @@
-﻿namespace Catalog.API.Exceptions;
-[Serializable]
-internal class ProductNotFoundException : NotFoundException
+﻿namespace BuildingBlocks.Exceptions;
+
+public class ProductNotFoundException : NotFoundException
 {
 
     public ProductNotFoundException(Guid Id) : base("Product", Id)

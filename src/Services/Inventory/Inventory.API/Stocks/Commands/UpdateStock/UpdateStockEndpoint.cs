@@ -1,5 +1,11 @@
 ﻿namespace Inventory.API.Stocks.Commands.UpdateStock;
-public record UpdateStockRequest(Stock Stock);
+public record UpdateStockRequest
+{
+    public Guid Id { get; set; } = Guid.NewGuid();  // Identifiant unique pour l'entrée de stock
+    public string ProductType { get; set; } = default!;// Type de produit (Clothing, Accessory)
+    public List<ColorVariant> ColorVariants { get; set; } = new();  // Redéfinit les variantes pour avoir des prix directs
+
+}
 public record UpdateStockResponse(bool IsSuccess);
 public class UpdateStockEndpoint : ICarterModule
 {

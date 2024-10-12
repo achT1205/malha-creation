@@ -24,7 +24,7 @@ public class ApplyCartDiscountCommandHandler(
 
         var price = cart.TotalPrice - (cart.TotalPrice * coupon.DiscountRate) / 100;
 
-        cart.SetTotalPrice(price);
+        //cart.SetTotalPrice(price);
 
         await repository.StoreCart(cart, cancellationToken);
 

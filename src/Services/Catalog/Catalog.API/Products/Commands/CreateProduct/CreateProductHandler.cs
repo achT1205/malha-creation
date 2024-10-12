@@ -2,34 +2,51 @@
 using Catalog.API.Helpers;
 
 namespace Catalog.API.Products.Commands.CreateProduct;
-public record CreateProductCommand(Product Product)
-    : ICommand<CreateProductResult>;
+public record CreateProductCommand
+    : ICommand<CreateProductResult>
+{
+    public Guid Id { get; set; }  // Identifiant unique du produit
+    public string Name { get; set; } = default!; // Nom du produit
+    public string NameEn { get; set; } = default!; // Nom du produit
+    public string CoverImage { get; set; } = default!; // Image de couverture
+    public ProductType ProductType { get; set; } // Type de produit (Clothing, Accessory)
+    public string ForOccasion { get; set; } = default!; // Occasion (e.g., casual, formal)
+    public string Description { get; set; } = default!; // Description détaillée
+    public string Material { get; set; } = default!; // Matériau (e.g., coton, cuir, métal)
+    public bool IsHandmade { get; set; }  // Indique si le produit est fait main
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;// Date de création
+    public DateTime UpdatedAt { get; set; }  // Date de mise à jour
+    public string Collection { get; set; } = default!; // Collection associée
+    public List<string> Categories { get; set; } = new(); // Liste des catégories
+    public List<ColorVariant> ColorVariants { get; set; } = new();  // Redéfinit les variantes pour avoir des prix directs
+
+};
 public record CreateProductResult(Guid Id);
 public class CreateProductCommandValidation : AbstractValidator<CreateProductCommand>
 {
     public CreateProductCommandValidation()
     {
-        RuleFor(x => x.Product.Name).NotEmpty().WithMessage("Name is required.");
-        RuleFor(x => x.Product.NameEn).NotEmpty().WithMessage("NameEn is required.");
-        RuleFor(x => x.Product.NameEn)
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+        RuleFor(x => x.NameEn).NotEmpty().WithMessage("NameEn is required.");
+        RuleFor(x => x.NameEn)
             .Matches(@"^[a-zA-Z0-9 \-]*$")
             .WithMessage("The field must not contain special characters.");
-        RuleFor(x => x.Product.ProductType).IsInEnum().WithMessage("The ProductType is required.");
-        RuleFor(x => x.Product.ProductType == ProductType.Clothing || x.Product.ProductType == ProductType.Accessory).NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
-        RuleFor(x => x.Product.Categories).NotEmpty().WithMessage("The Category is required.");
-        RuleFor(x => x.Product.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
-        RuleFor(x => x.Product.ColorVariants.Count()).GreaterThan(0).WithMessage("ColorVariants is required.");
-        RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
-        RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0."));
-        When(x => x.Product.ProductType == ProductType.Clothing, () =>
+        RuleFor(x => x.ProductType).IsInEnum().WithMessage("The ProductType is required.");
+        RuleFor(x => x.ProductType == ProductType.Clothing || x.ProductType == ProductType.Accessory).NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
+        RuleFor(x => x.Categories).NotEmpty().WithMessage("The Category is required.");
+        RuleFor(x => x.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
+        RuleFor(x => x.ColorVariants.Count()).GreaterThan(0).WithMessage("ColorVariants is required.");
+        RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
+        RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0."));
+        When(x => x.ProductType == ProductType.Clothing, () =>
         {
-            RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Sizes).NotNull().WithMessage("The Sizes can not be null."));
-            RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Size).NotEmpty().WithMessage("Size is required for clothing products.")));
-            RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero.")));
+            RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Sizes).NotNull().WithMessage("The Sizes can not be null."));
+            RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Size).NotEmpty().WithMessage("Size is required for clothing products.")));
+            RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleForEach(x => x.Sizes).ChildRules(size => size.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero.")));
         });
-        When(x => x.Product.ProductType == ProductType.Accessory, () =>
+        When(x => x.ProductType == ProductType.Accessory, () =>
         {
-            RuleForEach(x => x.Product.ColorVariants).ChildRules(color => color.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero."));
+            RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero."));
         });
     }
 }
@@ -39,14 +56,14 @@ public class CreateProductCommandHandler(IDocumentSession session, IPublishEndpo
     public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
         var products = await session.Query<Product>()
-            .Where(_ => _.NameEn == command.Product.NameEn
-            || _.Name == command.Product.Name).ToListAsync();
+            .Where(_ => _.NameEn == command.NameEn
+            || _.Name == command.Name).ToListAsync();
         if (products.Any())
         {
             throw new ProductAlreadyExistsFoundException("A product with the same name already exists.");
         }
 
-        var product = CreateProduct(command.Product);
+        var product = CreateProduct(command);
 
         session.Store(product);
         await session.SaveChangesAsync(cancellationToken);
@@ -58,7 +75,7 @@ public class CreateProductCommandHandler(IDocumentSession session, IPublishEndpo
         return new CreateProductResult(product.Id);
     }
 
-    private Product CreateProduct(Product product)
+    private Product CreateProduct(CreateProductCommand product)
     {
         var productType = product.ProductType;
         return new Product

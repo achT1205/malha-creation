@@ -1,5 +1,8 @@
 using Weasel.Core;
 using BuildingBlocks.Messaging.MassTransit;
+using Catalog.API.Services.Interfaces;
+using Catalog.API.Services;
+using Catalog.API.Configs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +35,15 @@ builder.Services.AddMessageBroker(builder.Configuration);
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(builder.Configuration.GetConnectionString("Database")!);
+
+// Bind the ExternalApiSettings from appsettings.json
+builder.Services.Configure<ExternalApiSettings>(builder.Configuration.GetSection("ExternalApiSettings"));
+
+// Register HttpClient
+builder.Services.AddHttpClient();
+
+// Register the external API service
+builder.Services.AddScoped<ISctockApiService, SctockApiService>();
 
 var app = builder.Build();
 

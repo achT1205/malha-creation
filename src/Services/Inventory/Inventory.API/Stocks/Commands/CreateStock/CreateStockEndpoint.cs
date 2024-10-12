@@ -1,5 +1,10 @@
 ﻿namespace Inventory.API.Stocks.Commands.CreateStock;
-public record CreateStockRequest(StockDto Stock);
+public record CreateStockRequest
+{
+    public Guid ProductId { get; set; }  // Clé étrangère vers la table des produits
+    public string ProductType { get; set; } = default!;// Type de produit (Clothing, Accessory)
+    public List<ColorVariant> ColorVariants { get; set; } = new();  // Redéfinit les variantes pour avoir des prix directs
+}
 public record CreateStockResponse(Guid Id);
 public class UpdateStockEndpoint : ICarterModule
 {
