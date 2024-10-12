@@ -1,7 +1,7 @@
 ﻿namespace Ordering.Application.Orders.Commands.CreateOrder;
-public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
+public class AutoCreateOrderCommandValidator : AbstractValidator<AutoCreateOrderCommand>
 {
-    public CreateOrderCommandValidator()
+    public AutoCreateOrderCommandValidator()
     {
         RuleFor(x => x.CustomerId).NotNull().WithMessage("CustomerId is required");
         RuleFor(x => x.OrderItems).NotEmpty().WithMessage("OrderItems should not be empty");

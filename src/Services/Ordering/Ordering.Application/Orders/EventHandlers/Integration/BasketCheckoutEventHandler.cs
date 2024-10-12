@@ -1,9 +1,5 @@
 ﻿using BuildingBlocks.Messaging.Events;
 using Ordering.Application.Orders.Commands.CreateOrder;
-using Ordering.Application.Orders.Helpers;
-using Ordering.Domain.Orders.Enums;
-using Ordering.Domain.ValueObjects;
-using System.Drawing;
 
 namespace Ordering.Application.Orders.EventHandlers.Integration;
 public class BasketCheckoutEventHandler
@@ -19,7 +15,7 @@ public class BasketCheckoutEventHandler
         await sender.Send(command);
     }
 
-    private CreateOrderCommand MapToCreateOrderCommand(CartCheckoutEvent message)
+    private AutoCreateOrderCommand MapToCreateOrderCommand(CartCheckoutEvent message)
     {
         // Create full order with incoming event data
         var address = new AddressDto(message.FirstName, message.LastName, message.EmailAddress, message.AddressLine, message.Country, message.State, message.ZipCode);
@@ -31,11 +27,11 @@ public class BasketCheckoutEventHandler
                  cartItem.Quantity,
                  cartItem.Color,
                  cartItem.Size,
-                 null
+                 cartItem.Price
         )).ToList();
 
 
-        return new CreateOrderCommand()
+        return new AutoCreateOrderCommand()
         {
             CustomerId = message.UserId,
             BillingAddress = address,
