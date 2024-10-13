@@ -3,6 +3,7 @@ using BuildingBlocks.Messaging.MassTransit;
 using Catalog.API.Services.Interfaces;
 using Catalog.API.Services;
 using Catalog.API.Configs;
+using BuildingBlocks.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,8 @@ builder.Services.AddScoped<ISctockApiService, SctockApiService>();
 var app = builder.Build();
 
 //Configure the HTTP request pipeline
+
+app.UseMiddleware<RetrictAccessMiddleware>();
 
 app.MapCarter();
 
