@@ -20,6 +20,7 @@ var app = builder.Build();
 
 
 app.UseCors();
+app.UseMiddleware<TokenCheckerMiddleware>();
 app.UseMiddleware<InterceptionMiddleware>();
 app.UseOcelot().Wait();
 app.Run();

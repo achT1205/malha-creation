@@ -22,6 +22,8 @@ builder.Services.AddIdentityCore<User>()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 
+
+
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
