@@ -1,14 +1,16 @@
-﻿using Catalog.Domain.Abstractions;
-
-namespace Catalog.Domain.Models;
+﻿namespace Catalog.Domain.Models;
 
 public class Material : Entity<MaterialId>
 {
     public string Name { get; private set; } = default!;
-
-    public Material(MaterialId id, string name)
+    public static Material Create(string name)
     {
-        Id = id;
-        Name = name ?? throw new ArgumentNullException(nameof(name));
+        var occasion = new Material
+        {
+            Id = MaterialId.Of(Guid.NewGuid()),
+            Name = name ?? throw new ArgumentNullException(nameof(name))
+        };
+
+        return occasion;
     }
 }

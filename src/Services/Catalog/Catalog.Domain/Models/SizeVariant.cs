@@ -1,16 +1,15 @@
-﻿using Catalog.Domain.Abstractions;
-using Catalog.Domain.ValueObjects;
-
-namespace Catalog.Domain.Models;
+﻿namespace Catalog.Domain.Models;
 
 public class SizeVariant : Entity<SizeVariantId>
 {
+    public ColorVariantId ColorVariantId  { get; private set; }
     public Size Size { get; private set; } = default!;
     public Price Price { get; private set; }
 
-    public SizeVariant(SizeVariantId id, Size size, Price price, int quantity)
+    public SizeVariant(ColorVariantId colorVariantId, Size size, Price price, int quantity)
     {
-        Id = id;
+        Id = SizeVariantId.Of(Guid.NewGuid());
+        ColorVariantId = colorVariantId;
         Size = size;
         Price = price;
     }

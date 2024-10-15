@@ -2,11 +2,12 @@
 
 public record Price
 {
-    public decimal Value { get; private set; }
-
-    private Price(decimal value)
+    public decimal Value { get; }
+    private Price(decimal value) => Value = value;
+    public static Price Of(decimal value)
     {
-        if (value < 0) throw new ArgumentException("Price cannot be negative.");
-        Value = value;
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
+
+        return new Price(value);
     }
 }

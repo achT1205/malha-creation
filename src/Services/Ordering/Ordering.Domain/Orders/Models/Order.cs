@@ -5,8 +5,6 @@ namespace Ordering.Domain.Orders.Models;
 
 public class Order : Aggregate<OrderId>
 {
-    //private readonly HashSet<OrderItem> _orderItems = new();
-    //public IReadOnlyList<OrderItem> OrderItems => _orderItems.ToList();
     private readonly List<OrderItem> _orderItems = new();
     public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
     public CustomerId CustomerId { get; private set; } = default!;

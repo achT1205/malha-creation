@@ -1,16 +1,18 @@
-﻿using Catalog.Domain.Abstractions;
-using Catalog.Domain.ValueObjects;
-
-namespace Catalog.Domain.Models;
+﻿namespace Catalog.Domain.Models;
 
 
 public class Category : Entity<CategoryId>
 {
     public string Name { get; private set; } = default!;
 
-    Category(CategoryId id, string name)
+    public static Category Create(string name)
     {
-        Id = id;
-        Name = name ?? throw new ArgumentNullException(nameof(name));
+        var occasion = new Category
+        {
+            Id = CategoryId.Of(Guid.NewGuid()),
+            Name = name ?? throw new ArgumentNullException(nameof(name))
+        };
+
+        return occasion;
     }
 }
