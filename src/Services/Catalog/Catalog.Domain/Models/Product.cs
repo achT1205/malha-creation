@@ -1,178 +1,171 @@
 ﻿using Catalog.Domain.Events;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using System.Text;
-
-namespace Catalog.Domain.Models;
 
 public class Product : Aggregate<ProductId>
 {
-    private readonly List<ColorVariant> _colorVariants = new();
-    public IReadOnlyList<ColorVariant> ColorVariants => _colorVariants.AsReadOnly();
-
-    private readonly List<OccasionId> _occasionIds = new();
-    public IReadOnlyList<OccasionId> OccasionIds => _occasionIds.AsReadOnly();
-
-    private readonly List<CategoryId> _categoryIds = new();
-    public IReadOnlyList<CategoryId> CategoryIds => _categoryIds.AsReadOnly();
-
-    public string Name { get; private set; } = default!;
-    public string NameEn { get; private set; } = default!;
-    public ImageId CoverImageId { get; private set; } = default!;
-    public ProductTypeId ProductTypeId { get; private set; } = default!;
-    public string Description { get; private set; } = default!;
-    public MaterialId MaterialId { get; private set; } = default!;
+    public string Name { get; private set; }
+    public string UrlFriendlyName { get; private set; }
+    public string Description { get; private set; }
+    public Image CoverImage { get; set; }
     public bool IsHandmade { get; private set; }
-    public CollectionId CollectionId { get; private set; } = default!;
+    public ProductType ProductType { get; private set; }
+    public Material Material { get; private set; }
+    public Collection Collection { get; private set; }
+    public List<Category> Categories { get; private set; }
+    public List<Occasion> Occasions { get; private set; }
+    public List<ColorVariantBase> ColorVariants { get; private set; }
+
+    private Product(
+        ProductId id,
+        string name,
+        string urlFriendlyName,
+        string description,
+        bool isHandmade,
+        Image coverImage,
+        ProductType productType,
+        Material material,
+        Collection collection,
+        List<Occasion> occasions,
+        List<Category> categories
+        )
+    {
+        Id = id;
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        UrlFriendlyName = urlFriendlyName ?? throw new ArgumentNullException(nameof(urlFriendlyName));
+        Description = description ?? throw new ArgumentNullException(nameof(description));
+        IsHandmade = isHandmade;
+        CoverImage = coverImage ?? throw new ArgumentNullException(nameof(coverImage));
+        ProductType = productType ?? throw new ArgumentNullException(nameof(productType));
+        Material = material ?? throw new ArgumentNullException(nameof(material));
+        Collection = collection ?? throw new ArgumentNullException(nameof(collection));
+        Categories = categories ?? new List<Category>();
+        Occasions = occasions ?? new List<Occasion>();
+        ColorVariants = new List<ColorVariantBase>();
+    }
 
     public static Product Create(
-        ProductId productId,
         string name,
-        string nameEn,
-        ImageId coverImageId,
-        ProductTypeId productTypeId,
+        string UrlFriendlyName,
         string description,
-        MaterialId materialId,
         bool isHandmade,
-        CollectionId collectionId
-
-    )
+        Image coverImage,
+        ProductType productType,
+        Occasion occasion,
+        Material material,
+        Collection collection,
+        List<Occasion> occasions,
+        List<Category> categories
+        )
     {
-        var product = new Product()
-        {
-            Id = productId,
-            Name = name ?? throw new ArgumentNullException(nameof(name)),
-            NameEn = nameEn ?? throw new ArgumentNullException(nameof(nameEn)),
-            CoverImageId = coverImageId,
-            ProductTypeId = productTypeId,
-            MaterialId = materialId,
-            IsHandmade = isHandmade,
-            CollectionId = collectionId,
-            Description = description ?? throw new ArgumentNullException(nameof(description))
-        };
+        var product = new Product(
+             ProductId.Of(Guid.NewGuid()),
+             name,
+             UrlFriendlyName,
+             description,
+             isHandmade,
+             coverImage,
+             productType,
+             material,
+             collection,
+             occasions,
+             categories
+         );
 
         product.AddDomainEvent(new ProductCreatedEvent(product));
         return product;
     }
 
-
-    public void Update(
-        string name,
-        string nameEn,
-        ImageId coverImageId,
-        MaterialId materialId,
-        bool isHandmade,
-        CollectionId collectionId)
+    // Ajout d'une variante de couleur
+    public void AddColorVariant(ColorVariantBase colorVariant)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
-        NameEn = nameEn ?? throw new ArgumentNullException(nameof(nameEn));
-        CoverImageId = coverImageId;
-        MaterialId = materialId;
-        IsHandmade = isHandmade;
-        CollectionId = collectionId;
-        LastModified = DateTime.UtcNow;
+        if (colorVariant == null)
+        {
+            throw new ArgumentNullException(nameof(colorVariant));
+        }
+        if (ColorVariants.Any(c => c.Slug.Value == colorVariant.Slug.Value))
+        {
+            throw new InvalidOperationException("A color variant with the same slug already exists.");
+        }
+
+        ColorVariants.Add(colorVariant);
         AddDomainEvent(new ProductUpdatedEvent(this));
-    }
-
-    public void AddColorVariant(string color, List<string> images, Price? price)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(color);
-        var slug = GenerateSlug(NameEn, color);
-        var variant = new ColorVariant(Id, color, images, slug, price);
-
-        _colorVariants.Add(variant);
-
-        AddDomainEvent(new ProductUpdatedEvent(this));
-        AddDomainEvent(new ProductVariantAddedEvent(variant));
     }
 
     public void RemoveColorVariant(ColorVariantId colorVariantId)
     {
-        var variant = _colorVariants.FirstOrDefault(x => x.Id == colorVariantId);
-        if (variant is not null)
+        var colorVariant = ColorVariants.FirstOrDefault(c => c.Id == colorVariantId);
+        if (colorVariant != null)
         {
-            _colorVariants.Remove(variant);
+            ColorVariants.Remove(colorVariant);
             AddDomainEvent(new ProductUpdatedEvent(this));
-            AddDomainEvent(new ProductVariantRemovedEvent(variant));
+        }
+        else
+        {
+            throw new InvalidOperationException("Color variant not found.");
         }
     }
 
-
-    public void AddOccasion(OccasionId occasionId)
+    // Méthodes pour ajouter des catégories
+    public void AddCategory(Category category)
     {
-        if (!_occasionIds.Contains(occasionId))
+        if (category == null)
         {
-            _occasionIds.Add(occasionId);
+            throw new ArgumentNullException(nameof(category));
+        }
+
+        if (!Categories.Contains(category))
+        {
+            Categories.Add(category);
             AddDomainEvent(new ProductUpdatedEvent(this));
         }
     }
 
-    public void RemoveOccasion(OccasionId occasionId)
-    {
-        if (_occasionIds.Contains(occasionId))
-        {
-            _occasionIds.Remove(occasionId);
-            AddDomainEvent(new ProductUpdatedEvent(this));
-        }
-    }
-
-
-    public void AddCategory(CategoryId  categoryId)
-    {
-        if (!_categoryIds.Contains(categoryId))
-        {
-            _categoryIds.Add(categoryId);
-            AddDomainEvent(new ProductUpdatedEvent(this));
-        }
-    }
-
+    // Suppression d'une catégorie
     public void RemoveCategory(CategoryId categoryId)
     {
-        if (_categoryIds.Contains(categoryId))
+        var category = Categories.FirstOrDefault(c => c.Id == categoryId);
+        if (category != null)
         {
-            _categoryIds.Remove(categoryId);
+            Categories.Remove(category);
+            AddDomainEvent(new ProductUpdatedEvent(this));
+        }
+        else
+        {
+            throw new InvalidOperationException("Color variant not found.");
+        }
+    }
+
+    // Modification de la collection
+    public void UpdateCollection(Collection newCollection)
+    {
+        if (!Collection.Equals(newCollection))
+        {
+            Collection = newCollection ?? throw new ArgumentNullException(nameof(newCollection));
+            AddDomainEvent(new ProductUpdatedEvent(this));
+        }
+    }
+
+    // Modification du matériau
+    public void UpdateMaterial(Material newMaterial)
+    {
+        if (!Material.Equals(newMaterial))
+        {
+            Material = newMaterial ?? throw new ArgumentNullException(nameof(newMaterial));
             AddDomainEvent(new ProductUpdatedEvent(this));
         }
     }
 
 
-
-    private string GenerateSlug(string productName, string color)
+    // Méthodes de mise à jour des informations sur le produit
+    public void UpdateDescription(string newDescription)
     {
-        // Concatenate product name and color
-        string slugInput = $"{productName} in {color}";
-
-        // Convert to lowercase
-        slugInput = slugInput.ToLowerInvariant();
-
-        // Remove all invalid characters
-        slugInput = RemoveDiacritics(slugInput); // Optional: Normalize and remove accents/diacritics
-        slugInput = Regex.Replace(slugInput, @"[^a-z0-9\s-]", "");  // Keep only alphanumeric, spaces, and hyphens
-
-        // Replace spaces with hyphens
-        slugInput = Regex.Replace(slugInput, @"\s+", "-").Trim();
-
-        // Optionally, truncate the slug to a reasonable length
-        slugInput = slugInput.Substring(0, slugInput.Length <= 100 ? slugInput.Length : 100).Trim('-');
-
-        return slugInput;
+        Description = newDescription ?? throw new ArgumentNullException(nameof(newDescription));
+        AddDomainEvent(new ProductUpdatedEvent(this));
     }
 
-    // Optional: Remove diacritics (accents on letters like é, à, etc.)
-    private string RemoveDiacritics(string text)
+    public void UpdateName(string newName, string newUrlFriendlyName)
     {
-        var normalizedString = text.Normalize(NormalizationForm.FormD);
-        var stringBuilder = new StringBuilder();
-
-        foreach (var c in normalizedString)
-        {
-            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
-            {
-                stringBuilder.Append(c);
-            }
-        }
-
-        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        Name = newName ?? throw new ArgumentNullException(nameof(newName));
+        UrlFriendlyName = newUrlFriendlyName ?? throw new ArgumentNullException(nameof(newUrlFriendlyName));
+        AddDomainEvent(new ProductUpdatedEvent(this));
     }
 }

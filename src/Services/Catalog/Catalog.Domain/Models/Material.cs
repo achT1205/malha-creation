@@ -2,15 +2,27 @@
 
 public class Material : Entity<MaterialId>
 {
-    public string Name { get; private set; } = default!;
+    public string Name { get; private set; }
+
+    // Constructeur privé pour garantir que Material est créé via la méthode Create
+    private Material(MaterialId id, string name)
+    {
+        Id = id;
+        Name = name;
+    }
+
     public static Material Create(string name)
     {
-        var occasion = new Material
+        if (string.IsNullOrWhiteSpace(name))
         {
-            Id = MaterialId.Of(Guid.NewGuid()),
-            Name = name ?? throw new ArgumentNullException(nameof(name))
-        };
+            throw new ArgumentException("Material name cannot be null or empty.", nameof(name));
+        }
 
-        return occasion;
+        if (name.Length > 100) // Exemple de contrainte sur la longueur
+        {
+            throw new ArgumentException("Material name cannot exceed 100 characters.", nameof(name));
+        }
+
+        return new Material(MaterialId.Of(Guid.NewGuid()), name);
     }
 }

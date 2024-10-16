@@ -5,3 +5,55 @@ Add-Migration Create_Database -OutputDir Data/Migrations -Project Ordering.Infra
 update-database
 
 Add-Migration Create_Database -OutputDir Data/Migrations -Project IdentityServer -StartupProject IdentityServer
+
+
+
+test 
+
+create product 
+
+{
+    "name": "T-shirt",
+    "urlFriendlyName": "t-shirt",
+    "description": "A comfortable cotton t-shirt",
+    "isHandmade": false,
+    "productTypeId": "23c5e2ff-9176-4ebc-b3d7-2b13a63a3411",
+    "materialId": "97a1e2ff-bae2-4f89-b8ef-b2ed4b44f354",
+    "collectionId": "1d78e30d-7c4b-47de-9a1d-4fb90e568d16",
+    "coverImageId": "2c79e30a-55c2-42b9-9c41-7eaad3dbdff9",
+    "categoryIds": ["c79e30a-55c2-42b9-9c41-7eaad3dbdff9"],
+    "occasionIds": ["93e2fcd4-23e4-4a55-b245-ef2b69dfeadb"]
+}
+
+
+add color variant
+
+{
+    "$type": "CreateAccessoryColorVariantDto",
+    "color": "Red",
+    "imageIds": ["c79e30a-55c2-42b9-9c41-7eaad3dbdff9"],
+    "price": 19.99,
+    "quantity": 50
+}
+
+
+ou 
+
+
+{
+    "$type": "CreateClothingColorVariantDto",
+    "color": "Blue",
+    "imageIds": ["c79e30a-55c2-42b9-9c41-7eaad3dbdff9"],
+    "sizeVariants": [
+        {
+            "size": "M",
+            "price": 25.99,
+            "quantity": 10
+        },
+        {
+            "size": "L",
+            "price": 28.99,
+            "quantity": 5
+        }
+    ]
+}

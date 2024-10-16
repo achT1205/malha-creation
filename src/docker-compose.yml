@@ -1,6 +1,8 @@
 services:
+  # mc-catalogdb:
+  #   image: postgres
   mc-catalogdb:
-    image: postgres
+    image: mcr.microsoft.com/azure-sql-edge:latest
 
   mc-stockdb:
     image: postgres
@@ -45,8 +47,6 @@ services:
       dockerfile: Services/Cart/Cart.API/Dockerfile
 
 volumes:
-  postgres-mccatalog:
   postgres-mcstock: 
   postgres-mccart: 
-  postgres-mcorder: 
   postgres-mcidentity: 

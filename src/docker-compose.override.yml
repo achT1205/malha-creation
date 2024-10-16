@@ -2,14 +2,11 @@ services:
   mc-catalogdb:
     container_name: mc-catalogdb
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=MCCatalogDb
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SwN12345678
     restart: always
     ports:
-        - "5432:5432"
-    volumes:
-      - postgres-mccatalog:/var/lib/postgresql/data/
+      - "1433:1433"
 
   mc-stockdb:
     container_name: mc-stockdb
@@ -78,7 +75,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Server=mc-catalogdb;Port=5432;Database=MCCatalogDb;User Id=postgres;Password=postgres;Include Error Detail=true
+      - ConnectionStrings__Database=Server=mc-catalogdb;Database=MCCatalogDb;User Id=sa;Password=SwN12345678;Encrypt=False;TrustServerCertificate=True
       - MessageBroker__Host=amqp://ecommerce-mq:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest

@@ -2,16 +2,27 @@
 
 public class Occasion : Entity<OccasionId>
 {
-    public string Name { get; private set; } = default!;
+    public string Name { get; private set; }
 
-    public static Occasion Create ( string name)
+    // Constructeur privé pour forcer l'utilisation de la méthode Create
+    private Occasion(OccasionId id, string name)
     {
-        var occasion = new Occasion
-        {
-            Id = OccasionId.Of(Guid.NewGuid()),
-            Name = name ?? throw new ArgumentNullException(nameof(name))
-        };
+        Id = id;
+        Name = name;
+    }
 
-        return occasion;
+    public static Occasion Create(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Occasion name cannot be null or empty.", nameof(name));
+        }
+
+        if (name.Length > 100) // Exemple de contrainte sur la longueur
+        {
+            throw new ArgumentException("Occasion name cannot exceed 100 characters.", nameof(name));
+        }
+
+        return new Occasion(OccasionId.Of(Guid.NewGuid()), name);
     }
 }

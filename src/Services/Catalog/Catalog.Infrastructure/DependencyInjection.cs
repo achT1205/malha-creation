@@ -1,5 +1,7 @@
-﻿using Catalog.Infrastructure.Data;
+﻿using Catalog.Application.Interfaces;
+using Catalog.Infrastructure.Data;
 using Catalog.Infrastructure.Interceptors;
+using Catalog.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Catalog.Infrastructure;
@@ -19,6 +21,14 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICollectionRepository, CollectionRepository>();
+        services.AddScoped<IImageRepository, ImageRepository>();
+        services.AddScoped<IMaterialRepository, MaterialRepository>();
+        services.AddScoped<IOccasionRepository, OccasionRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
 
         return services;
     }

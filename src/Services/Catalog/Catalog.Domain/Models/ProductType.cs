@@ -2,15 +2,26 @@
 
 public class ProductType : Entity<ProductTypeId>
 {
-    public string Name { get; private set; } = default!;
+    public string Name { get; private set; }
+
+    private ProductType(ProductTypeId id, string name)
+    {
+        Id = id;
+        Name = name;
+    }
+
     public static ProductType Create(string name)
     {
-        var occasion = new ProductType
+        if (string.IsNullOrWhiteSpace(name))
         {
-            Id = ProductTypeId.Of(Guid.NewGuid()),
-            Name = name ?? throw new ArgumentNullException(nameof(name))
-        };
+            throw new ArgumentException("Product type name cannot be null or empty.", nameof(name));
+        }
 
-        return occasion;
+        if (name.Length > 100) // Exemple de validation de longueur
+        {
+            throw new ArgumentException("Product type name cannot exceed 100 characters.", nameof(name));
+        }
+
+        return new ProductType(ProductTypeId.Of(Guid.NewGuid()), name);
     }
 }

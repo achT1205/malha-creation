@@ -10,4 +10,22 @@ public record Price
 
         return new Price(value);
     }
+
+    public Price Increase(decimal amount)
+    {
+        return new Price(Value + amount);
+    }
+
+    public Price Decrease(decimal amount)
+    {
+        if (Value - amount < 0)
+        {
+            throw new InvalidOperationException("Price cannot be reduced below zero");
+        }
+        return new Price(Value - amount);
+    }
+    public override string ToString()
+    {
+        return Value.ToString("C");  // Formats as currency
+    }
 }
