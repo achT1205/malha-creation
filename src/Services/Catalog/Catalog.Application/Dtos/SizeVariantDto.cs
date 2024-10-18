@@ -4,5 +4,6 @@ public record SizeVariantDto
     (
     string Size,
     decimal Price,
-    decimal Quantity
+    string Currency,
+    int Quantity
     );

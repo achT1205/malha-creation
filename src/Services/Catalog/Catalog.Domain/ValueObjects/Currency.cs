@@ -7,7 +7,12 @@ public record Currency
     public static readonly Currency USD = new("USD");
     public static readonly Currency EUR = new("EUR");
 
-    public string Value { get; }
+    public string Value { get; } = default!;
+
+    public Currency()
+    {
+        
+    }
 
     private Currency(string value)
     {

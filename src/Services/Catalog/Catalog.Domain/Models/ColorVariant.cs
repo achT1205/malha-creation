@@ -9,8 +9,8 @@ public class ColorVariant : Entity<ColorVariantId>
     private readonly List<Image> _images = new();
     public IReadOnlyList<Image>  Images => _images.AsReadOnly();
 
-    //private readonly List<SizeVariant> _sizeVariants = new();
-    //public IReadOnlyList<SizeVariant> SizeVariants => _sizeVariants.AsReadOnly();
+    private readonly List<SizeVariant> _sizeVariants = new();
+    public IReadOnlyList<SizeVariant> SizeVariants => _sizeVariants.AsReadOnly();
 
     public Price Price { get; private set; } = default!;
     public Quantity Quantity { get; private set; } = default!;
@@ -50,23 +50,23 @@ public class ColorVariant : Entity<ColorVariantId>
         }
     }
 
-    //public void AddSizeVariant(SizeVariant sizeVariant)
-    //{
-    //    if (sizeVariant == null)
-    //    {
-    //        throw new ArgumentNullException(nameof(sizeVariant));
-    //    }
+    public void AddSizeVariant(SizeVariant sizeVariant)
+    {
+        if (sizeVariant == null)
+        {
+            throw new ArgumentNullException(nameof(sizeVariant));
+        }
 
-    //    // Vérification pour éviter les doublons
-    //    var existingVariant = SizeVariants.FirstOrDefault(sv => sv.Size.Equals(sizeVariant));
+        // Vérification pour éviter les doublons
+        var existingVariant = SizeVariants.FirstOrDefault(sv => sv.Size.Equals(sizeVariant));
 
-    //    if (existingVariant != null)
-    //    {
-    //        throw new InvalidOperationException("A size variant with the same ID already exists.");
-    //    }
+        if (existingVariant != null)
+        {
+            throw new InvalidOperationException("A size variant with the same ID already exists.");
+        }
 
-    //    _sizeVariants.Add(sizeVariant);
-    //}
+        _sizeVariants.Add(sizeVariant);
+    }
 
     public void AddImage(Image  image)
     {

@@ -9,8 +9,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         ConfigureProductsTable(builder);
         ConfigureColorVariantsTable(builder);
-        ConfigureCategoriesTable(builder);
-        ConfigureOccasionsTable(builder);
+        ConfigureCategoryIdsTable(builder);
+        ConfigureOccasionIdsTable(builder);
         ConfigureProductReviewIdsTable(builder);
     }
 
@@ -32,8 +32,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Metadata.FindNavigation(nameof(Product.ProductReviewIds))!
        .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
-
-    private void ConfigureOccasionsTable(EntityTypeBuilder<Product> builder)
+    private void ConfigureOccasionIdsTable(EntityTypeBuilder<Product> builder)
     {
 
         builder.OwnsMany(p => p.OccasionIds, ob =>
@@ -52,7 +51,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Metadata.FindNavigation(nameof(Product.OccasionIds))!
        .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
-    private void ConfigureCategoriesTable(EntityTypeBuilder<Product> builder)
+    private void ConfigureCategoryIdsTable(EntityTypeBuilder<Product> builder)
     {
 
         builder.OwnsMany(p => p.CategoryIds, cb =>
@@ -106,16 +105,12 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
             cvb.OwnsOne(cv => cv.Price, prb =>
             {
-                prb.OwnsOne(p => p.Currency, cb =>
-                {
-                    cb.Property(c => c.Value)
-                      .HasColumnName("Currency")
-                      .IsRequired()
-                      .HasMaxLength(Currency.Length);
-                });
+                prb.Property(p => p.Currency)
+                 .HasColumnName("Currency")
+                 .IsRequired();
 
                 prb.Property(p => p.Amount)
-                .HasColumnName("Amount")
+                .HasColumnName("Price")
                 .IsRequired();
             });
 
@@ -123,8 +118,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             {
                 qb.Property(q => q.Value)
                   .HasColumnName("Quantity")
-                  .IsRequired()
-                  .HasMaxLength(200);
+                  .IsRequired();
             });
 
             cvb.OwnsMany(cv => cv.Images, imsb =>
@@ -132,41 +126,51 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 imsb.ToTable("ColorVariantImages");
             });
 
-            //cvb.OwnsMany(cv => cv.SizeVariants, svb =>
-            //{
-            //    svb.ToTable("SizeVariants");
+            cvb.OwnsMany(cv => cv.SizeVariants, svb =>
+            {
+                svb.ToTable("SizeVariants");
 
-            //    svb.WithOwner().HasForeignKey(nameof(ColorVariantId), nameof(ProductId));
+                svb.WithOwner().HasForeignKey(nameof(ColorVariantId), nameof(ProductId));
 
-            //    svb.HasKey(nameof(SizeVariant.Id), nameof(ColorVariantId), nameof(ProductId));
+                svb.HasKey(nameof(SizeVariant.Id), nameof(ColorVariantId), nameof(ProductId));
 
-            //    svb.Property(sv => sv.Id)
-            //    .HasColumnName(nameof(SizeVariantId))
-            //    .ValueGeneratedNever()
-            //    .HasConversion(
-            //        id => id.Value,
-            //        dbId => SizeVariantId.Of(dbId));
+                svb.Property(sv => sv.Id)
+                .HasColumnName(nameof(SizeVariantId))
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    dbId => SizeVariantId.Of(dbId));
 
-            //    svb.OwnsOne(cv => cv.Size);
+                svb.OwnsOne(cv => cv.Price, prb =>
+                {
+                    prb.Property(p => p.Currency)
+                       .HasColumnName("Currency")
+                       .IsRequired();
 
-            //    svb.OwnsOne(cv => cv.Price, prb =>
-            //    {
-            //        prb.OwnsOne(p => p.Currency, cb =>
-            //        {
-            //            cb.Property(c => c.Value)
-            //              .HasColumnName("Currency")
-            //              .IsRequired()
-            //              .HasMaxLength(Currency.Length);
-            //        });
-            //    });
+                    prb.Property(p => p.Amount)
+                        .HasColumnName("Price")
+                        .IsRequired();
+                });
+            
 
-            //    svb.OwnsOne(cv => cv.Quantity);
+                svb.OwnsOne(sv => sv.Size, qb =>
+                {
+                    qb.Property(q => q.Value)
+                      .HasColumnName("Size")
+                      .HasMaxLength(5)
+                      .IsRequired();
+                });
 
+                svb.OwnsOne(sv => sv.Quantity, qb =>
+                {
+                    qb.Property(q => q.Value)
+                      .HasColumnName("Quantity")
+                      .IsRequired();
+                });
+            });
 
-            //});
-
-            //cvb.Navigation(cv => cv.SizeVariants).Metadata.SetField("_sizeVariants");
-            //cvb.Navigation(cv => cv.SizeVariants).UsePropertyAccessMode(PropertyAccessMode.Field);
+            cvb.Navigation(cv => cv.SizeVariants).Metadata.SetField("_sizeVariants");
+            cvb.Navigation(cv => cv.SizeVariants).UsePropertyAccessMode(PropertyAccessMode.Field);
         });
 
         builder.Metadata.FindNavigation(nameof(Product.ColorVariants))!
@@ -177,6 +181,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.ToTable("Products");
 
         builder.HasKey(p => p.Id);
+
 
         builder.Property(p => p.Id)
             .ValueGeneratedNever()
@@ -234,14 +239,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                      .HasColumnName(nameof(Product.CoverImage.AltText))
                      .IsRequired();
               });
-
-
-        //builder.OwnsOne(p => p.Name);
-        //builder.OwnsOne(p => p.UrlFriendlyName);
-        //builder.OwnsOne(p => p.Description);
-        //builder.OwnsOne(p => p.AverageRating);
-
-        //builder.OwnsOne(p => p.CoverImage);
 
         builder.Property(p => p.IsHandmade);
 

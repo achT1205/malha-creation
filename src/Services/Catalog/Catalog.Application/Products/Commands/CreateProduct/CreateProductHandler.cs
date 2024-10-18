@@ -19,9 +19,16 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
     public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
         var product = CreateNewProduct(command);
+        try
+        {
 
-        await _productRepository.AddAsync(product);
-        await _productRepository.SaveChangesAsync();
+            await _productRepository.AddAsync(product);
+            await _productRepository.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
 
         return new CreateProductResult(product.Id.Value);
     }
@@ -59,7 +66,7 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                 product.Id,
                 Color.Of(colorVariant.Color),
                 Slug.Of(command.UrlFriendlyName, colorVariant.Color),
-                Price.Of(Currency.USD, colorVariant.Price),
+                Price.Of("USD", colorVariant.Price),
                 Quantity.Of(colorVariant.Quantity));
 
             foreach (var image in colorVariant.Images)
@@ -68,16 +75,16 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                 newColorVariant.AddImage(newImage);
             }
 
-            //foreach (var sizeVariant in colorVariant.sizeVariants)
-            //{
-            //    var newSizeVariant = SizeVariant.Create(
-            //        newColorVariant.Id,
-            //        SizeVariantId.Of(Guid.NewGuid()),
-            //        Size.Of(sizeVariant.Size),
-            //        Price.Of(Currency.USD, sizeVariant.Price),
-            //    Quantity.Of(colorVariant.Quantity));
-            //    newColorVariant.AddSizeVariant(newSizeVariant);
-            //}
+            foreach (var sizeVariant in colorVariant.sizeVariants)
+            {
+                var newSizeVariant = SizeVariant.Create(
+                    newColorVariant.Id,
+                    SizeVariantId.Of(Guid.NewGuid()),
+                    Size.Of(sizeVariant.Size),
+                    Price.Of("USD", sizeVariant.Price),
+                Quantity.Of(colorVariant.Quantity));
+                newColorVariant.AddSizeVariant(newSizeVariant);
+            }
             product.AddColorVariant(newColorVariant);
         }
 
