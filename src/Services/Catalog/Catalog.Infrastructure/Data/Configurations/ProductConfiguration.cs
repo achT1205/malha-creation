@@ -107,41 +107,41 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
             cvb.OwnsMany(cv => cv.Images);
 
-            cvb.OwnsMany(cv => cv.SizeVariants, svb =>
-            {
-                svb.ToTable("SizeVariants");
+            //cvb.OwnsMany(cv => cv.SizeVariants, svb =>
+            //{
+            //    svb.ToTable("SizeVariants");
 
-                svb.WithOwner().HasForeignKey(nameof(ColorVariantId), nameof(ProductId));
+            //    svb.WithOwner().HasForeignKey(nameof(ColorVariantId), nameof(ProductId));
 
-                svb.HasKey(nameof(SizeVariant.Id), nameof(ColorVariantId), nameof(ProductId));
+            //    svb.HasKey(nameof(SizeVariant.Id), nameof(ColorVariantId), nameof(ProductId));
 
-                svb.Property(sv => sv.Id)
-                .HasColumnName(nameof(SizeVariantId))
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    dbId => SizeVariantId.Of(dbId));
+            //    svb.Property(sv => sv.Id)
+            //    .HasColumnName(nameof(SizeVariantId))
+            //    .ValueGeneratedNever()
+            //    .HasConversion(
+            //        id => id.Value,
+            //        dbId => SizeVariantId.Of(dbId));
 
-                svb.OwnsOne(cv => cv.Size);
+            //    svb.OwnsOne(cv => cv.Size);
 
-                svb.OwnsOne(cv => cv.Price, prb =>
-                {
-                    prb.OwnsOne(p => p.Currency, cb =>
-                    {
-                        cb.Property(c => c.Value)
-                          .HasColumnName("Currency")
-                          .IsRequired()
-                          .HasMaxLength(Currency.Length);
-                    });
-                });
+            //    svb.OwnsOne(cv => cv.Price, prb =>
+            //    {
+            //        prb.OwnsOne(p => p.Currency, cb =>
+            //        {
+            //            cb.Property(c => c.Value)
+            //              .HasColumnName("Currency")
+            //              .IsRequired()
+            //              .HasMaxLength(Currency.Length);
+            //        });
+            //    });
 
-                svb.OwnsOne(cv => cv.Quantity);
+            //    svb.OwnsOne(cv => cv.Quantity);
 
 
-            });
+            //});
 
-            cvb.Navigation(cv => cv.SizeVariants).Metadata.SetField("_sizeVariants");
-            cvb.Navigation(cv => cv.SizeVariants).UsePropertyAccessMode(PropertyAccessMode.Field);
+            //cvb.Navigation(cv => cv.SizeVariants).Metadata.SetField("_sizeVariants");
+            //cvb.Navigation(cv => cv.SizeVariants).UsePropertyAccessMode(PropertyAccessMode.Field);
         });
 
         builder.Metadata.FindNavigation(nameof(Product.ColorVariants))!

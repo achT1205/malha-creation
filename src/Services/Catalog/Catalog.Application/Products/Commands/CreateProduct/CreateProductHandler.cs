@@ -68,16 +68,16 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                 newColorVariant.AddImage(newImage);
             }
 
-            foreach (var sizeVariant in colorVariant.sizeVariants)
-            {
-                var newSizeVariant = SizeVariant.Create(
-                    newColorVariant.Id,
-                    SizeVariantId.Of(Guid.NewGuid()),
-                    Size.Of(sizeVariant.Size),
-                    Price.Of(Currency.USD, sizeVariant.Price),
-                Quantity.Of(colorVariant.Quantity));
-                newColorVariant.AddSizeVariant(newSizeVariant);
-            }
+            //foreach (var sizeVariant in colorVariant.sizeVariants)
+            //{
+            //    var newSizeVariant = SizeVariant.Create(
+            //        newColorVariant.Id,
+            //        SizeVariantId.Of(Guid.NewGuid()),
+            //        Size.Of(sizeVariant.Size),
+            //        Price.Of(Currency.USD, sizeVariant.Price),
+            //    Quantity.Of(colorVariant.Quantity));
+            //    newColorVariant.AddSizeVariant(newSizeVariant);
+            //}
             product.AddColorVariant(newColorVariant);
         }
 

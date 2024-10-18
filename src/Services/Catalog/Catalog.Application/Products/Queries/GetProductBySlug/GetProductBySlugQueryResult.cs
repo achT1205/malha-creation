@@ -1,5 +1,3 @@
-﻿using Catalog.Application.Products.Dtos;
+﻿namespace Catalog.Application.Products.Queries.GetProductBySlug;
 
-namespace Catalog.Application.Products.Queries.GetProductBySlug;
-
-public record GetProductBySlugQueryResult(ProductDto Product);
+//public record GetProductBySlugQueryResult(ProductDto Product);

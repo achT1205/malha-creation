@@ -40,17 +40,15 @@ public class ProductRepository : IProductRepository
     //}
 
     // Récupérer tous les produits
-    //public async Task<List<Product>> GetAllAsync()
-    //{
-    //    return await _context.Products
-    //        .Include(p => p.Categories)
-    //        .Include(p => p.Occasions)
-    //        .Include(p => p.ColorVariants)
-    //            .ThenInclude(cv => cv.Images)
-    //        .Include(p => p.ColorVariants)
-    //            .ThenInclude(cv => (cv).SizeVariants)
-    //        .ToListAsync();
-    //}
+    public async Task<List<Product>> GetAllAsync()
+    {
+        return await _context.Products
+            .Include(p => p.ColorVariants)
+                .ThenInclude(cv => cv.Images)
+            //.Include(p => p.ColorVariants)
+            //    .ThenInclude(cv => (cv).SizeVariants)
+            .ToListAsync();
+    }
     // Ajouter un nouveau produit
     public async Task AddAsync(Product product)
     {

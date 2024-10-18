@@ -1,4 +1,5 @@
 using Catalog.API;
+using Catalog.API.Endpoints;
 using Catalog.Application;
 using Catalog.Infrastructure;
 using Catalog.Infrastructure.Extentions;
@@ -20,5 +21,7 @@ if (app.Environment.IsDevelopment())
 {
     await app.InitialiseDatabaseAsync();
 }
+
+app.MapProductEndpoints();
 
 app.Run();

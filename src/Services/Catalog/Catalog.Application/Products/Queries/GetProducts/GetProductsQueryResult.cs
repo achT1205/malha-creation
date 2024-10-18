@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Products.Dtos;
+﻿using Catalog.Application.Dtos;
 
 namespace Catalog.Application.Products.Queries.GetProducts;
 
