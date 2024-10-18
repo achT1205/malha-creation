@@ -1,6 +1,10 @@
 ﻿public record MaterialId
 {
-    public Guid Value { get; }
+    public Guid Value { get; private set; }
+    private MaterialId()
+    {
+        
+    }
     private MaterialId(Guid value) => Value = value;
     public static MaterialId Of(Guid value)
     {

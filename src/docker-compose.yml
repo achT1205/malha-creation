@@ -1,52 +1,52 @@
 services:
-  # mc-catalogdb:
-  #   image: postgres
   mc-catalogdb:
     image: mcr.microsoft.com/azure-sql-edge:latest
 
-  mc-stockdb:
-    image: postgres
+  # mc-stockdb:
+  #   image: postgres
 
-  mc-cartdb:
-    image: postgres
+  # mc-cartdb:
+  #   image: postgres
 
-  mc-distributedcache:
-    image: redis
+  # mc-distributedcache:
+  #   image: redis
 
-  mc-orderdb:
-    image: mcr.microsoft.com/azure-sql-edge:latest
+  # mc-orderdb:
+  #   image: mcr.microsoft.com/azure-sql-edge:latest
 
-  mc-identitydb:
-    image: postgres
+  # mc-identitydb:
+  #   image: postgres
 
-  catalog.api:
-    image: ${DOCKER_REGISTRY-}catalogapi
-    build:
-      context: .
-      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+  # messagebroker:
+  #   image: rabbitmq:management
 
-  messagebroker:
-    image: rabbitmq:management
+  # catalog.api:
+  #   image: ${DOCKER_REGISTRY-}catalogapi
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Catalog/Catalog.API/Dockerfile
 
-  inventory.api:
-    image: ${DOCKER_REGISTRY-}inventoryapi
-    build:
-      context: .
-      dockerfile: Services/Inventory/Inventory.API/Dockerfile
+  # inventory.api:
+  #   image: ${DOCKER_REGISTRY-}inventoryapi
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Inventory/Inventory.API/Dockerfile
 
-  discount.grpc:
-    image: ${DOCKER_REGISTRY-}discountgrpc
-    build:
-      context: .
-      dockerfile: Services/Discount/Discount.Grpc/Dockerfile
+  # discount.grpc:
+  #   image: ${DOCKER_REGISTRY-}discountgrpc
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
-  cart.api:
-    image: ${DOCKER_REGISTRY-}cartapi
-    build:
-      context: .
-      dockerfile: Services/Cart/Cart.API/Dockerfile
+  # cart.api:
+  #   image: ${DOCKER_REGISTRY-}cartapi
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Cart/Cart.API/Dockerfile
 
-volumes:
-  postgres-mcstock: 
-  postgres-mccart: 
-  postgres-mcidentity: 
+# volumes:
+#   postgres-mccatalog:
+  # postgres-mcstock: 
+  # postgres-mccart: 
+  # postgres-mcorder: 
+  # postgres-mcidentity: 

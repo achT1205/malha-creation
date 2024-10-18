@@ -1,70 +1,213 @@
-﻿namespace Catalog.Infrastructure.Data.Configurations;
+﻿
+
+
+
+namespace Catalog.Infrastructure.Data.Configurations;
 internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
-        // Configuration de la clé primaire
+        ConfigureProductsTable(builder);
+        ConfigureColorVariantsTable(builder);
+        ConfigureCategoriesTable(builder);
+        ConfigureOccasionsTable(builder);
+        ConfigureProductReviewIdsTable(builder);
+    }
+
+    private void ConfigureProductReviewIdsTable(EntityTypeBuilder<Product> builder)
+    {
+        builder.OwnsMany(p => p.ProductReviewIds, rib =>
+        {
+            rib.ToTable("ProductReviewIds");
+
+            rib.WithOwner().HasForeignKey("ProductId");
+
+            rib.HasKey("Id");
+
+            rib.Property(r => r.Value)
+            .HasColumnName("ReviewId")
+            .ValueGeneratedNever();
+        });
+
+        builder.Metadata.FindNavigation(nameof(Product.ProductReviewIds))!
+       .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+
+    private void ConfigureOccasionsTable(EntityTypeBuilder<Product> builder)
+    {
+
+        builder.OwnsMany(p => p.OccasionIds, ob =>
+        {
+            ob.ToTable("OccasionIds");
+
+            ob.WithOwner().HasForeignKey("ProductId");
+
+            ob.HasKey("Id");
+
+            ob.Property(r => r.Value)
+            .HasColumnName("OccasionId")
+            .ValueGeneratedNever();
+        });
+
+        builder.Metadata.FindNavigation(nameof(Product.OccasionIds))!
+       .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    private void ConfigureCategoriesTable(EntityTypeBuilder<Product> builder)
+    {
+
+        builder.OwnsMany(p => p.CategoryIds, cb =>
+        {
+            cb.ToTable("CategoryIds");
+
+            cb.WithOwner().HasForeignKey("ProductId");
+
+            cb.HasKey("Id");
+
+            cb.Property(r => r.Value)
+            .HasColumnName("CategoryId")
+            .ValueGeneratedNever();
+        });
+
+        builder.Metadata.FindNavigation(nameof(Product.CategoryIds))!
+       .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    private void ConfigureColorVariantsTable(EntityTypeBuilder<Product> builder)
+    {
+        builder.OwnsMany(p => p.ColorVariants, cvb =>
+        {
+            cvb.ToTable(nameof(Product.ColorVariants));
+
+            cvb.WithOwner().HasForeignKey(nameof(ColorVariant.ProductId));
+
+            cvb.HasKey(cv => new { cv.Id, cv.ProductId });
+
+            cvb.Property(cv => cv.Id)
+            .HasColumnName(nameof(ColorVariantId))
+            .ValueGeneratedNever()
+            .HasConversion(
+                id => id.Value,
+                dbId => ColorVariantId.Of(dbId));
+
+            cvb.OwnsOne(cv => cv.Color);
+
+            cvb.OwnsOne(cv => cv.Slug);
+
+            cvb.OwnsOne(cv => cv.Price, prb =>
+            {
+                prb.OwnsOne(p => p.Currency, cb =>
+                {
+                    cb.Property(c => c.Value)
+                      .HasColumnName("Currency")
+                      .IsRequired()
+                      .HasMaxLength(Currency.Length);
+                });
+            });
+
+            cvb.OwnsOne(cv => cv.Quantity);
+
+            cvb.OwnsMany(cv => cv.Images);
+
+            cvb.OwnsMany(cv => cv.SizeVariants, svb =>
+            {
+                svb.ToTable("SizeVariants");
+
+                svb.WithOwner().HasForeignKey(nameof(ColorVariantId), nameof(ProductId));
+
+                svb.HasKey(nameof(SizeVariant.Id), nameof(ColorVariantId), nameof(ProductId));
+
+                svb.Property(sv => sv.Id)
+                .HasColumnName(nameof(SizeVariantId))
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    dbId => SizeVariantId.Of(dbId));
+
+                svb.OwnsOne(cv => cv.Size);
+
+                svb.OwnsOne(cv => cv.Price, prb =>
+                {
+                    prb.OwnsOne(p => p.Currency, cb =>
+                    {
+                        cb.Property(c => c.Value)
+                          .HasColumnName("Currency")
+                          .IsRequired()
+                          .HasMaxLength(Currency.Length);
+                    });
+                });
+
+                svb.OwnsOne(cv => cv.Quantity);
+
+
+            });
+
+            cvb.Navigation(cv => cv.SizeVariants).Metadata.SetField("_sizeVariants");
+            cvb.Navigation(cv => cv.SizeVariants).UsePropertyAccessMode(PropertyAccessMode.Field);
+        });
+
+        builder.Metadata.FindNavigation(nameof(Product.ColorVariants))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    private void ConfigureProductsTable(EntityTypeBuilder<Product> builder)
+    {
+        builder.ToTable("Products");
+
         builder.HasKey(p => p.Id);
 
-        // Configuration des propriétés basiques
-        builder.Property(p => p.Name)
-            .IsRequired()
-            .HasMaxLength(200); // Exemple de contrainte de longueur
+        builder.Property(p => p.Id)
+            .ValueGeneratedNever()
+            .HasConversion(
+                id => id.Value,
+                dbId => ProductId.Of(dbId));
 
-        builder.Property(p => p.UrlFriendlyName)
-            .IsRequired()
-            .HasMaxLength(300); // Exemple de longueur maximale pour un slug
+        //builder.ComplexProperty(
+        //p => p.Name, nameBuilder =>
+        //{
+        //    nameBuilder.Property(n => n.Value)
+        //        .HasColumnName(nameof(Product.Name))
+        //        .HasMaxLength(100)
+        //        .IsRequired();
+        //});
 
-        builder.Property(p => p.Description)
-            .IsRequired()
-            .HasMaxLength(1000); // Exemple de longueur maximale pour la description
+        //builder.ComplexProperty(
+        //        p => p.UrlFriendlyName, nameBuilder =>
+        //        {
+        //            nameBuilder.Property(n => n.Value)
+        //                .HasColumnName(nameof(Product.UrlFriendlyName))
+        //                .HasMaxLength(100)
+        //                .IsRequired();
+        //        });
 
-        builder.Property(p => p.IsHandmade)
-            .IsRequired();
+        //builder.ComplexProperty(
+        //        p => p.Description, nameBuilder =>
+        //        {
+        //            nameBuilder.Property(n => n.Value)
+        //                .HasColumnName(nameof(Product.Description))
+        //                .HasMaxLength(100)
+        //                .IsRequired();
+        //        });
 
-        // Relations avec des entités simples
-        builder.HasOne(p => p.ProductType)
-            .WithMany()
-            .HasForeignKey("ProductTypeId")
-            .IsRequired();
+        builder.OwnsOne(p => p.Name);
+        builder.OwnsOne(p => p.UrlFriendlyName);
+        builder.OwnsOne(p => p.Description);
+        builder.OwnsOne(p => p.AverageRating);
 
-        builder.HasOne(p => p.Material)
-            .WithMany()
-            .HasForeignKey("MaterialId")
-            .IsRequired();
+        builder.OwnsOne(p => p.CoverImage);
 
-        builder.HasOne(p => p.Collection)
-            .WithMany()
-            .HasForeignKey("CollectionId")
-            .IsRequired();
+        builder.Property(p => p.IsHandmade);
 
-        builder.HasOne(p => p.CoverImage)
-            .WithMany()
-            .HasForeignKey("CoverImageId")
-            .IsRequired();
+        builder.Property(p => p.ProductTypeId)
+            .ValueGeneratedNever().HasConversion(
+            id => id.Value,
+            dbId => ProductTypeId.Of(dbId));
 
-        // Relations avec les catégories (Many-to-Many)
-        builder.HasMany(p => p.Categories)
-            .WithMany("Products") // Assuming 'Products' is the navigation property on Category
-            .UsingEntity(j => j.ToTable("ProductCategories"));
+        builder.Property(p => p.MaterialId)
+            .ValueGeneratedNever().HasConversion(
+            id => id.Value,
+            dbId => MaterialId.Of(dbId));
 
-        // Relations avec les occasions (Many-to-Many)
-        builder.HasMany(p => p.Occasions)
-            .WithMany("Products") // Assuming 'Products' is the navigation property on Occasion
-            .UsingEntity(j => j.ToTable("ProductOccasions"));
-
-        // Relations avec ColorVariants (One-to-Many)
-        builder.HasMany(p => p.ColorVariants)
-            .WithOne()
-            .HasForeignKey("ProductId")
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade); // Cascade delete if a product is deleted
-
-        // Indices pour optimiser les recherches
-        builder.HasIndex(p => p.UrlFriendlyName)
-            .IsUnique(); // Ensure that the slug is unique
-
-        // Table name
-        builder.ToTable("Products");
+        builder.Property(p => p.CollectionId)
+            .ValueGeneratedNever().HasConversion(
+            id => id.Value,
+            dbId => CollectionId.Of(dbId));
     }
 }

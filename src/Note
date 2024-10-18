@@ -6,6 +6,7 @@ update-database
 
 Add-Migration Create_Database -OutputDir Data/Migrations -Project IdentityServer -StartupProject IdentityServer
 
+Add-Migration Create_Database -OutputDir Data/Migrations -Project Catalog.Infrastructure -StartupProject Catalog.API
 
 
 test 

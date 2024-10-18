@@ -2,8 +2,12 @@
 
 public record Color
 {
-    public string Value { get; }
+    public string Value { get; private set; } = default!;
 
+    private Color()
+    {
+        
+    }
     private Color(string value)
     {
         if (string.IsNullOrWhiteSpace(value))

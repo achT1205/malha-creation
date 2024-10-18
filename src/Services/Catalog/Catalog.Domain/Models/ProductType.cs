@@ -2,7 +2,7 @@
 
 public class ProductType : Entity<ProductTypeId>
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
 
     private ProductType(ProductTypeId id, string name)
     {
@@ -10,6 +10,10 @@ public class ProductType : Entity<ProductTypeId>
         Name = name;
     }
 
+    private ProductType()
+    {
+
+    }
     public static ProductType Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))

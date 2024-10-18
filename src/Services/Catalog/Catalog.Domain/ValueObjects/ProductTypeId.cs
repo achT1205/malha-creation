@@ -2,7 +2,11 @@
 
 public record ProductTypeId
 {
-    public Guid Value { get; }
+    public Guid Value { get; private set; }
+    private ProductTypeId()
+    {
+        
+    }
     private ProductTypeId(Guid value) => Value = value;
     public static ProductTypeId Of(Guid value)
     {

@@ -2,30 +2,28 @@
 
 public record Price
 {
-    public decimal Value { get; }
-    private Price(decimal value) => Value = value;
-    public static Price Of(decimal value)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
+    public Currency Currency { get; private set; } = default!;
+    public decimal Amount { get; private set; } = default!;
 
-        return new Price(value);
+    private Price()
+    {
+        
+    }
+    private Price(Currency currency, decimal amount)
+    {
+        Currency = currency;
+
+        if (amount < 0)
+            throw new ArgumentException("Amount can't be negative.", nameof(amount));
+
+        Amount = amount;
     }
 
-    public Price Increase(decimal amount)
+    public static Price Of(Currency currency, decimal amount)
     {
-        return new Price(Value + amount);
-    }
+        if (amount < 0)
+            throw new ArgumentException("Amount can't be negative.", nameof(amount));
 
-    public Price Decrease(decimal amount)
-    {
-        if (Value - amount < 0)
-        {
-            throw new InvalidOperationException("Price cannot be reduced below zero");
-        }
-        return new Price(Value - amount);
-    }
-    public override string ToString()
-    {
-        return Value.ToString("C");  // Formats as currency
+        return new Price(currency, amount);
     }
 }

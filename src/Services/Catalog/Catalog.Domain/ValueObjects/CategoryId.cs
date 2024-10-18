@@ -3,7 +3,11 @@ namespace Catalog.Domain.ValueObjects;
 
 public record CategoryId
 {
-    public Guid Value { get; }
+    public Guid Value { get; private set; }
+    private CategoryId()
+    {
+        
+    }
     private CategoryId(Guid value) => Value = value;
     public static CategoryId Of(Guid value)
     {

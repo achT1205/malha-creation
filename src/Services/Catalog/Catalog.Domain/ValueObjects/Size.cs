@@ -4,7 +4,12 @@
 public record Size
 {
     private const int DefaultLength = 5;
-    public string Value { get; }
+    public string Value { get; private set; } = default!;
+
+    private Size()
+    {
+        
+    }
 
     private Size(string value)
     {

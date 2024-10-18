@@ -8,138 +8,138 @@ services:
     ports:
       - "1433:1433"
 
-  mc-stockdb:
-    container_name: mc-stockdb
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=MCStockDb
-    restart: always
-    ports:
-        - "5433:5432"
-    volumes:
-      - postgres-mcstock:/var/lib/postgresql/data/
+  # mc-stockdb:
+  #   container_name: mc-stockdb
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=MCStockDb
+  #   restart: always
+  #   ports:
+  #       - "5433:5432"
+  #   volumes:
+  #     - postgres-mcstock:/var/lib/postgresql/data/
 
-  mc-cartdb:
-    container_name: mc-cartdb
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=MCCartDb
-    restart: always
-    ports:
-        - "5434:5432"
-    volumes:
-      - postgres-mccart:/var/lib/postgresql/data/
+  # mc-cartdb:
+  #   container_name: mc-cartdb
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=MCCartDb
+  #   restart: always
+  #   ports:
+  #       - "5434:5432"
+  #   volumes:
+  #     - postgres-mccart:/var/lib/postgresql/data/
 
-  mc-distributedcache:
-    container_name: mc-distributedcache
-    restart: always
-    ports:
-      - "6379:6379"
+  # mc-distributedcache:
+  #   container_name: mc-distributedcache
+  #   restart: always
+  #   ports:
+  #     - "6379:6379"
 
-  mc-orderdb:
-    container_name: mc-orderdb
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=SwN12345678
-    restart: always
-    ports:
-      - "1433:1433"
+  # mc-orderdb:
+  #   container_name: mc-orderdb
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #     - SA_PASSWORD=SwN12345678
+  #   restart: always
+  #   ports:
+  #     - "1433:1433"
 
-  mc-identitydb:
-    container_name: mc-identitydb
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=MCIdentityDb
-    restart: always
-    ports:
-        - "5435:5432"
-    volumes:
-      - postgres-mcidentity:/var/lib/postgresql/data/
+  # mc-identitydb:
+  #   container_name: mc-identitydb
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=MCIdentityDb
+  #   restart: always
+  #   ports:
+  #       - "5435:5432"
+  #   volumes:
+  #     - postgres-mcidentity:/var/lib/postgresql/data/
 
-  messagebroker:
-    container_name: messagebroker
-    hostname: ecommerce-mq
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
-    restart: always
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+  # messagebroker:
+  #   container_name: messagebroker
+  #   hostname: ecommerce-mq
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=guest
+  #     - RABBITMQ_DEFAULT_PASS=guest
+  #   restart: always
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
 
-  catalog.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Server=mc-catalogdb;Database=MCCatalogDb;User Id=sa;Password=SwN12345678;Encrypt=False;TrustServerCertificate=True
-      - MessageBroker__Host=amqp://ecommerce-mq:5672
-      - MessageBroker__UserName=guest
-      - MessageBroker__Password=guest
-    depends_on:
-      - mc-catalogdb
-      - messagebroker
-    ports:
-      - "4000:8080"
-      - "4040:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  # catalog.api:
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #     - ASPNETCORE_HTTPS_PORTS=8081
+  #     - ConnectionStrings__Database=Server=mc-catalogdb;Port=5432;Database=MCCatalogDb;User Id=postgres;Password=postgres;Include Error Detail=true
+  #     - MessageBroker__Host=amqp://ecommerce-mq:5672
+  #     - MessageBroker__UserName=guest
+  #     - MessageBroker__Password=guest
+  #   depends_on:
+  #     - mc-catalogdb
+  #     - messagebroker
+  #   ports:
+  #     - "4000:8080"
+  #     - "4040:8081"
+  #   volumes:
+  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
   
-  inventory.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Server=mc-stockdb;Port=5432;Database=MCStockDb;User Id=postgres;Password=postgres;Include Error Detail=true
-      - MessageBroker__Host=amqp://ecommerce-mq:5672
-      - MessageBroker__UserName=guest
-      - MessageBroker__Password=guest
-    depends_on:
-      - mc-stockdb
-      - messagebroker
-    ports:
-      - "4001:8080"
-      - "4041:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  # inventory.api:
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #     - ASPNETCORE_HTTPS_PORTS=8081
+  #     - ConnectionStrings__Database=Server=mc-stockdb;Port=5432;Database=MCStockDb;User Id=postgres;Password=postgres;Include Error Detail=true
+  #     - MessageBroker__Host=amqp://ecommerce-mq:5672
+  #     - MessageBroker__UserName=guest
+  #     - MessageBroker__Password=guest
+  #   depends_on:
+  #     - mc-stockdb
+  #     - messagebroker
+  #   ports:
+  #     - "4001:8080"
+  #     - "4041:8081"
+  #   volumes:
+  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
-  discount.grpc:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Data Source=discountdb
-    ports:
-      - "4002:8080"
-      - "4042:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  # discount.grpc:
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #     - ASPNETCORE_HTTPS_PORTS=8081
+  #     - ConnectionStrings__Database=Data Source=discountdb
+  #   ports:
+  #     - "4002:8080"
+  #     - "4042:8081"
+  #   volumes:
+  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
-  cart.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Server=mc-cartdb;Port=5432;Database=MCCartDb;user Id=postgres;Password=postgres;Include Error Detail=true
-      - ConnectionStrings__Redis=mc-distributedcache:6379
-      - GrpcSettings__DiscountUrl=https://discount.grpc:8081
-      - MessageBroker__Host=amqp://ecommerce-mq:5672
-      - MessageBroker__UserName=guest
-      - MessageBroker__Password=guest
-    depends_on:
-      - mc-cartdb
-      - mc-distributedcache
-      - discount.grpc
-      - messagebroker
-    ports:
-      - "4003:8080"
-      - "4043:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  # cart.api:
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #     - ASPNETCORE_HTTPS_PORTS=8081
+  #     - ConnectionStrings__Database=Server=mc-cartdb;Port=5432;Database=MCCartDb;user Id=postgres;Password=postgres;Include Error Detail=true
+  #     - ConnectionStrings__Redis=mc-distributedcache:6379
+  #     - GrpcSettings__DiscountUrl=https://discount.grpc:8081
+  #     - MessageBroker__Host=amqp://ecommerce-mq:5672
+  #     - MessageBroker__UserName=guest
+  #     - MessageBroker__Password=guest
+  #   depends_on:
+  #     - mc-cartdb
+  #     - mc-distributedcache
+  #     - discount.grpc
+  #     - messagebroker
+  #   ports:
+  #     - "4003:8080"
+  #     - "4043:8081"
+  #   volumes:
+  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro

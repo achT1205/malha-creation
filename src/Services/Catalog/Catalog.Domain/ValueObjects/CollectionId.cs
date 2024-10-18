@@ -2,7 +2,11 @@
 
 public record CollectionId
 {
-    public Guid Value { get; }
+    public Guid Value { get; private set; }
+    private CollectionId()
+    {
+        
+    }
     private CollectionId(Guid value) => Value = value;
     public static CollectionId Of(Guid value)
     {

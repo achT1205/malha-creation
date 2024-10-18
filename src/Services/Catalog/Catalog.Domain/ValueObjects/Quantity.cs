@@ -2,11 +2,16 @@
 
 public record Quantity
 {
-    public int Value { get; }
+    public int Value { get; private set; }
+
+    private Quantity()
+    {
+        
+    }
     private Quantity(int value) => Value = value;
     public static Quantity Of(int value)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
+        //ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
 
         return new Quantity(value);
     }

@@ -2,7 +2,7 @@
 
 public class Material : Entity<MaterialId>
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
 
     // Constructeur privé pour garantir que Material est créé via la méthode Create
     private Material(MaterialId id, string name)
@@ -10,7 +10,10 @@ public class Material : Entity<MaterialId>
         Id = id;
         Name = name;
     }
-
+    private Material()
+    {
+        
+    }
     public static Material Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))

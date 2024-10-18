@@ -2,10 +2,13 @@
 
 public class Collection : Entity<CollectionId>
 {
-    public string Name { get; private set; }
-    public Image Image { get; private set; }
+    public string Name { get; private set; } = default!;
+    public Image Image { get; private set; } = default!;
 
-    // Constructeur privé pour s'assurer que l'entité est créée via la méthode Create
+    private Collection()
+    {
+        
+    }
     private Collection(CollectionId id, string name, Image image)
     {
         Id = id;

@@ -2,15 +2,19 @@
 
 public record Slug
 {
-    public string Value { get; }
+    public string Value { get; private set; } = default!;
 
+    private Slug()
+    {
+        
+    }
     private Slug(string value)
     {
         Value = value;
     }
 
     // Méthode pour créer le slug avec validation
-    public static Slug Create(string urlFriendlyName, string color)
+    public static Slug Of(string urlFriendlyName, string color)
     {
         if (string.IsNullOrWhiteSpace(urlFriendlyName))
         {

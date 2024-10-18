@@ -2,30 +2,37 @@
 
 public class Product : Aggregate<ProductId>
 {
-    public string Name { get; private set; }
-    public string UrlFriendlyName { get; private set; }
-    public string Description { get; private set; }
-    public Image CoverImage { get; set; }
-    public bool IsHandmade { get; private set; }
-    public ProductType ProductType { get; private set; }
-    public Material Material { get; private set; }
-    public Collection Collection { get; private set; }
-    public List<Category> Categories { get; private set; }
-    public List<Occasion> Occasions { get; private set; }
-    public List<ColorVariantBase> ColorVariants { get; private set; }
+    public IReadOnlyList<OccasionId> OccasionIds => _occasionIds.AsReadOnly();
+    public IReadOnlyList<CategoryId> CategoryIds => _categoryIds.AsReadOnly();
+    public IReadOnlyList<ColorVariant> ColorVariants => _colorVariants.AsReadOnly();
+    public IReadOnlyList<ProductReviewId>  ProductReviewIds => _productReviewIds.AsReadOnly();
 
+    public ProductName Name { get; private set; } = default!;
+    public UrlFriendlyName UrlFriendlyName { get; private set; } = default!;
+    public ProductDescription Description { get; private set; } = default!;
+    public AverageRating AverageRating { get; private set; } = default!;
+    public Image CoverImage { get; private set; } = default!; 
+    public bool IsHandmade { get; private set; } = default!;
+    public ProductTypeId ProductTypeId { get; private set; } = default!;
+    public MaterialId MaterialId { get; private set; } = default!;
+    public CollectionId CollectionId { get; private set; } = default!;
+    private readonly List<ProductReviewId>  _productReviewIds = new();
+    private readonly List<OccasionId> _occasionIds = new();
+    private readonly List<CategoryId> _categoryIds = new();
+    private readonly List<ColorVariant> _colorVariants = new();
+
+    private Product() { }
     private Product(
         ProductId id,
-        string name,
-        string urlFriendlyName,
-        string description,
+        ProductName name,
+        UrlFriendlyName urlFriendlyName,
+        ProductDescription description,
         bool isHandmade,
         Image coverImage,
-        ProductType productType,
-        Material material,
-        Collection collection,
-        List<Occasion> occasions,
-        List<Category> categories
+        ProductTypeId productTypeId,
+        MaterialId materialId,
+        CollectionId collectionId,
+        AverageRating averageRating
         )
     {
         Id = id;
@@ -34,138 +41,87 @@ public class Product : Aggregate<ProductId>
         Description = description ?? throw new ArgumentNullException(nameof(description));
         IsHandmade = isHandmade;
         CoverImage = coverImage ?? throw new ArgumentNullException(nameof(coverImage));
-        ProductType = productType ?? throw new ArgumentNullException(nameof(productType));
-        Material = material ?? throw new ArgumentNullException(nameof(material));
-        Collection = collection ?? throw new ArgumentNullException(nameof(collection));
-        Categories = categories ?? new List<Category>();
-        Occasions = occasions ?? new List<Occasion>();
-        ColorVariants = new List<ColorVariantBase>();
+        ProductTypeId = productTypeId ?? throw new ArgumentNullException(nameof(productTypeId));
+        MaterialId = materialId ?? throw new ArgumentNullException(nameof(materialId));
+        CollectionId = collectionId ?? throw new ArgumentNullException(nameof(collectionId));
+        AverageRating = averageRating ?? AverageRating.Of(0, 0);
     }
 
+    // Méthode de création pour s'assurer que la création respecte la logique métier
     public static Product Create(
-        string name,
-        string UrlFriendlyName,
-        string description,
+        ProductId id,
+        ProductName name,
+        UrlFriendlyName urlFriendlyName,
+        ProductDescription description,
         bool isHandmade,
         Image coverImage,
-        ProductType productType,
-        Occasion occasion,
-        Material material,
-        Collection collection,
-        List<Occasion> occasions,
-        List<Category> categories
+        ProductTypeId productTypeId,
+        MaterialId materialId,
+        CollectionId collectionId,
+        AverageRating averageRating
         )
     {
         var product = new Product(
-             ProductId.Of(Guid.NewGuid()),
+             id,
              name,
-             UrlFriendlyName,
+             urlFriendlyName,
              description,
              isHandmade,
              coverImage,
-             productType,
-             material,
-             collection,
-             occasions,
-             categories
+             productTypeId,
+             materialId,
+             collectionId,
+             averageRating
          );
 
         product.AddDomainEvent(new ProductCreatedEvent(product));
         return product;
     }
 
-    // Ajout d'une variante de couleur
-    public void AddColorVariant(ColorVariantBase colorVariant)
+    // Ajout d'une nouvelle évaluation (ProductReview)
+    public void AddReview(ProductReviewId reviewId)
     {
-        if (colorVariant == null)
+        if (!_productReviewIds.Contains(reviewId))
         {
-            throw new ArgumentNullException(nameof(colorVariant));
-        }
-        if (ColorVariants.Any(c => c.Slug.Value == colorVariant.Slug.Value))
-        {
-            throw new InvalidOperationException("A color variant with the same slug already exists.");
-        }
-
-        ColorVariants.Add(colorVariant);
-        AddDomainEvent(new ProductUpdatedEvent(this));
-    }
-
-    public void RemoveColorVariant(ColorVariantId colorVariantId)
-    {
-        var colorVariant = ColorVariants.FirstOrDefault(c => c.Id == colorVariantId);
-        if (colorVariant != null)
-        {
-            ColorVariants.Remove(colorVariant);
-            AddDomainEvent(new ProductUpdatedEvent(this));
-        }
-        else
-        {
-            throw new InvalidOperationException("Color variant not found.");
-        }
-    }
-
-    // Méthodes pour ajouter des catégories
-    public void AddCategory(Category category)
-    {
-        if (category == null)
-        {
-            throw new ArgumentNullException(nameof(category));
-        }
-
-        if (!Categories.Contains(category))
-        {
-            Categories.Add(category);
+            _productReviewIds.Add(reviewId);
             AddDomainEvent(new ProductUpdatedEvent(this));
         }
     }
 
-    // Suppression d'une catégorie
-    public void RemoveCategory(CategoryId categoryId)
+    // Méthode pour ajouter une occasion
+    public void AddOccasion(OccasionId occasionId)
     {
-        var category = Categories.FirstOrDefault(c => c.Id == categoryId);
-        if (category != null)
+        if (!_occasionIds.Contains(occasionId))
         {
-            Categories.Remove(category);
-            AddDomainEvent(new ProductUpdatedEvent(this));
-        }
-        else
-        {
-            throw new InvalidOperationException("Color variant not found.");
-        }
-    }
-
-    // Modification de la collection
-    public void UpdateCollection(Collection newCollection)
-    {
-        if (!Collection.Equals(newCollection))
-        {
-            Collection = newCollection ?? throw new ArgumentNullException(nameof(newCollection));
+            _occasionIds.Add(occasionId);
             AddDomainEvent(new ProductUpdatedEvent(this));
         }
     }
 
-    // Modification du matériau
-    public void UpdateMaterial(Material newMaterial)
+    // Méthode pour ajouter une catégorie
+    public void AddCategory(CategoryId categoryId)
     {
-        if (!Material.Equals(newMaterial))
+        if (!_categoryIds.Contains(categoryId))
         {
-            Material = newMaterial ?? throw new ArgumentNullException(nameof(newMaterial));
+            _categoryIds.Add(categoryId);
             AddDomainEvent(new ProductUpdatedEvent(this));
         }
     }
 
-
-    // Méthodes de mise à jour des informations sur le produit
-    public void UpdateDescription(string newDescription)
+    // Méthode pour ajouter une variante de couleur
+    public void AddColorVariant(ColorVariant colorVariant)
     {
-        Description = newDescription ?? throw new ArgumentNullException(nameof(newDescription));
-        AddDomainEvent(new ProductUpdatedEvent(this));
+        if (!_colorVariants.Contains(colorVariant))
+        {
+            _colorVariants.Add(colorVariant);
+            AddDomainEvent(new ProductUpdatedEvent(this));
+        }
     }
 
-    public void UpdateName(string newName, string newUrlFriendlyName)
+    // Méthode pour mettre à jour la note moyenne après une nouvelle évaluation
+    public void UpdateAverageRating(decimal newRating)
     {
-        Name = newName ?? throw new ArgumentNullException(nameof(newName));
-        UrlFriendlyName = newUrlFriendlyName ?? throw new ArgumentNullException(nameof(newUrlFriendlyName));
+        AverageRating = AverageRating.AddNewRating(newRating);
         AddDomainEvent(new ProductUpdatedEvent(this));
     }
 }

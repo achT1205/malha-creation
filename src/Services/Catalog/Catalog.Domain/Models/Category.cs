@@ -3,27 +3,23 @@
 
 public class Category : Entity<CategoryId>
 {
-    public string Name { get; private set; }
+    public ProductId ProductId { get; private set; } = default!;
+    public CategoryName Name { get; private set; } = default!;
 
-    // Constructeur privé pour forcer l'utilisation de la méthode Create
-    private Category(CategoryId id, string name)
+    private Category()
     {
+        
+    }
+    private Category(ProductId productId, CategoryId id, CategoryName name)
+    {
+        ProductId = productId;
         Id = id;
         Name = name;
     }
 
-    public static Category Create(string name)
+    public static Category Create(ProductId productId, CategoryId id, CategoryName name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Category name cannot be null or empty.", nameof(name));
-        }
 
-        if (name.Length > 100) // Exemple de contrainte sur la longueur
-        {
-            throw new ArgumentException("Category name cannot exceed 100 characters.", nameof(name));
-        }
-
-        return new Category(CategoryId.Of(Guid.NewGuid()), name);
+        return new Category(productId, id, name);
     }
 }
