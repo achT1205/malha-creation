@@ -16,17 +16,17 @@ namespace Catalog.Infrastructure.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name_Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UrlFriendlyName_Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description_Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AverageRating_Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AverageRating_TotalRatingsCount = table.Column<int>(type: "int", nullable: false),
-                    CoverImage_ImageSrc = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CoverImage_AltText = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsHandmade = table.Column<bool>(type: "bit", nullable: false),
                     ProductTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CollectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TotalRatingsCount = table.Column<int>(type: "int", nullable: false),
+                    AverageRating = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AltText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageSrc = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UrlFriendlyName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -38,36 +38,16 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CategoryIds",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CategoryIds", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CategoryIds_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ColorVariants",
                 columns: table => new
                 {
                     ColorVariantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Color_Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Slug_Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Price_Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Quantity_Value = table.Column<int>(type: "int", nullable: false),
+                    Color = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Slug = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", maxLength: 200, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -85,7 +65,27 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OccasionIds",
+                name: "ProductCategoryIds",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductCategoryIds", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductCategoryIds_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductOccasionIds",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -95,9 +95,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OccasionIds", x => x.Id);
+                    table.PrimaryKey("PK_ProductOccasionIds", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OccasionIds_Products_ProductId",
+                        name: "FK_ProductOccasionIds_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -125,7 +125,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ColorVariants_Images",
+                name: "ColorVariantImages",
                 columns: table => new
                 {
                     ColorVariantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -137,9 +137,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ColorVariants_Images", x => new { x.ColorVariantId, x.ColorVariantProductId, x.Id });
+                    table.PrimaryKey("PK_ColorVariantImages", x => new { x.ColorVariantId, x.ColorVariantProductId, x.Id });
                     table.ForeignKey(
-                        name: "FK_ColorVariants_Images_ColorVariants_ColorVariantId_ColorVariantProductId",
+                        name: "FK_ColorVariantImages_ColorVariants_ColorVariantId_ColorVariantProductId",
                         columns: x => new { x.ColorVariantId, x.ColorVariantProductId },
                         principalTable: "ColorVariants",
                         principalColumns: new[] { "ColorVariantId", "ProductId" },
@@ -147,18 +147,18 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoryIds_ProductId",
-                table: "CategoryIds",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ColorVariants_ProductId",
                 table: "ColorVariants",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OccasionIds_ProductId",
-                table: "OccasionIds",
+                name: "IX_ProductCategoryIds_ProductId",
+                table: "ProductCategoryIds",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductOccasionIds_ProductId",
+                table: "ProductOccasionIds",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -171,13 +171,13 @@ namespace Catalog.Infrastructure.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CategoryIds");
+                name: "ColorVariantImages");
 
             migrationBuilder.DropTable(
-                name: "ColorVariants_Images");
+                name: "ProductCategoryIds");
 
             migrationBuilder.DropTable(
-                name: "OccasionIds");
+                name: "ProductOccasionIds");
 
             migrationBuilder.DropTable(
                 name: "ProductReviewIds");

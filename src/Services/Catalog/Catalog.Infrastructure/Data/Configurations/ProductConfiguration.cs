@@ -38,7 +38,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.OwnsMany(p => p.OccasionIds, ob =>
         {
-            ob.ToTable("OccasionIds");
+            ob.ToTable("ProductOccasionIds");
 
             ob.WithOwner().HasForeignKey("ProductId");
 
@@ -57,7 +57,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.OwnsMany(p => p.CategoryIds, cb =>
         {
-            cb.ToTable("CategoryIds");
+            cb.ToTable("ProductCategoryIds");
 
             cb.WithOwner().HasForeignKey("ProductId");
 
@@ -88,9 +88,21 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 id => id.Value,
                 dbId => ColorVariantId.Of(dbId));
 
-            cvb.OwnsOne(cv => cv.Color);
+            cvb.OwnsOne(cv => cv.Color, cb =>
+            {
+                cb.Property(c => c.Value)
+                  .HasColumnName("Color")
+                  .IsRequired()
+                  .HasMaxLength(50);
+            });
 
-            cvb.OwnsOne(cv => cv.Slug);
+            cvb.OwnsOne(cv => cv.Slug, slb =>
+            {
+                slb.Property(c => c.Value)
+                  .HasColumnName("Slug")
+                  .IsRequired()
+                  .HasMaxLength(200);
+            });
 
             cvb.OwnsOne(cv => cv.Price, prb =>
             {
@@ -101,11 +113,24 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                       .IsRequired()
                       .HasMaxLength(Currency.Length);
                 });
+
+                prb.Property(p => p.Amount)
+                .HasColumnName("Amount")
+                .IsRequired();
             });
 
-            cvb.OwnsOne(cv => cv.Quantity);
+            cvb.OwnsOne(cv => cv.Quantity, qb =>
+            {
+                qb.Property(q => q.Value)
+                  .HasColumnName("Quantity")
+                  .IsRequired()
+                  .HasMaxLength(200);
+            });
 
-            cvb.OwnsMany(cv => cv.Images);
+            cvb.OwnsMany(cv => cv.Images, imsb =>
+            {
+                imsb.ToTable("ColorVariantImages");
+            });
 
             //cvb.OwnsMany(cv => cv.SizeVariants, svb =>
             //{
@@ -159,39 +184,64 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 id => id.Value,
                 dbId => ProductId.Of(dbId));
 
-        //builder.ComplexProperty(
-        //p => p.Name, nameBuilder =>
-        //{
-        //    nameBuilder.Property(n => n.Value)
-        //        .HasColumnName(nameof(Product.Name))
-        //        .HasMaxLength(100)
-        //        .IsRequired();
-        //});
+        builder.ComplexProperty(
+        p => p.Name, nb =>
+        {
+            nb.Property(n => n.Value)
+                .HasColumnName(nameof(Product.Name))
+                .HasMaxLength(100)
+                .IsRequired();
+        });
 
-        //builder.ComplexProperty(
-        //        p => p.UrlFriendlyName, nameBuilder =>
-        //        {
-        //            nameBuilder.Property(n => n.Value)
-        //                .HasColumnName(nameof(Product.UrlFriendlyName))
-        //                .HasMaxLength(100)
-        //                .IsRequired();
-        //        });
+        builder.ComplexProperty(
+                p => p.UrlFriendlyName, unb =>
+                {
+                    unb.Property(n => n.Value)
+                        .HasColumnName(nameof(Product.UrlFriendlyName))
+                        .HasMaxLength(100)
+                        .IsRequired();
+                });
 
-        //builder.ComplexProperty(
-        //        p => p.Description, nameBuilder =>
-        //        {
-        //            nameBuilder.Property(n => n.Value)
-        //                .HasColumnName(nameof(Product.Description))
-        //                .HasMaxLength(100)
-        //                .IsRequired();
-        //        });
+        builder.ComplexProperty(
+                p => p.Description, desb =>
+                {
+                    desb.Property(n => n.Value)
+                        .HasColumnName(nameof(Product.Description))
+                        .HasMaxLength(100)
+                        .IsRequired();
+                });
 
-        builder.OwnsOne(p => p.Name);
-        builder.OwnsOne(p => p.UrlFriendlyName);
-        builder.OwnsOne(p => p.Description);
-        builder.OwnsOne(p => p.AverageRating);
+        builder.ComplexProperty(
+          p => p.AverageRating, avb =>
+          {
+              avb.Property(av => av.Value)
+                  .HasColumnName(nameof(Product.AverageRating))
+                  .IsRequired();
 
-        builder.OwnsOne(p => p.CoverImage);
+              avb.Property(av => av.TotalRatingsCount)
+                 .HasColumnName(nameof(Product.AverageRating.TotalRatingsCount))
+                 .IsRequired();
+          });
+
+        builder.ComplexProperty(
+              p => p.CoverImage, cib =>
+              {
+                  cib.Property(ci => ci.ImageSrc)
+                      .HasColumnName(nameof(Product.CoverImage.ImageSrc))
+                      .IsRequired();
+
+                  cib.Property(ci => ci.AltText)
+                     .HasColumnName(nameof(Product.CoverImage.AltText))
+                     .IsRequired();
+              });
+
+
+        //builder.OwnsOne(p => p.Name);
+        //builder.OwnsOne(p => p.UrlFriendlyName);
+        //builder.OwnsOne(p => p.Description);
+        //builder.OwnsOne(p => p.AverageRating);
+
+        //builder.OwnsOne(p => p.CoverImage);
 
         builder.Property(p => p.IsHandmade);
 
