@@ -1,28 +1,26 @@
-﻿using Catalog.Domain.Events;
-
-public class Product : Aggregate<ProductId>
+﻿public abstract class Product<T> : Aggregate<ProductId>
 {
     public IReadOnlyList<OccasionId> OccasionIds => _occasionIds.AsReadOnly();
     public IReadOnlyList<CategoryId> CategoryIds => _categoryIds.AsReadOnly();
-    public IReadOnlyList<ColorVariant> ColorVariants => _colorVariants.AsReadOnly();
     public IReadOnlyList<ProductReviewId>  ProductReviewIds => _productReviewIds.AsReadOnly();
+    public IReadOnlyList<T> ColorVariants => _colorVariants.AsReadOnly();
+    protected readonly List<T> _colorVariants = new();
 
-    public ProductName Name { get; private set; } = default!;
-    public UrlFriendlyName UrlFriendlyName { get; private set; } = default!;
-    public ProductDescription Description { get; private set; } = default!;
-    public AverageRating AverageRating { get; private set; } = default!;
-    public Image CoverImage { get; private set; } = default!; 
-    public bool IsHandmade { get; private set; } = default!;
-    public ProductTypeId ProductTypeId { get; private set; } = default!;
-    public MaterialId MaterialId { get; private set; } = default!;
-    public CollectionId CollectionId { get; private set; } = default!;
-    private readonly List<ProductReviewId>  _productReviewIds = new();
-    private readonly List<OccasionId> _occasionIds = new();
-    private readonly List<CategoryId> _categoryIds = new();
-    private readonly List<ColorVariant> _colorVariants = new();
+    public ProductName Name { get; protected set; } = default!;
+    public UrlFriendlyName UrlFriendlyName { get; protected set; } = default!;
+    public ProductDescription Description { get; protected set; } = default!;
+    public AverageRating AverageRating { get; protected set; } = default!;
+    public Image CoverImage { get; protected set; } = default!; 
+    public bool IsHandmade { get; protected set; } = default!;
+    public ProductTypeId ProductTypeId { get; protected set; } = default!;
+    public MaterialId MaterialId { get; protected set; } = default!;
+    public CollectionId CollectionId { get; protected set; } = default!;
+    protected readonly List<ProductReviewId>  _productReviewIds = new();
+    protected readonly List<OccasionId> _occasionIds = new();
+    protected readonly List<CategoryId> _categoryIds = new();
 
-    private Product() { }
-    private Product(
+    protected Product() { }
+    protected Product(
         ProductId id,
         ProductName name,
         UrlFriendlyName urlFriendlyName,
@@ -47,81 +45,9 @@ public class Product : Aggregate<ProductId>
         AverageRating = averageRating ?? AverageRating.Of(0, 0);
     }
 
-    // Méthode de création pour s'assurer que la création respecte la logique métier
-    public static Product Create(
-        ProductId id,
-        ProductName name,
-        UrlFriendlyName urlFriendlyName,
-        ProductDescription description,
-        bool isHandmade,
-        Image coverImage,
-        ProductTypeId productTypeId,
-        MaterialId materialId,
-        CollectionId collectionId,
-        AverageRating averageRating
-        )
-    {
-        var product = new Product(
-             id,
-             name,
-             urlFriendlyName,
-             description,
-             isHandmade,
-             coverImage,
-             productTypeId,
-             materialId,
-             collectionId,
-             averageRating
-         );
-
-        product.AddDomainEvent(new ProductCreatedEvent(product));
-        return product;
-    }
-
-    // Ajout d'une nouvelle évaluation (ProductReview)
-    public void AddReview(ProductReviewId reviewId)
-    {
-        if (!_productReviewIds.Contains(reviewId))
-        {
-            _productReviewIds.Add(reviewId);
-            AddDomainEvent(new ProductUpdatedEvent(this));
-        }
-    }
-
-    // Méthode pour ajouter une occasion
-    public void AddOccasion(OccasionId occasionId)
-    {
-        if (!_occasionIds.Contains(occasionId))
-        {
-            _occasionIds.Add(occasionId);
-            AddDomainEvent(new ProductUpdatedEvent(this));
-        }
-    }
-
-    // Méthode pour ajouter une catégorie
-    public void AddCategory(CategoryId categoryId)
-    {
-        if (!_categoryIds.Contains(categoryId))
-        {
-            _categoryIds.Add(categoryId);
-            AddDomainEvent(new ProductUpdatedEvent(this));
-        }
-    }
-
-    // Méthode pour ajouter une variante de couleur
-    public void AddColorVariant(ColorVariant colorVariant)
-    {
-        if (!_colorVariants.Contains(colorVariant))
-        {
-            _colorVariants.Add(colorVariant);
-            AddDomainEvent(new ProductUpdatedEvent(this));
-        }
-    }
-
-    // Méthode pour mettre à jour la note moyenne après une nouvelle évaluation
-    public void UpdateAverageRating(decimal newRating)
-    {
-        AverageRating = AverageRating.AddNewRating(newRating);
-        AddDomainEvent(new ProductUpdatedEvent(this));
-    }
+    public abstract void AddReview(ProductReviewId reviewId);
+    public abstract void AddOccasion(OccasionId occasionId);
+    public abstract void AddCategory(CategoryId categoryId);
+    public abstract void UpdateAverageRating(decimal newRating);
+    public abstract void AddColorVariant(T colorVariant);
 }

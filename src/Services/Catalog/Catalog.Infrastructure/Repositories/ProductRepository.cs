@@ -16,37 +16,62 @@ public class ProductRepository : IProductRepository
     //Récupérer un produit par son ID
     public async Task<Product> GetByIdAsync(ProductId id)
     {
-        return await _context.Products
-            //.Include(p => p.Categories)
-            //.Include(p => p.Occasions)
-            .Include(p => p.ColorVariants) // Inclusion des ColorVariants
-                .ThenInclude(cv => cv.Images) // Inclusion des Images pour chaque ColorVariant
-            .Include(p => p.ColorVariants) // Réinclusion des ColorVariants pour les dépendances supplémentaires
-                .ThenInclude(cv => (cv).SizeVariants) // Inclusion des tailles si le variant est un vêtement
-            .FirstOrDefaultAsync(product => product.Id == id)
-            ?? throw new KeyNotFoundException($"Product with ID {id.Value} not found.");
+        var product = await _context.Products
+        .Include(p => ((AccessoryProduct)p).ColorVariants)
+            .ThenInclude(cv => cv.Images)
+        .Include(p => ((ClothingProduct)p).ColorVariants)
+            .ThenInclude(cv => cv.Images)
+        .Include(p => ((ClothingProduct)p).ColorVariants)
+            .ThenInclude(cv => (cv as ClothingColorVariant).SizeVariants)
+        .FirstOrDefaultAsync(p => p.Id == id);
+
+        return product ?? throw new KeyNotFoundException($"Product with ID {id.Value} not found.");
+        //return await _context.Products
+
+        //    .Include(p => p.ColorVariants) 
+        //        .ThenInclude(cv => cv.Images) 
+        //    .Include(p => p.ColorVariants) 
+        //        .ThenInclude(cv => (cv).SizeVariants) 
+        //    .FirstOrDefaultAsync(product => product.Id == id)
+        //    ?? throw new KeyNotFoundException($"Product with ID {id.Value} not found.");
     }
 
     public async Task<Product?> GetBySlugAsync(string slug)
     {
         return await _context.Products
-            //.Include(p => p.Categories)
-            //.Include(p => p.Occasions)
-            .Include(p => p.ColorVariants)
-                .ThenInclude(cv => cv.Images)
-            .Include(p => p.ColorVariants)
-                .ThenInclude(cv => (cv).SizeVariants)
-            .FirstOrDefaultAsync(p => p.ColorVariants.Any(cv => cv.Slug.Value == slug));
+        .Include(p => ((AccessoryProduct)p).ColorVariants)
+            .ThenInclude(cv => cv.Images)
+        .Include(p => ((ClothingProduct)p).ColorVariants)
+            .ThenInclude(cv => cv.Images)
+        .Include(p => ((ClothingProduct)p).ColorVariants)
+            .ThenInclude(cv => (cv as ClothingColorVariant).SizeVariants)
+        .FirstOrDefaultAsync(p => p.ColorVariants.Any(cv => cv.Slug.Value == slug));
+
+        //return await _context.Products
+        //    .Include(p => p.ColorVariants)
+        //        .ThenInclude(cv => cv.Images)
+        //    .Include(p => p.ColorVariants)
+        //        .ThenInclude(cv => (cv).SizeVariants)
+        //    .FirstOrDefaultAsync(p => p.ColorVariants.Any(cv => cv.Slug.Value == slug));
     }
 
     // Récupérer tous les produits
     public async Task<List<Product>> GetAllAsync()
     {
+        //return await _context.Products
+        //    .Include(p => p.ColorVariants)
+        //        .ThenInclude(cv => cv.Images)
+        //    .Include(p => p.ColorVariants)
+        //        .ThenInclude(cv => (cv).SizeVariants)
+        //    .ToListAsync();
+
         return await _context.Products
-            .Include(p => p.ColorVariants)
+            .Include(p => ((AccessoryProduct)p).ColorVariants)
                 .ThenInclude(cv => cv.Images)
-            .Include(p => p.ColorVariants)
-                .ThenInclude(cv => (cv).SizeVariants)
+            .Include(p => ((ClothingProduct)p).ColorVariants)
+                .ThenInclude(cv => cv.Images)
+            .Include(p => ((ClothingProduct)p).ColorVariants)
+                .ThenInclude(cv => (cv as ClothingColorVariant).SizeVariants)
             .ToListAsync();
     }
     // Ajouter un nouveau produit

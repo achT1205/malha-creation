@@ -35,8 +35,22 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
 
     private Product CreateNewProduct(CreateProductCommand command)
     {
+        if (command.ColorVariants.Any(_ => _.sizeVariants.Any()))
+        {
+            var p = createNewClothimgProduct(command);
+            return (Product)p;
+        }
+        else {
+            var p = createNewAccessoryProduct(command);
+            return (Product)p;
+        }
+    }
+
+    private object createNewAccessoryProduct(CreateProductCommand command)
+    {
+
         var coverImage = Image.Of(command.CoverImage.ImageSrc, command.CoverImage.AltText);
-        var product = Product.Create(
+        var product = AccessoryProduct.Create(
             ProductId.Of(Guid.NewGuid()),
             ProductName.Of(command.Name),
             UrlFriendlyName.Of(command.UrlFriendlyName),
@@ -62,12 +76,58 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
         foreach (var colorVariant in command.ColorVariants)
         {
 
-            var newColorVariant = ColorVariant.Create(
+            var newColorVariant = AccessoryColorVariant.Create(
                 product.Id,
                 Color.Of(colorVariant.Color),
                 Slug.Of(command.UrlFriendlyName, colorVariant.Color),
                 Price.Of("USD", colorVariant.Price),
                 Quantity.Of(colorVariant.Quantity));
+
+            foreach (var image in colorVariant.Images)
+            {
+                var newImage = Image.Of(image.ImageSrc, image.AltText);
+                newColorVariant.AddImage(newImage);
+            }
+            product.AddColorVariant(newColorVariant);
+        }
+
+        return product;
+    }
+
+    private object createNewClothimgProduct(CreateProductCommand command)
+    {
+
+        var coverImage = Image.Of(command.CoverImage.ImageSrc, command.CoverImage.AltText);
+        var product = ClothingProduct.Create(
+            ProductId.Of(Guid.NewGuid()),
+            ProductName.Of(command.Name),
+            UrlFriendlyName.Of(command.UrlFriendlyName),
+            ProductDescription.Of(command.Description),
+            command.IsHandmade,
+            coverImage,
+            ProductTypeId.Of(command.ProductTypeId),
+            MaterialId.Of(command.MaterialId),
+            CollectionId.Of(command.CollectionId),
+            AverageRating.Of(0m, 0)
+        );
+
+        foreach (var id in command.OccasionIds)
+        {
+            product.AddCategory(CategoryId.Of(id));
+        }
+
+        foreach (var id in command.CategoryIds)
+        {
+            product.AddOccasion(OccasionId.Of(id));
+        }
+
+        foreach (var colorVariant in command.ColorVariants)
+        {
+
+            var newColorVariant = ClothingColorVariant.Create(
+                product.Id,
+                Color.Of(colorVariant.Color),
+                Slug.Of(command.UrlFriendlyName, colorVariant.Color));
 
             foreach (var image in colorVariant.Images)
             {
@@ -89,6 +149,5 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
         }
 
         return product;
-
     }
 }
