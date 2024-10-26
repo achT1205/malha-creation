@@ -14,9 +14,9 @@ public record ProductDto
     List<Guid> OccasionIds,
     List<Guid> CategoryIds,
     List<OutputColorVariantDto> ColorVariants,
-    string ProductType,
-    string Material,
-    string Collection,
-    List<string>  Occasions,
-    List<string> Categories
+    string? ProductType,
+    string? Material,
+    string? Collection,
+    List<string>?  Occasions,
+    List<string>? Categories
 );

@@ -72,7 +72,7 @@ public class StoreCartCommandHandler(
                 throw new ProductNotFoundException($"No variant exists for this product in the color {item.Color}");
             }
             shoppingCartItem.Slug = variant.Slug;
-            if (product.ProductType == ProductType.Clothing)
+            if (product.ProductType == ProductTypeEnum.Clothing)
             {
                 var size = variant?.Sizes?.FirstOrDefault(x => x.Size.ToLower() == item.Size.ToLower());
                 if (size == null)

@@ -53,7 +53,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
     }
     private void ConfigureCategoryIdsTable(EntityTypeBuilder<Product> builder)
     {
-
         builder.OwnsMany(p => p.CategoryIds, cb =>
         {
             cb.ToTable("ProductCategoryIds");
@@ -66,7 +65,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasColumnName("CategoryId")
             .ValueGeneratedNever();
         });
-
         builder.Metadata.FindNavigation(nameof(Product.CategoryIds))!
        .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
@@ -106,19 +104,16 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             cvb.OwnsOne(cv => cv.Price, prb =>
             {
                 prb.Property(p => p.Currency)
-                 .HasColumnName("Currency")
-                 .IsRequired();
+                 .HasColumnName("Currency");
 
                 prb.Property(p => p.Amount)
-                .HasColumnName("Price")
-                .IsRequired();
+                .HasColumnName("Price");
             });
 
             cvb.OwnsOne(cv => cv.Quantity, qb =>
             {
                 qb.Property(q => q.Value)
-                  .HasColumnName("Quantity")
-                  .IsRequired();
+                  .HasColumnName("Quantity");
             });
 
             cvb.OwnsMany(cv => cv.Images, imsb =>
@@ -182,7 +177,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.HasKey(p => p.Id);
 
-
         builder.Property(p => p.Id)
             .ValueGeneratedNever()
             .HasConversion(
@@ -220,12 +214,10 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
           p => p.AverageRating, avb =>
           {
               avb.Property(av => av.Value)
-                  .HasColumnName(nameof(Product.AverageRating))
-                  .IsRequired();
+                  .HasColumnName(nameof(Product.AverageRating));
 
               avb.Property(av => av.TotalRatingsCount)
-                 .HasColumnName(nameof(Product.AverageRating.TotalRatingsCount))
-                 .IsRequired();
+                 .HasColumnName(nameof(Product.AverageRating.TotalRatingsCount));
           });
 
         builder.ComplexProperty(

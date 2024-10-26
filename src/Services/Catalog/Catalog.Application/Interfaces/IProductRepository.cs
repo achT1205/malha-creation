@@ -7,8 +7,8 @@ public interface IProductRepository
     Task<Product?> GetBySlugAsync(string slug);
     Task<List<Product>> GetAllAsync();
     Task AddAsync(Product product);
-    Task UpdateAsync(Product product);
-    Task RemoveAsync(Product product);
+    void UpdateAsync(Product product);
+    void RemoveAsync(Product product);
     Task SaveChangesAsync();
 }
 

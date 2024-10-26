@@ -2,9 +2,9 @@
 using BuildingBlocks.Enums;
 using Catalog.Application.Dtos;
 
-namespace Catalog.Application.Products.Commands.CreateProduct;
-
-public record CreateProductCommand(
+namespace Catalog.Application.Products.Commands.UpdateProduct;
+public record UpdateProductCommand(
+    Guid Id,
     string Name,
     string UrlFriendlyName,
     string Description,
@@ -16,6 +16,13 @@ public record CreateProductCommand(
     Guid CollectionId,
     List<Guid> OccasionIds,
     List<Guid> CategoryIds,
-    List<ColorVariantDto> ColorVariants
+    List<ColorVariantDto> ColorVariants,
+    RemovedItems ? RemovedItems
    )
-    : ICommand<CreateProductResult>;
+    : ICommand<UpdateProductResult>;
+
+public record RemovedItems(
+    List<Guid> OccasionIds,
+    List<Guid> CategoryIds,
+    List<Guid> ColorVariantIds
+    );

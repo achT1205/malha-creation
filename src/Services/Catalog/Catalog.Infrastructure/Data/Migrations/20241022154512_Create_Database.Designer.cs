@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241018213909_Create_Database")]
+    [Migration("20241022154512_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -315,7 +315,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");
 
-                            b1.OwnsOne("Catalog.Domain.ValueObjects.Price", "Price", b2 =>
+                            b1.OwnsOne("Catalog.Domain.ValueObjects.Color", "Color", b2 =>
                                 {
                                     b2.Property<Guid>("ColorVariantId")
                                         .HasColumnType("uniqueidentifier");
@@ -323,7 +323,29 @@ namespace Catalog.Infrastructure.Data.Migrations
                                     b2.Property<Guid>("ColorVariantProductId")
                                         .HasColumnType("uniqueidentifier");
 
-                                    b2.Property<decimal>("Amount")
+                                    b2.Property<string>("Value")
+                                        .IsRequired()
+                                        .HasMaxLength(50)
+                                        .HasColumnType("nvarchar(50)")
+                                        .HasColumnName("Color");
+
+                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
+
+                                    b2.ToTable("ColorVariants");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
+                                });
+
+                            b1.OwnsOne("Catalog.Domain.ValueObjects.ColorVariantPrice", "Price", b2 =>
+                                {
+                                    b2.Property<Guid>("ColorVariantId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<Guid>("ColorVariantProductId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<decimal?>("Amount")
                                         .HasColumnType("decimal(18,2)")
                                         .HasColumnName("Price");
 
@@ -340,7 +362,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                                         .HasForeignKey("ColorVariantId", "ColorVariantProductId");
                                 });
 
-                            b1.OwnsOne("Catalog.Domain.ValueObjects.Quantity", "Quantity", b2 =>
+                            b1.OwnsOne("Catalog.Domain.ValueObjects.ColorVariantQuantity", "Quantity", b2 =>
                                 {
                                     b2.Property<Guid>("ColorVariantId")
                                         .HasColumnType("uniqueidentifier");
@@ -348,31 +370,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                                     b2.Property<Guid>("ColorVariantProductId")
                                         .HasColumnType("uniqueidentifier");
 
-                                    b2.Property<int>("Value")
+                                    b2.Property<int?>("Value")
                                         .HasColumnType("int")
                                         .HasColumnName("Quantity");
-
-                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
-
-                                    b2.ToTable("ColorVariants");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
-                                });
-
-                            b1.OwnsOne("Catalog.Domain.ValueObjects.Color", "Color", b2 =>
-                                {
-                                    b2.Property<Guid>("ColorVariantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ColorVariantProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasMaxLength(50)
-                                        .HasColumnType("nvarchar(50)")
-                                        .HasColumnName("Color");
 
                                     b2.HasKey("ColorVariantId", "ColorVariantProductId");
 

@@ -49,44 +49,43 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
             AverageRating.Of(0m, 0)
         );
 
-        foreach (var id in command.OccasionIds)
+        foreach (var id in command.CategoryIds)
         {
             product.AddCategory(CategoryId.Of(id));
         }
 
-        foreach (var id in command.CategoryIds)
+        foreach (var id in command.OccasionIds)
         {
             product.AddOccasion(OccasionId.Of(id));
         }
-
         foreach (var colorVariant in command.ColorVariants)
-        {
-
-            var newColorVariant = ColorVariant.Create(
-                product.Id,
-                Color.Of(colorVariant.Color),
-                Slug.Of(command.UrlFriendlyName, colorVariant.Color),
-                Price.Of("USD", colorVariant.Price),
-                Quantity.Of(colorVariant.Quantity));
-
-            foreach (var image in colorVariant.Images)
             {
-                var newImage = Image.Of(image.ImageSrc, image.AltText);
-                newColorVariant.AddImage(newImage);
-            }
 
-            foreach (var sizeVariant in colorVariant.sizeVariants)
-            {
-                var newSizeVariant = SizeVariant.Create(
-                    newColorVariant.Id,
-                    SizeVariantId.Of(Guid.NewGuid()),
-                    Size.Of(sizeVariant.Size),
-                    Price.Of("USD", sizeVariant.Price),
-                Quantity.Of(colorVariant.Quantity));
-                newColorVariant.AddSizeVariant(newSizeVariant);
+                var newColorVariant = ColorVariant.Create(
+                    product.Id,
+                    Color.Of(colorVariant.Color),
+                    Slug.Of(command.UrlFriendlyName, colorVariant.Color),
+                    ColorVariantPrice.Of(colorVariant.Price.HasValue ? "USD" : null, colorVariant.Price),
+                    ColorVariantQuantity.Of(colorVariant.Quantity));
+
+                foreach (var image in colorVariant.Images)
+                {
+                    var newImage = Image.Of(image.ImageSrc, image.AltText);
+                    newColorVariant.AddImage(newImage);
+                }
+
+                foreach (var sizeVariant in colorVariant.sizeVariants)
+                {
+                    var newSizeVariant = SizeVariant.Create(
+                        newColorVariant.Id,
+                        SizeVariantId.Of(Guid.NewGuid()),
+                        Size.Of(sizeVariant.Size),
+                        Price.Of("USD", sizeVariant.Price),
+                    Quantity.Of(sizeVariant.Quantity));
+                    newColorVariant.AddSizeVariant(newSizeVariant);
+                }
+                product.AddColorVariant(newColorVariant);
             }
-            product.AddColorVariant(newColorVariant);
-        }
 
         return product;
 

@@ -6,7 +6,7 @@ public class Product
 {
     public Guid Id { get; set; }  // Identifiant unique du produit
     public string Name { get; set; } = default!; // Nom du produit
-    public ProductType ProductType { get; set; } // Type de produit (Clothing, Accessory)
+    public ProductTypeEnum ProductType { get; set; } // Type de produit (Clothing, Accessory)
     public List<ColorVariant> ColorVariants { get; set; } = new();  // Redéfinit les variantes pour avoir des prix directs
 }
 

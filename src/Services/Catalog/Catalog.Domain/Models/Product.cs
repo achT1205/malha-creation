@@ -98,6 +98,16 @@ public class Product : Aggregate<ProductId>
         }
     }
 
+    // Méthode pour supoprimner une occasion
+    public void RemoveOccasion(OccasionId occasionId)
+    {
+        if (_occasionIds.Contains(occasionId))
+        {
+            _occasionIds.Remove(occasionId);
+            AddDomainEvent(new ProductUpdatedEvent(this));
+        }
+    }
+
     // Méthode pour ajouter une catégorie
     public void AddCategory(CategoryId categoryId)
     {
@@ -108,12 +118,33 @@ public class Product : Aggregate<ProductId>
         }
     }
 
+    // Méthode pour supprimer une catégorie
+    public void RemoveCategory(CategoryId categoryId)
+    {
+        if (_categoryIds.Contains(categoryId))
+        {
+            _categoryIds.Remove(categoryId);
+            AddDomainEvent(new ProductUpdatedEvent(this));
+        }
+    }
+
     // Méthode pour ajouter une variante de couleur
     public void AddColorVariant(ColorVariant colorVariant)
     {
-        if (!_colorVariants.Contains(colorVariant))
+        if (!_colorVariants.Any(cv => cv.Color.Value.ToLower() == colorVariant.Color.Value.ToLower()))
         {
             _colorVariants.Add(colorVariant);
+            AddDomainEvent(new ProductUpdatedEvent(this));
+        }
+    }
+
+    // Méthode pour supprimer une variante de couleur
+    public void RemoveColorVariant(ColorVariantId  colorVariantId)
+    {
+        var colorVariant = _colorVariants.FirstOrDefault(cv => cv.Id == colorVariantId);
+        if (colorVariant != null)
+        {
+            _colorVariants.Remove(colorVariant);
             AddDomainEvent(new ProductUpdatedEvent(this));
         }
     }
@@ -123,5 +154,25 @@ public class Product : Aggregate<ProductId>
     {
         AverageRating = AverageRating.AddNewRating(newRating);
         AddDomainEvent(new ProductUpdatedEvent(this));
+    }
+
+    // Méthodes de mise à jour des informations sur le produit
+    public void UpdateDescription(ProductDescription newDescription)
+    {
+        Description = newDescription ?? throw new ArgumentNullException(nameof(newDescription));
+    }
+    public void UpdateNames(ProductName newName, UrlFriendlyName newNameEn)
+    {
+        Name = newName ?? throw new ArgumentNullException(nameof(newName));
+        UrlFriendlyName = newNameEn ?? throw new ArgumentNullException(nameof(newNameEn));
+    }
+
+    public void UpdateMaterial(MaterialId materialId)
+    {
+        MaterialId = materialId ?? throw new ArgumentNullException(nameof(materialId));
+    }
+    public void UpdateCollection(CollectionId collectionId )
+    {
+        CollectionId = collectionId ?? throw new ArgumentNullException(nameof(collectionId));
     }
 }

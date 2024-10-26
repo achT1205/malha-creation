@@ -1,5 +1,6 @@
 ﻿using Catalog.Application.Interfaces;
 using Catalog.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Repositories;
 
@@ -17,12 +18,10 @@ public class ProductRepository : IProductRepository
     public async Task<Product> GetByIdAsync(ProductId id)
     {
         return await _context.Products
-            //.Include(p => p.Categories)
-            //.Include(p => p.Occasions)
-            .Include(p => p.ColorVariants) // Inclusion des ColorVariants
-                .ThenInclude(cv => cv.Images) // Inclusion des Images pour chaque ColorVariant
-            .Include(p => p.ColorVariants) // Réinclusion des ColorVariants pour les dépendances supplémentaires
-                .ThenInclude(cv => (cv).SizeVariants) // Inclusion des tailles si le variant est un vêtement
+            .Include(p => p.ColorVariants) 
+                .ThenInclude(cv => cv.Images)
+            .Include(p => p.ColorVariants)
+                .ThenInclude(cv => (cv).SizeVariants) 
             .FirstOrDefaultAsync(product => product.Id == id)
             ?? throw new KeyNotFoundException($"Product with ID {id.Value} not found.");
     }
@@ -30,8 +29,6 @@ public class ProductRepository : IProductRepository
     public async Task<Product?> GetBySlugAsync(string slug)
     {
         return await _context.Products
-            //.Include(p => p.Categories)
-            //.Include(p => p.Occasions)
             .Include(p => p.ColorVariants)
                 .ThenInclude(cv => cv.Images)
             .Include(p => p.ColorVariants)
@@ -60,7 +57,7 @@ public class ProductRepository : IProductRepository
     }
 
     // Mettre à jour un produit existant
-    public async Task UpdateAsync(Product product)
+    public  void UpdateAsync(Product product)
     {
         if (product == null)
         {
@@ -70,7 +67,7 @@ public class ProductRepository : IProductRepository
     }
 
     // Supprimer un produit
-    public async Task RemoveAsync(Product product)
+    public void RemoveAsync(Product product)
     {
         if (product == null)
         {

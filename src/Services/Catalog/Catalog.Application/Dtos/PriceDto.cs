@@ -2,5 +2,5 @@
 
 public record PriceDto(
     string Currency, 
-    decimal Amount
+    decimal? Amount
     );

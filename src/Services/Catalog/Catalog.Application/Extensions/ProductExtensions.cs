@@ -4,17 +4,38 @@ namespace Catalog.Application.Extensions;
 
 public static class ProductExtensions
 {
-    public static IEnumerable<ProductDto> ToProductDtoList(this IEnumerable<Product>  products)
+    public static IEnumerable<ProductDto> ToProductDtoList(this IEnumerable<Product> products)
     {
-        return products.Select(product => DtoFromProduct(product)).ToList();
+        return products.Select(product => DtoFromProduct(product, null, null, null, null, null)).ToList();
     }
 
-    public static ProductDto ToOrderDto(this Product product )
+    public static ProductDto ToOrderDto(
+        this Product product,
+        string material,
+        string collection,
+        string productType,
+        List<string>? occasions,
+        List<string>? categories
+        )
     {
-        return DtoFromProduct(product);
+        return DtoFromProduct(
+            product,
+            material,
+            collection,
+            productType,
+            occasions,
+            categories
+            );
     }
 
-    private static ProductDto DtoFromProduct(Product product)
+    private static ProductDto DtoFromProduct(
+        Product product,
+        string? material,
+        string? collection,
+        string? productType,
+        List<string>? occasions,
+        List<string>? categories
+        )
     {
         return new ProductDto(
             Id: product.Id.Value,
@@ -29,18 +50,20 @@ public static class ProductExtensions
             OccasionIds: product.OccasionIds.Select(i => i.Value).ToList(),
             CategoryIds: product.CategoryIds.Select(i => i.Value).ToList(),
             ColorVariants: product.ColorVariants.Select(cv => new OutputColorVariantDto(
+                Id: cv.Id.Value,
                 Color: cv.Color.Value,
                 Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
                 Price: new PriceDto(cv.Price.Currency, cv.Price.Amount),
                 Quantity: cv.Quantity.Value,
+                Slug: cv.Slug.Value,
                 SizeVariants: cv.SizeVariants.Select(
                     sv => new SizeVariantDto(sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value)).ToList()
                 )).ToList(),
-            ProductType: string.Empty,
-            Material: string.Empty,
-            Collection: string.Empty,
-            Occasions: new(),
-            Categories: new()
+            ProductType: productType,
+            Material: material,
+            Collection: collection,
+            Occasions: occasions,
+            Categories: categories
         );
     }
 }

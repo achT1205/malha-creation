@@ -17,13 +17,13 @@ public class CreateStockCommandValidation : AbstractValidator<CreateStockCommand
         RuleFor(x => x.ProductId).NotEmpty().WithMessage("ProductId is required.");
         RuleForEach(x => x.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.LowStockThreshold).NotEmpty().WithMessage("The LowStockThreshold is required."));
         RuleFor(x => x.ProductType).NotEmpty().WithMessage("ProductType is required.");
-        When(x => x.ProductType == ProductType.Clothing.ToString(), () =>
+        When(x => x.ProductType == ProductTypeEnum.Clothing.ToString(), () =>
         {
             RuleForEach(x => x.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
             RuleForEach(x => x.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Quantity).NotEmpty().WithMessage("The Quantity name is required."));
             RuleForEach(x => x.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Size).NotEmpty().WithMessage("The Sise name is required."));
         });
-        When(x => x.ProductType == ProductType.Accessory.ToString(), () =>
+        When(x => x.ProductType == ProductTypeEnum.Accessory.ToString(), () =>
         {
             RuleForEach(x => x.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
             RuleForEach(x => x.ColorVariants).ChildRules(cv => cv.RuleFor(x => x.Quantity).NotEmpty().WithMessage("The Quantity name is required."));

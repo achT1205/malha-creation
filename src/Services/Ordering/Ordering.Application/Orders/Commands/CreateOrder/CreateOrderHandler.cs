@@ -49,7 +49,7 @@ public class CreateOrderCommandHandler(IApplicationDbContext _context, IProductS
             }
             decimal price = 0;
             ColorVariant variant = new();
-            if (product?.ProductType == ProductType.Clothing)
+            if (product?.ProductType == ProductTypeEnum.Clothing)
             {
                 variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
                 var size = variant?.Sizes?.FirstOrDefault(x => x.Size == orderItemDto.Size);

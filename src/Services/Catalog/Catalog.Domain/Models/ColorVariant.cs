@@ -12,14 +12,14 @@ public class ColorVariant : Entity<ColorVariantId>
     private readonly List<SizeVariant> _sizeVariants = new();
     public IReadOnlyList<SizeVariant> SizeVariants => _sizeVariants.AsReadOnly();
 
-    public Price Price { get; private set; } = default!;
-    public Quantity Quantity { get; private set; } = default!;
+    public ColorVariantPrice Price { get; private set; } = default!;
+    public ColorVariantQuantity Quantity { get; private set; } = default!;
 
     private ColorVariant()
     {
         
     }
-    private ColorVariant(ProductId productId, Color color, Slug slug, Price price, Quantity quantity)
+    private ColorVariant(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity)
     {
         Id = ColorVariantId.Of(Guid.NewGuid());
         Price = price ;
@@ -29,12 +29,12 @@ public class ColorVariant : Entity<ColorVariantId>
         Slug = slug ?? throw new ArgumentNullException(nameof(slug));
     }
 
-    public static ColorVariant Create(ProductId productId, Color color, Slug slug, Price price, Quantity quantity)
+    public static ColorVariant Create(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity)
     {
         return new ColorVariant(productId, color, slug, price, quantity);
     }
 
-    public void UpdatePrice(Price newPrice)
+    public void UpdatePrice(ColorVariantPrice newPrice)
     {
         if (!Price.Equals(newPrice))
         {
@@ -42,7 +42,7 @@ public class ColorVariant : Entity<ColorVariantId>
         }
     }
 
-    public void UpdateQuantity(Quantity newQuantity)
+    public void UpdateQuantity(ColorVariantQuantity newQuantity)
     {
         if (!Quantity.Equals(newQuantity))
         {

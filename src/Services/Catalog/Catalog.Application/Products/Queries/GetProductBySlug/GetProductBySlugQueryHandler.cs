@@ -1,60 +1,54 @@
-﻿//using BuildingBlocks.CQRS;
-//using Catalog.Application.Interfaces;
-//using Catalog.Application.Products.Dtos;
+﻿using BuildingBlocks.CQRS;
+using Catalog.Application.Extensions;
+using Catalog.Application.Interfaces;
 
-//namespace Catalog.Application.Products.Queries.GetProductBySlug;
+namespace Catalog.Application.Products.Queries.GetProductBySlug;
 
-//public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery, GetProductBySlugQueryResult>
-//{
-//    private readonly IProductRepository _productRepository;
-//    private readonly IProductTypeRepository _productTypeRepository;
-//    private readonly IMaterialRepository  _materialRepository;
-//    private readonly ICollectionRepository  _collectionRepository;
+public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery, GetProductBySlugQueryResult>
+{
+    private readonly IProductRepository _productRepository;
+    private readonly IProductTypeRepository _productTypeRepository;
+    private readonly IMaterialRepository _materialRepository;
+    private readonly ICollectionRepository _collectionRepository;
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IOccasionRepository _occasionRepository;
+    public GetProductBySlugQueryHandler(
+        IProductRepository productRepository,
+        IProductTypeRepository productTypeRepository,
+        IMaterialRepository materialRepository,
+        ICollectionRepository collectionRepository,
+        ICategoryRepository categoryRepository,
+        IOccasionRepository occasionRepository)
+    {
+        _productRepository = productRepository;
+        _productTypeRepository = productTypeRepository;
+        _materialRepository = materialRepository;
+        _collectionRepository = collectionRepository;
+        _categoryRepository = categoryRepository;
+        _occasionRepository = occasionRepository;
+    }
 
-//    public GetProductBySlugQueryHandler(IProductRepository productRepository, IProductTypeRepository productTypeRepository, IMaterialRepository materialRepository, ICollectionRepository collectionRepository)
-//    {
-//        _productRepository = productRepository;
-//        _productTypeRepository = productTypeRepository;
-//        _materialRepository = materialRepository;
-//        _collectionRepository = collectionRepository;
-//    }
+    public async Task<GetProductBySlugQueryResult> Handle(GetProductBySlugQuery query, CancellationToken cancellationToken)
+    {
+        var product = await _productRepository.GetBySlugAsync(query.Slug);
 
-//    public async Task<GetProductBySlugQueryResult> Handle(GetProductBySlugQuery query, CancellationToken cancellationToken)
-//    {
-//        // Récupérer le produit par son Slug
-//        var product = await _productRepository.GetBySlugAsync(query.Slug);
+        if (product == null)
+        {
+            throw new KeyNotFoundException($"Product with slug '{query.Slug}' not found.");
+        }
+        var productType = await _productTypeRepository.GetByIdAsync(product.ProductTypeId);
+        var material = await _materialRepository.GetByIdAsync(product.MaterialId);
+        var collection = await _collectionRepository.GetByIdAsync(product.CollectionId);
+        var categories = await _categoryRepository.GetByIdsAsync(product.CategoryIds.ToList());
+        var occasions = await _occasionRepository.GetByIdsAsync(product.OccasionIds.ToList());
 
-//        if (product == null)
-//        {
-//            throw new KeyNotFoundException($"Product with slug '{query.Slug}' not found.");
-//        }
-//        var productType = await _productTypeRepository.GetByIdAsync(product.ProductTypeId);
-//        var material = await _materialRepository.GetByIdAsync(product.MaterialId);
-//        var collection = await _collectionRepository.GetByIdAsync(product.CollectionId);
-//        // Mapper l'entité Product vers un DTO
-//        var productDto = new ProductDto(
-//            product.Id.Value,
-//            product.Name.Value,
-//            product.Description.Value,
-//            product.IsHandmade,
-//            productType.Name,
-//            material.Name,
-//            collection.Name,
-//            product.Categories.Select(c => new CategoryDto(c.Id.Value, c.Name.Value)).ToList(),
-//            product.Occasions.Select(o => new OccasionDto(o.Id.Value, o.Name.Value)).ToList(),
-//            product.ColorVariants.Select(cv => new ColorVariantDto(
-//                cv.Id.Value,
-//                cv.Color.ToString(),
-//                cv.Slug.Value,
-//                cv.Images.Select(i => i.ImageSrc).ToList(),
-//                cv.SizeVariants != null ?
-//                    cv.SizeVariants.Select(sv => new SizeVariantDto(sv.Size.Value, sv.Price.Amount, sv.Quantity.Value)).ToList()
-//                    : null,
-//                cv.SizeVariants != null ? cv.Price.Amount : (decimal?)null,
-//                cv.SizeVariants != null ? cv.Quantity.Value : (int?)null
-//            )).ToList()
-//        );
+        var productDto = product.ToOrderDto(
+            material.Name,
+            collection.Name,
+            productType.Name,
+            occasions.Select(o => o.Name.Value).ToList(),
+            categories.Select(c => c.Name.Value).ToList());
 
-//        return new GetProductBySlugQueryResult(productDto);
-//    }
-//}
+        return new GetProductBySlugQueryResult(productDto);
+    }
+}

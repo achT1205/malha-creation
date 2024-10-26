@@ -22,7 +22,7 @@ public static class DependencyInjection
     {
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-        //services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICollectionRepository, CollectionRepository>();
         services.AddScoped<IMaterialRepository, MaterialRepository>();
         services.AddScoped<IOccasionRepository, OccasionRepository>();
