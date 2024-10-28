@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241018213909_Create_Database")]
+    [Migration("20241026175522_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -99,6 +99,64 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Collections", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Models.ColorVariant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.ComplexProperty<Dictionary<string, object>>("Color", "Catalog.Domain.Models.ColorVariant.Color#Color", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)")
+                                .HasColumnName("Color");
+                        });
+
+                    b.ComplexProperty<Dictionary<string, object>>("Slug", "Catalog.Domain.Models.ColorVariant.Slug#Slug", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("Slug");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ColorVariants");
+
+                    b.HasDiscriminator().HasValue("ColorVariant");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Catalog.Domain.Models.Material", b =>
@@ -188,6 +246,66 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.ToTable("ProductTypes", (string)null);
                 });
 
+            modelBuilder.Entity("Catalog.Domain.Models.SizeVariant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ColorVariantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ComplexProperty<Dictionary<string, object>>("Price", "Catalog.Domain.Models.SizeVariant.Price#Price", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("decimal(18,2)")
+                                .HasColumnName("Price");
+
+                            b1.Property<string>("Currency")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Currency");
+                        });
+
+                    b.ComplexProperty<Dictionary<string, object>>("Quantity", "Catalog.Domain.Models.SizeVariant.Quantity#Quantity", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Value")
+                                .HasColumnType("int")
+                                .HasColumnName("Quantity");
+                        });
+
+                    b.ComplexProperty<Dictionary<string, object>>("Size", "Catalog.Domain.Models.SizeVariant.Size#Size", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Size");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ColorVariantId");
+
+                    b.ToTable("SizeVariant");
+                });
+
             modelBuilder.Entity("Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -213,6 +331,14 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                     b.Property<Guid>("MaterialId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<int>("ProductTypeEnum")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ProductTypeId")
                         .HasColumnType("uniqueidentifier");
@@ -281,295 +407,112 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products", (string)null);
+
+                    b.HasDiscriminator<string>("ProductType").HasValue("Product");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Models.AccessoryColorVariant", b =>
+                {
+                    b.HasBaseType("Catalog.Domain.Models.ColorVariant");
+
+                    b.ComplexProperty<Dictionary<string, object>>("Price", "Catalog.Domain.Models.AccessoryColorVariant.Price#Price", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("decimal(18,2)")
+                                .HasColumnName("Price");
+
+                            b1.Property<string>("Currency")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Currency");
+                        });
+
+                    b.ComplexProperty<Dictionary<string, object>>("Quantity", "Catalog.Domain.Models.AccessoryColorVariant.Quantity#Quantity", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Value")
+                                .HasColumnType("int")
+                                .HasColumnName("Quantity");
+                        });
+
+                    b.HasDiscriminator().HasValue("AccessoryColorVariant");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Models.ClothingColorVariant", b =>
+                {
+                    b.HasBaseType("Catalog.Domain.Models.ColorVariant");
+
+                    b.HasDiscriminator().HasValue("ClothingColorVariant");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Models.AccessoryProduct", b =>
+                {
+                    b.HasBaseType("Product");
+
+                    b.HasDiscriminator().HasValue("Accessory");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Models.ClothingProduct", b =>
+                {
+                    b.HasBaseType("Product");
+
+                    b.HasDiscriminator().HasValue("Clothing");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Models.ColorVariant", b =>
+                {
+                    b.HasOne("Product", null)
+                        .WithMany("ColorVariants")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("Catalog.Domain.ValueObjects.Image", "Images", b1 =>
+                        {
+                            b1.Property<Guid>("ColorVariantId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<string>("AltText")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("ImageSrc")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("ColorVariantId", "Id");
+
+                            b1.ToTable("ColorVariantImages", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ColorVariantId");
+                        });
+
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Models.SizeVariant", b =>
+                {
+                    b.HasOne("Catalog.Domain.Models.ClothingColorVariant", null)
+                        .WithMany("SizeVariants")
+                        .HasForeignKey("ColorVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Product", b =>
                 {
-                    b.OwnsMany("Catalog.Domain.Models.ColorVariant", "ColorVariants", b1 =>
-                        {
-                            b1.Property<Guid>("Id")
-                                .HasColumnType("uniqueidentifier")
-                                .HasColumnName("ColorVariantId");
-
-                            b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<DateTime?>("CreatedAt")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<string>("CreatedBy")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<DateTime?>("LastModified")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<string>("LastModifiedBy")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("Id", "ProductId");
-
-                            b1.HasIndex("ProductId");
-
-                            b1.ToTable("ColorVariants", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("ProductId");
-
-                            b1.OwnsOne("Catalog.Domain.ValueObjects.Price", "Price", b2 =>
-                                {
-                                    b2.Property<Guid>("ColorVariantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ColorVariantProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<decimal>("Amount")
-                                        .HasColumnType("decimal(18,2)")
-                                        .HasColumnName("Price");
-
-                                    b2.Property<string>("Currency")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("Currency");
-
-                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
-
-                                    b2.ToTable("ColorVariants");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
-                                });
-
-                            b1.OwnsOne("Catalog.Domain.ValueObjects.Quantity", "Quantity", b2 =>
-                                {
-                                    b2.Property<Guid>("ColorVariantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ColorVariantProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("Value")
-                                        .HasColumnType("int")
-                                        .HasColumnName("Quantity");
-
-                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
-
-                                    b2.ToTable("ColorVariants");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
-                                });
-
-                            b1.OwnsOne("Catalog.Domain.ValueObjects.Color", "Color", b2 =>
-                                {
-                                    b2.Property<Guid>("ColorVariantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ColorVariantProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasMaxLength(50)
-                                        .HasColumnType("nvarchar(50)")
-                                        .HasColumnName("Color");
-
-                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
-
-                                    b2.ToTable("ColorVariants");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
-                                });
-
-                            b1.OwnsMany("Catalog.Domain.ValueObjects.Image", "Images", b2 =>
-                                {
-                                    b2.Property<Guid>("ColorVariantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ColorVariantProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("AltText")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.Property<string>("ImageSrc")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("ColorVariantId", "ColorVariantProductId", "Id");
-
-                                    b2.ToTable("ColorVariantImages", (string)null);
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
-                                });
-
-                            b1.OwnsOne("Catalog.Domain.ValueObjects.Slug", "Slug", b2 =>
-                                {
-                                    b2.Property<Guid>("ColorVariantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ColorVariantProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasMaxLength(200)
-                                        .HasColumnType("nvarchar(200)")
-                                        .HasColumnName("Slug");
-
-                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
-
-                                    b2.ToTable("ColorVariants");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
-                                });
-
-                            b1.OwnsMany("Catalog.Domain.Models.SizeVariant", "SizeVariants", b2 =>
-                                {
-                                    b2.Property<Guid>("Id")
-                                        .HasColumnType("uniqueidentifier")
-                                        .HasColumnName("SizeVariantId");
-
-                                    b2.Property<Guid>("ColorVariantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<DateTime?>("CreatedAt")
-                                        .HasColumnType("datetime2");
-
-                                    b2.Property<string>("CreatedBy")
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.Property<DateTime?>("LastModified")
-                                        .HasColumnType("datetime2");
-
-                                    b2.Property<string>("LastModifiedBy")
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("Id", "ColorVariantId", "ProductId");
-
-                                    b2.HasIndex("ColorVariantId", "ProductId");
-
-                                    b2.ToTable("SizeVariants", (string)null);
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ColorVariantId", "ProductId");
-
-                                    b2.OwnsOne("Catalog.Domain.ValueObjects.Price", "Price", b3 =>
-                                        {
-                                            b3.Property<Guid>("SizeVariantId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("SizeVariantColorVariantId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("SizeVariantProductId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<decimal>("Amount")
-                                                .HasColumnType("decimal(18,2)")
-                                                .HasColumnName("Price");
-
-                                            b3.Property<string>("Currency")
-                                                .IsRequired()
-                                                .HasColumnType("nvarchar(max)")
-                                                .HasColumnName("Currency");
-
-                                            b3.HasKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
-
-                                            b3.ToTable("SizeVariants");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
-                                        });
-
-                                    b2.OwnsOne("Catalog.Domain.ValueObjects.Quantity", "Quantity", b3 =>
-                                        {
-                                            b3.Property<Guid>("SizeVariantId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("SizeVariantColorVariantId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("SizeVariantProductId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<int>("Value")
-                                                .HasColumnType("int")
-                                                .HasColumnName("Quantity");
-
-                                            b3.HasKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
-
-                                            b3.ToTable("SizeVariants");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
-                                        });
-
-                                    b2.OwnsOne("Catalog.Domain.ValueObjects.Size", "Size", b3 =>
-                                        {
-                                            b3.Property<Guid>("SizeVariantId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("SizeVariantColorVariantId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("SizeVariantProductId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<string>("Value")
-                                                .IsRequired()
-                                                .HasMaxLength(5)
-                                                .HasColumnType("nvarchar(5)")
-                                                .HasColumnName("Size");
-
-                                            b3.HasKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
-
-                                            b3.ToTable("SizeVariants");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
-                                        });
-
-                                    b2.Navigation("Price")
-                                        .IsRequired();
-
-                                    b2.Navigation("Quantity")
-                                        .IsRequired();
-
-                                    b2.Navigation("Size")
-                                        .IsRequired();
-                                });
-
-                            b1.Navigation("Color")
-                                .IsRequired();
-
-                            b1.Navigation("Images");
-
-                            b1.Navigation("Price")
-                                .IsRequired();
-
-                            b1.Navigation("Quantity")
-                                .IsRequired();
-
-                            b1.Navigation("SizeVariants");
-
-                            b1.Navigation("Slug")
-                                .IsRequired();
-                        });
-
                     b.OwnsMany("Catalog.Domain.ValueObjects.CategoryId", "CategoryIds", b1 =>
                         {
                             b1.Property<int>("Id")
@@ -647,11 +590,19 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                     b.Navigation("CategoryIds");
 
-                    b.Navigation("ColorVariants");
-
                     b.Navigation("OccasionIds");
 
                     b.Navigation("ProductReviewIds");
+                });
+
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.Navigation("ColorVariants");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Models.ClothingColorVariant", b =>
+                {
+                    b.Navigation("SizeVariants");
                 });
 #pragma warning restore 612, 618
         }

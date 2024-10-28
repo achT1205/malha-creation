@@ -1,7 +1,8 @@
-﻿using Catalog.Domain.Events;
+﻿using Catalog.Domain.Enums;
+using Catalog.Domain.Events;
 
 namespace Catalog.Domain.Models;
-public class ClothingProduct : Product<ClothingColorVariant>
+public class ClothingProduct : Product
 {
     private ClothingProduct() { }
     private ClothingProduct(
@@ -12,22 +13,14 @@ public class ClothingProduct : Product<ClothingColorVariant>
         bool isHandmade,
         Image coverImage,
         ProductTypeId productTypeId,
+        ProductTypeEnum productTypeEnum,
         MaterialId materialId,
         CollectionId collectionId,
         AverageRating averageRating
-        ) : base(id, name, urlFriendlyName, description, isHandmade, coverImage, productTypeId, materialId, collectionId, averageRating)
-    {
-        Id = id;
-        Name = name ?? throw new ArgumentNullException(nameof(name));
-        UrlFriendlyName = urlFriendlyName ?? throw new ArgumentNullException(nameof(urlFriendlyName));
-        Description = description ?? throw new ArgumentNullException(nameof(description));
-        IsHandmade = isHandmade;
-        CoverImage = coverImage ?? throw new ArgumentNullException(nameof(coverImage));
-        ProductTypeId = productTypeId ?? throw new ArgumentNullException(nameof(productTypeId));
-        MaterialId = materialId ?? throw new ArgumentNullException(nameof(materialId));
-        CollectionId = collectionId ?? throw new ArgumentNullException(nameof(collectionId));
-        AverageRating = averageRating ?? AverageRating.Of(0, 0);
-    }
+        ) : base(id, name, urlFriendlyName, description, isHandmade, coverImage, productTypeId, productTypeEnum, materialId, collectionId, averageRating)
+        {
+
+        }
 
     // Méthode de création pour s'assurer que la création respecte la logique métier
     public static ClothingProduct Create(
@@ -38,6 +31,7 @@ public class ClothingProduct : Product<ClothingColorVariant>
         bool isHandmade,
         Image coverImage,
         ProductTypeId productTypeId,
+        ProductTypeEnum productTypeEnum,
         MaterialId materialId,
         CollectionId collectionId,
         AverageRating averageRating
@@ -51,6 +45,7 @@ public class ClothingProduct : Product<ClothingColorVariant>
              isHandmade,
              coverImage,
              productTypeId,
+             productTypeEnum,
              materialId,
              collectionId,
              averageRating
@@ -91,7 +86,7 @@ public class ClothingProduct : Product<ClothingColorVariant>
     }
 
     // Méthode pour ajouter une variante de couleur
-    public override void AddColorVariant(ClothingColorVariant colorVariant)
+    public void AddColorVariant(ClothingColorVariant colorVariant)
     {
         if (!_colorVariants.Contains(colorVariant))
         {
@@ -105,5 +100,10 @@ public class ClothingProduct : Product<ClothingColorVariant>
     {
         AverageRating = AverageRating.AddNewRating(newRating);
         AddDomainEvent(new ClothingProductUpdatedEvent(this));
+    }
+
+    public override void AddColorVariant(ColorVariant colorVariant)
+    {
+        throw new NotImplementedException();
     }
 }

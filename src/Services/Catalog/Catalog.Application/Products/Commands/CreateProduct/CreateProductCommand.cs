@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.CQRS;
 using Catalog.Application.Dtos;
+using Catalog.Domain.Enums;
 
 namespace Catalog.Application.Products.Commands.CreateProduct;
 
@@ -10,6 +11,7 @@ public record CreateProductCommand(
     bool IsHandmade,
     ImageDto CoverImage,
     Guid ProductTypeId,
+    ProductTypeEnum ProductType,
     Guid MaterialId,
     Guid CollectionId,
     List<Guid> OccasionIds,

@@ -5,6 +5,11 @@ public class AccessoryColorVariant : ColorVariant
 {
     public Price Price { get; protected set; } = default!;
     public Quantity Quantity { get; protected set; } = default!;
+
+    private AccessoryColorVariant()
+    {
+        
+    }
     public AccessoryColorVariant(ProductId productId, Color color, Slug slug, Price price, Quantity quantity)
     : base(productId, color, slug)
     {

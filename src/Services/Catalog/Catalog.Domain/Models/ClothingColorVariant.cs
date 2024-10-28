@@ -6,6 +6,10 @@ public class ClothingColorVariant : ColorVariant
     private readonly List<SizeVariant> _sizeVariants = new();
     public IReadOnlyList<SizeVariant> SizeVariants => _sizeVariants.AsReadOnly();
 
+    private ClothingColorVariant()
+    {
+        
+    }
     public ClothingColorVariant(ProductId productId, Color color, Slug slug)
         : base(productId, color, slug)
     {

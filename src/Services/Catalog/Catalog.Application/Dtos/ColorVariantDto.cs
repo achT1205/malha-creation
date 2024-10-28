@@ -12,7 +12,7 @@ public class ColorVariantDto
 public record OutputColorVariantDto(
         string Color,
         List<ImageDto> Images,
-        PriceDto Price,
-        int Quantity,
-        List<SizeVariantDto> SizeVariants
+        PriceDto? Price,
+        int? Quantity,
+        List<SizeVariantDto>? SizeVariants
     );

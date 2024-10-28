@@ -28,14 +28,15 @@ public static class ProductExtensions
             CollectionId: product.CollectionId.Value,
             OccasionIds: product.OccasionIds.Select(i => i.Value).ToList(),
             CategoryIds: product.CategoryIds.Select(i => i.Value).ToList(),
-            ColorVariants: product.ColorVariants.Select(cv => new OutputColorVariantDto(
-                Color: cv.Color.Value,
-                Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
-                Price: new PriceDto(cv.Price.Currency, cv.Price.Amount),
-                Quantity: cv.Quantity.Value,
-                SizeVariants: cv.SizeVariants.Select(
-                    sv => new SizeVariantDto(sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value)).ToList()
-                )).ToList(),
+            ColorVariants:null,
+            //product.ColorVariants.Select(cv => new OutputColorVariantDto(
+            //    Color: cv.Color.Value,
+            //    Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
+            //    Price: new PriceDto(cv.Price.Currency, cv.Price.Amount),
+            //    Quantity: cv.Quantity.Value,
+            //    SizeVariants: cv.SizeVariants.Select(
+            //        sv => new SizeVariantDto(sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value)).ToList()
+            //    )).ToList(),
             ProductType: string.Empty,
             Material: string.Empty,
             Collection: string.Empty,

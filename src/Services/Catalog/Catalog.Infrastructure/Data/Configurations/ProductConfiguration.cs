@@ -2,13 +2,16 @@
 
 
 
+using Catalog.Domain.Enums;
+
 namespace Catalog.Infrastructure.Data.Configurations;
 internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
         //ConfigureProductsTable(builder);
-        //ConfigureColorVariantsTable(builder);
+        //ConfigureColorVariant(builder);
+        //ConfigureSizeVariant(builder);
         ConfigureCategoryIdsTable(builder);
         ConfigureOccasionIdsTable(builder);
         ConfigureProductReviewIdsTable(builder);
@@ -70,118 +73,20 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Metadata.FindNavigation(nameof(Product.CategoryIds))!
        .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
-    //private void ConfigureColorVariantsTable(EntityTypeBuilder<Product> builder)
-    //{
-    //    builder.OwnsMany(p => p.ColorVariants, cvb =>
-    //    {
-    //        cvb.ToTable(nameof(Product.ColorVariants));
 
-    //        cvb.WithOwner().HasForeignKey(nameof(ColorVariant.ProductId));
-
-    //        cvb.HasKey(cv => new { cv.Id, cv.ProductId });
-
-    //        cvb.Property(cv => cv.Id)
-    //        .HasColumnName(nameof(ColorVariantId))
-    //        .ValueGeneratedNever()
-    //        .HasConversion(
-    //            id => id.Value,
-    //            dbId => ColorVariantId.Of(dbId));
-
-    //        cvb.OwnsOne(cv => cv.Color, cb =>
-    //        {
-    //            cb.Property(c => c.Value)
-    //              .HasColumnName("Color")
-    //              .IsRequired()
-    //              .HasMaxLength(50);
-    //        });
-
-    //        cvb.OwnsOne(cv => cv.Slug, slb =>
-    //        {
-    //            slb.Property(c => c.Value)
-    //              .HasColumnName("Slug")
-    //              .IsRequired()
-    //              .HasMaxLength(200);
-    //        });
-
-    //        cvb.OwnsOne(cv => cv.Price, prb =>
-    //        {
-    //            prb.Property(p => p.Currency)
-    //             .HasColumnName("Currency")
-    //             .IsRequired();
-
-    //            prb.Property(p => p.Amount)
-    //            .HasColumnName("Price")
-    //            .IsRequired();
-    //        });
-
-    //        cvb.OwnsOne(cv => cv.Quantity, qb =>
-    //        {
-    //            qb.Property(q => q.Value)
-    //              .HasColumnName("Quantity")
-    //              .IsRequired();
-    //        });
-
-    //        cvb.OwnsMany(cv => cv.Images, imsb =>
-    //        {
-    //            imsb.ToTable("ColorVariantImages");
-    //        });
-
-    //        cvb.OwnsMany(cv => cv.SizeVariants, svb =>
-    //        {
-    //            svb.ToTable("SizeVariants");
-
-    //            svb.WithOwner().HasForeignKey(nameof(ColorVariantId), nameof(ProductId));
-
-    //            svb.HasKey(nameof(SizeVariant.Id), nameof(ColorVariantId), nameof(ProductId));
-
-    //            svb.Property(sv => sv.Id)
-    //            .HasColumnName(nameof(SizeVariantId))
-    //            .ValueGeneratedNever()
-    //            .HasConversion(
-    //                id => id.Value,
-    //                dbId => SizeVariantId.Of(dbId));
-
-    //            svb.OwnsOne(cv => cv.Price, prb =>
-    //            {
-    //                prb.Property(p => p.Currency)
-    //                   .HasColumnName("Currency")
-    //                   .IsRequired();
-
-    //                prb.Property(p => p.Amount)
-    //                    .HasColumnName("Price")
-    //                    .IsRequired();
-    //            });
-            
-
-    //            svb.OwnsOne(sv => sv.Size, qb =>
-    //            {
-    //                qb.Property(q => q.Value)
-    //                  .HasColumnName("Size")
-    //                  .HasMaxLength(5)
-    //                  .IsRequired();
-    //            });
-
-    //            svb.OwnsOne(sv => sv.Quantity, qb =>
-    //            {
-    //                qb.Property(q => q.Value)
-    //                  .HasColumnName("Quantity")
-    //                  .IsRequired();
-    //            });
-    //        });
-
-    //        cvb.Navigation(cv => cv.SizeVariants).Metadata.SetField("_sizeVariants");
-    //        cvb.Navigation(cv => cv.SizeVariants).UsePropertyAccessMode(PropertyAccessMode.Field);
-    //    });
-
-    //    builder.Metadata.FindNavigation(nameof(Product.ColorVariants))!
-    //        .SetPropertyAccessMode(PropertyAccessMode.Field);
-    //}
     private void ConfigureProductsTable(EntityTypeBuilder<Product> builder)
     {
         builder.ToTable("Products");
 
         builder.HasKey(p => p.Id);
 
+        builder.HasDiscriminator(p => p.ProductTypeEnum)
+            .HasValue<AccessoryProduct>(ProductTypeEnum.Accessory)
+            .HasValue<ClothingProduct>(ProductTypeEnum.Clothing);
+
+        builder.HasMany(p => p.ColorVariants)
+         .WithOne()
+         .HasForeignKey(cv => cv.ProductId);
 
         builder.Property(p => p.Id)
             .ValueGeneratedNever()
@@ -257,4 +162,52 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             id => id.Value,
             dbId => CollectionId.Of(dbId));
     }
+
+    //private void ConfigureColorVariant(EntityTypeBuilder<Product> builder)
+    //{
+    //    builder.OwnsMany(p => p.ColorVariants, cvb =>
+    //    {
+    //        //cvb.ToTable(nameof(Product.ColorVariants));
+
+    //        //cvb.WithOwner().HasForeignKey(nameof(ColorVariant.ProductId));
+
+    //        //cvb.HasKey(cv => new { cv.Id, cv.ProductId });
+
+    //        //cvb.Property(cv => cv.Id)
+    //        //.HasColumnName(nameof(ColorVariantId))
+    //        //.ValueGeneratedNever()
+    //        //.HasConversion(
+    //        //    id => id.Value,
+    //        //    dbId => ColorVariantId.Of(dbId));
+
+    //        //cvb.OwnsOne(cv => cv.Color, cb =>
+    //        //{
+    //        //    cb.Property(c => c.Value)
+    //        //      .HasColumnName("Color")
+    //        //      .IsRequired()
+    //        //      .HasMaxLength(50);
+    //        //});
+
+    //        //cvb.OwnsOne(cv => cv.Slug, slb =>
+    //        //{
+    //        //    slb.Property(c => c.Value)
+    //        //      .HasColumnName("Slug")
+    //        //      .IsRequired()
+    //        //      .HasMaxLength(200);
+    //        //});
+
+    //        //cvb.OwnsMany(cv => cv.Images, imsb =>
+    //        //{
+    //        //    imsb.ToTable("ColorVariantImages");
+    //        //});
+    //    });
+
+    //    builder.Metadata.FindNavigation(nameof(Product.ColorVariants))!
+    //        .SetPropertyAccessMode(PropertyAccessMode.Field);
+    //}
+
+    //private void ConfigureSizeVariant(EntityTypeBuilder<Product> builder)
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

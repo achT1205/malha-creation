@@ -42,10 +42,10 @@ public class ProductRepository : IProductRepository
         .Include(p => ((AccessoryProduct)p).ColorVariants)
             .ThenInclude(cv => cv.Images)
         .Include(p => ((ClothingProduct)p).ColorVariants)
-            .ThenInclude(cv => cv.Images)
-        .Include(p => ((ClothingProduct)p).ColorVariants)
-            .ThenInclude(cv => (cv as ClothingColorVariant).SizeVariants)
-        .FirstOrDefaultAsync(p => p.ColorVariants.Any(cv => cv.Slug.Value == slug));
+            .ThenInclude(cv => cv.Images).FirstOrDefaultAsync();
+        //.Include(p => ((ClothingProduct)p).ColorVariants)
+        //    .ThenInclude(cv => (cv as ClothingColorVariant).SizeVariants)
+        //.FirstOrDefaultAsync(p => p.ColorVariants.Any(cv => cv.Slug.Value == slug));
 
         //return await _context.Products
         //    .Include(p => p.ColorVariants)
@@ -70,8 +70,8 @@ public class ProductRepository : IProductRepository
                 .ThenInclude(cv => cv.Images)
             .Include(p => ((ClothingProduct)p).ColorVariants)
                 .ThenInclude(cv => cv.Images)
-            .Include(p => ((ClothingProduct)p).ColorVariants)
-                .ThenInclude(cv => (cv as ClothingColorVariant).SizeVariants)
+            //.Include(p => ((ClothingProduct)p).ColorVariants)
+            //    .ThenInclude(cv => (cv as ClothingColorVariant).SizeVariants)
             .ToListAsync();
     }
     // Ajouter un nouveau produit

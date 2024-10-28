@@ -28,86 +28,88 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             .HasValue<ClothingProduct>("Clothing");
 
         // Mapping des propriétés communes à tous les produits (Product)
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.ToTable("Products");
 
-        modelBuilder.Entity<Product>().ToTable("Products");
+            entity.HasKey(p => p.Id);
 
-        modelBuilder.Entity<Product>().HasKey(p => p.Id);
+            entity.Property(p => p.Id)
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    dbId => ProductId.Of(dbId));
 
-        modelBuilder.Entity<Product>().Property(p => p.Id)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                dbId => ProductId.Of(dbId));
-
-        modelBuilder.Entity<Product>().ComplexProperty(
-                 p => p.Name, nb =>
-                 {
-                     nb.Property(n => n.Value)
-                         .HasColumnName(nameof(Product.Name))
-                         .HasMaxLength(100)
-                         .IsRequired();
-                 });
+            entity.ComplexProperty(
+                     p => p.Name, nb =>
+                     {
+                         nb.Property(n => n.Value)
+                             .HasColumnName(nameof(Product.Name))
+                             .HasMaxLength(100)
+                             .IsRequired();
+                     });
 
 
-        modelBuilder.Entity<Product>().ComplexProperty(
-               p => p.UrlFriendlyName, unb =>
-               {
-                   unb.Property(n => n.Value)
-                       .HasColumnName(nameof(Product.UrlFriendlyName))
-                       .HasMaxLength(100)
-                       .IsRequired();
-               });
+            entity.ComplexProperty(
+                   p => p.UrlFriendlyName, unb =>
+                   {
+                       unb.Property(n => n.Value)
+                           .HasColumnName(nameof(Product.UrlFriendlyName))
+                           .HasMaxLength(100)
+                           .IsRequired();
+                   });
 
-        modelBuilder.Entity<Product>().ComplexProperty(
-                p => p.Description, desb =>
-                {
-                    desb.Property(n => n.Value)
-                        .HasColumnName(nameof(Product.Description))
-                        .HasMaxLength(100)
-                        .IsRequired();
-                });
+            entity.ComplexProperty(
+                    p => p.Description, desb =>
+                    {
+                        desb.Property(n => n.Value)
+                            .HasColumnName(nameof(Product.Description))
+                            .HasMaxLength(100)
+                            .IsRequired();
+                    });
 
-        modelBuilder.Entity<Product>().ComplexProperty(
-          p => p.AverageRating, avb =>
-          {
-              avb.Property(av => av.Value)
-                  .HasColumnName(nameof(Product.AverageRating))
-                  .IsRequired();
-
-              avb.Property(av => av.TotalRatingsCount)
-                 .HasColumnName(nameof(Product.AverageRating.TotalRatingsCount))
-                 .IsRequired();
-          });
-
-        modelBuilder.Entity<Product>().ComplexProperty(
-              p => p.CoverImage, cib =>
+            entity.ComplexProperty(
+              p => p.AverageRating, avb =>
               {
-                  cib.Property(ci => ci.ImageSrc)
-                      .HasColumnName(nameof(Product.CoverImage.ImageSrc))
+                  avb.Property(av => av.Value)
+                      .HasColumnName(nameof(Product.AverageRating))
                       .IsRequired();
 
-                  cib.Property(ci => ci.AltText)
-                     .HasColumnName(nameof(Product.CoverImage.AltText))
+                  avb.Property(av => av.TotalRatingsCount)
+                     .HasColumnName(nameof(Product.AverageRating.TotalRatingsCount))
                      .IsRequired();
               });
 
-        modelBuilder.Entity<Product>().Property(p => p.IsHandmade);
+            entity.ComplexProperty(
+                  p => p.CoverImage, cib =>
+                  {
+                      cib.Property(ci => ci.ImageSrc)
+                          .HasColumnName(nameof(Product.CoverImage.ImageSrc))
+                          .IsRequired();
 
-        modelBuilder.Entity<Product>().Property(p => p.ProductTypeId)
-            .ValueGeneratedNever().HasConversion(
-            id => id.Value,
-            dbId => ProductTypeId.Of(dbId));
+                      cib.Property(ci => ci.AltText)
+                         .HasColumnName(nameof(Product.CoverImage.AltText))
+                         .IsRequired();
+                  });
 
-        modelBuilder.Entity<Product>().Property(p => p.MaterialId)
-            .ValueGeneratedNever().HasConversion(
-            id => id.Value,
-            dbId => MaterialId.Of(dbId));
+            entity.Property(p => p.IsHandmade);
 
-        modelBuilder.Entity<Product>().Property(p => p.CollectionId)
-            .ValueGeneratedNever().HasConversion(
-            id => id.Value,
-            dbId => CollectionId.Of(dbId));
+            entity.Property(p => p.ProductTypeId)
+                .ValueGeneratedNever().HasConversion(
+                id => id.Value,
+                dbId => ProductTypeId.Of(dbId));
 
+            entity.Property(p => p.MaterialId)
+                .ValueGeneratedNever().HasConversion(
+                id => id.Value,
+                dbId => MaterialId.Of(dbId));
+
+            entity.Property(p => p.CollectionId)
+                .ValueGeneratedNever().HasConversion(
+                id => id.Value,
+                dbId => CollectionId.Of(dbId));
+
+        });
 
         // Mapping spécifique à AccessoryProduct
         modelBuilder.Entity<AccessoryProduct>()
@@ -121,54 +123,63 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             .WithOne()
             .HasForeignKey("ProductId");
 
-        // Mapping des variantes de couleur spécifiques à AccessoryProduct et ClothingProduct
 
-        modelBuilder.Entity<ColorVariant>().ComplexProperty(
-         acv => acv.Color, cb =>
-         {
-             cb.Property(c => c.Value)
-             .HasColumnName("Color")
-             .IsRequired()
-             .HasMaxLength(50);
-         });
+        modelBuilder.Entity<ColorVariant>(entity =>
+        {
+            entity.HasKey(cv => cv.Id);
 
-        modelBuilder.Entity<ColorVariant>().ComplexProperty(
-         acv => acv.Slug, slb =>
-         {
-             slb.Property(c => c.Value)
-               .HasColumnName("Slug")
-               .IsRequired()
-               .HasMaxLength(200);
-         });
+            entity.Property(cv => cv.Id)
+              .ValueGeneratedNever()
+              .HasConversion(
+                  id => id.Value,
+                  dbId => ColorVariantId.Of(dbId));
 
-        // Mapping spécifique à AccessoryProduct
-        modelBuilder.Entity<ColorVariant>()
-            .HasMany(a => a.Images)
-            .WithOne();
+            entity.ComplexProperty(
+             acv => acv.Color, cb =>
+             {
+                 cb.Property(c => c.Value)
+                 .HasColumnName("Color")
+                 .IsRequired()
+                 .HasMaxLength(50);
+             });
 
+            entity.ComplexProperty(
+             acv => acv.Slug, slb =>
+             {
+                 slb.Property(c => c.Value)
+                   .HasColumnName("Slug")
+                   .IsRequired()
+                   .HasMaxLength(200);
+             });
 
-        modelBuilder.Entity<AccessoryColorVariant>().ComplexProperty(
-         acv => acv.Price, prb =>
+            entity.OwnsMany(cv => cv.Images, imsb =>
             {
-                prb.Property(p => p.Currency)
-                 .HasColumnName("Currency")
-                 .IsRequired();
-
-                prb.Property(p => p.Amount)
-                .HasColumnName("Price")
-                .IsRequired();
+                imsb.ToTable("ColorVariantImages");
             });
+        });
 
-        modelBuilder.Entity<AccessoryColorVariant>().ComplexProperty(
-         acv => acv.Quantity, qb =>
-            {
-                qb.Property(q => q.Value)
-                  .HasColumnName("Quantity")
-                  .IsRequired();
-            });
+        modelBuilder.Entity<AccessoryColorVariant>(entity =>
+        {
+            entity.ComplexProperty(
+                acv => acv.Price, prb =>
+                {
+                    prb.Property(p => p.Currency)
+                      .HasColumnName("Currency")
+                      .IsRequired();
 
+                    prb.Property(p => p.Amount)
+                     .HasColumnName("Price")
+                     .IsRequired();
+                });
 
-
+            entity.ComplexProperty(
+                 acv => acv.Quantity, qb =>
+                 {
+                     qb.Property(q => q.Value)
+                   .HasColumnName("Quantity")
+                   .IsRequired();
+                 });
+        });
 
 
         modelBuilder.Entity<ClothingColorVariant>()
@@ -176,37 +187,42 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             .WithOne()
             .HasForeignKey("ColorVariantId");
 
-        modelBuilder.Entity<SizeVariant>().ComplexProperty(
-         acv => acv.Price, prb =>
-         {
-             prb.Property(p => p.Currency)
-              .HasColumnName("Currency")
-              .IsRequired();
+        modelBuilder.Entity<SizeVariant>(entity =>
+        {
+           entity.Property(sv => sv.Id)
+          .ValueGeneratedNever()
+          .HasConversion(
+              id => id.Value,
+              dbId => SizeVariantId.Of(dbId));
 
-             prb.Property(p => p.Amount)
-             .HasColumnName("Price")
-             .IsRequired();
-         });
+            entity.ComplexProperty(
+             sv => sv.Price, svb =>
+             {
+                 svb.Property(p => p.Currency)
+                  .HasColumnName("Currency")
+                  .IsRequired();
 
-        modelBuilder.Entity<SizeVariant>().ComplexProperty(
-         acv => acv.Quantity, qb =>
-         {
-             qb.Property(q => q.Value)
-               .HasColumnName("Quantity")
-               .IsRequired();
-         });
+                 svb.Property(p => p.Amount)
+                 .HasColumnName("Price")
+                 .IsRequired();
+             });
 
-        modelBuilder.Entity<SizeVariant>().ComplexProperty(
-         acv => acv.Size, sb =>
-         {
-             sb.Property(s => s.Value)
-               .HasColumnName("Quantity")
-               .IsRequired();
-         });
+            entity.ComplexProperty(
+             sv => sv.Quantity, qb =>
+             {
+                 qb.Property(q => q.Value)
+                   .HasColumnName("Quantity")
+                   .IsRequired();
+             });
 
-
-
-
+            entity.ComplexProperty(
+             sv => sv.Size, sb =>
+             {
+                 sb.Property(s => s.Value)
+                   .HasColumnName("Size")
+                   .IsRequired();
+             });
+        });
     }
 
     private void Productconfiguration(EntityTypeBuilder<Product> entityTypeBuilder, object builder)
