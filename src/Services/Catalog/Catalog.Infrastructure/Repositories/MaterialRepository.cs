@@ -53,4 +53,9 @@ public class MaterialRepository : IMaterialRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<Material>> GetAllAsync()
+    {
+        return await _context.Materials.ToListAsync();
+    }
 }

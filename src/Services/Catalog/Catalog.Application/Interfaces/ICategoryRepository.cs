@@ -8,6 +8,7 @@ public interface ICategoryRepository
     Task<List<Category>> GetByIdsAsync(List<CategoryId> ids);
     Task AddAsync(Category category);
     Task RemoveAsync(Category category);
+    Task<List<Category>> GetAllAsync();
     Task SaveChangesAsync();
 }
 

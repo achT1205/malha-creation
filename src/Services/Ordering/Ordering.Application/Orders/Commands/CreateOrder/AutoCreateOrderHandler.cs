@@ -37,16 +37,23 @@ public class AutoCreateOrderCommandHandler(IApplicationDbContext _context, IProd
                 payment: Payment.Of(orderDto.Payment.CardName, orderDto.Payment.CardNumber, orderDto.Payment.Expiration, orderDto.Payment.Cvv, orderDto.Payment.PaymentMethod)
                 );
 
-        foreach (var orderItemDto in orderDto.OrderItems)
+        try
         {
-            var product = await productService.GetProductByIdAsync(orderItemDto.ProductId);
-            if (product == null)
+            foreach (var orderItemDto in orderDto.OrderItems)
             {
-                newOrder.ClearDomainEvents();
-                throw new ProductNotFoundException(orderItemDto.ProductId);
+                var product = await productService.GetProductByIdAsync(orderItemDto.ProductId);
+                if (product == null)
+                {
+                    newOrder.ClearDomainEvents();
+                    throw new ProductNotFoundException(orderItemDto.ProductId);
+                }
+                var variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
+                newOrder.Add(OrderId.Of(orderId), ProductId.Of(orderItemDto.ProductId), orderItemDto.Quantity, orderItemDto.Price.Value, orderItemDto.Color, orderItemDto.Size, product.Name, variant.Slug);
             }
-            var variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
-            newOrder.Add(OrderId.Of(orderId), ProductId.Of(orderItemDto.ProductId), orderItemDto.Quantity, orderItemDto.Price.Value, orderItemDto.Color, orderItemDto.Size, product.Name, variant.Slug);
+        }
+        catch (Exception ex)
+        {
+            throw new InternalServerException(ex.InnerException.Message);
         }
         return newOrder;
     }

@@ -27,6 +27,11 @@ public class ProductTypeRepository : IProductTypeRepository
             .ToListAsync();
     }
 
+    public async Task<List<ProductType>> GetAllAsync()
+    {
+        return await _context.ProductTypes.ToListAsync();   
+    }
+
     // Ajouter un nouveau type de produit
     public async Task AddAsync(ProductType productType)
     {
@@ -52,5 +57,7 @@ public class ProductTypeRepository : IProductTypeRepository
     {
         await _context.SaveChangesAsync();
     }
+
+
 }
 

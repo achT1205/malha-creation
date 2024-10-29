@@ -1,6 +1,6 @@
 ﻿using BuildingBlocks.CQRS;
-using BuildingBlocks.Enums;
 using Catalog.Application.Dtos;
+using Catalog.Domain.Enums;
 
 namespace Catalog.Application.Products.Commands.CreateProduct;
 

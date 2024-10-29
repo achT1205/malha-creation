@@ -53,5 +53,10 @@ public class CollectionRepository : ICollectionRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<Collection>> GetAllAsync()
+    {
+        return await _context.Collections.ToListAsync();
+    }
 }
 

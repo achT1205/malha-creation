@@ -1,4 +1,5 @@
-﻿using Catalog.Domain.Events;
+﻿using Catalog.Domain.Enums;
+using Catalog.Domain.Events;
 
 public class Product : Aggregate<ProductId>
 {
@@ -14,6 +15,7 @@ public class Product : Aggregate<ProductId>
     public Image CoverImage { get; private set; } = default!; 
     public bool IsHandmade { get; private set; } = default!;
     public ProductTypeId ProductTypeId { get; private set; } = default!;
+    public ProductTypeEnum ProductType { get; private set; } = default!;
     public MaterialId MaterialId { get; private set; } = default!;
     public CollectionId CollectionId { get; private set; } = default!;
     private readonly List<ProductReviewId>  _productReviewIds = new();
@@ -30,6 +32,7 @@ public class Product : Aggregate<ProductId>
         bool isHandmade,
         Image coverImage,
         ProductTypeId productTypeId,
+        ProductTypeEnum productType,
         MaterialId materialId,
         CollectionId collectionId,
         AverageRating averageRating
@@ -45,6 +48,7 @@ public class Product : Aggregate<ProductId>
         MaterialId = materialId ?? throw new ArgumentNullException(nameof(materialId));
         CollectionId = collectionId ?? throw new ArgumentNullException(nameof(collectionId));
         AverageRating = averageRating ?? AverageRating.Of(0, 0);
+        ProductType = productType;
     }
 
     // Méthode de création pour s'assurer que la création respecte la logique métier
@@ -56,6 +60,7 @@ public class Product : Aggregate<ProductId>
         bool isHandmade,
         Image coverImage,
         ProductTypeId productTypeId,
+        ProductTypeEnum productType,
         MaterialId materialId,
         CollectionId collectionId,
         AverageRating averageRating
@@ -69,6 +74,7 @@ public class Product : Aggregate<ProductId>
              isHandmade,
              coverImage,
              productTypeId,
+             productType,   
              materialId,
              collectionId,
              averageRating

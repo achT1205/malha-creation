@@ -53,5 +53,10 @@ public class CategoryRepository : ICategoryRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<Category>> GetAllAsync()
+    {
+        return await _context.Categories.ToListAsync();
+    }
 }
 

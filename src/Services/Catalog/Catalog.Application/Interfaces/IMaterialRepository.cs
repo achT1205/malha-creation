@@ -5,5 +5,6 @@ public interface IMaterialRepository
     Task<List<Material>> GetByIdsAsync(List<MaterialId> ids);
     Task AddAsync(Material material);
     Task RemoveAsync(Material material);
+    Task<List<Material>> GetAllAsync();
     Task SaveChangesAsync();
 }

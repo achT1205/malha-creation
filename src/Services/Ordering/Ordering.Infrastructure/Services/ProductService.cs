@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using BuildingBlocks.Exceptions;
+using Microsoft.Extensions.Options;
 using Ordering.Application.Abstractions.Models;
 using Ordering.Application.Abstractions.Services;
 using Ordering.Infrastructure.Configs;
@@ -18,20 +19,28 @@ public class ProductService : IProductService
 
     public async Task<Product?> GetProductByIdAsync(Guid productId)
     {
-        var response = await _httpClient.GetAsync($"{_productApiUrl}/{productId}");
-
-        if (response.IsSuccessStatusCode)
+        try
         {
-            var jsonString = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.GetAsync($"{_productApiUrl}/{productId}");
 
-            var resp = JsonSerializer.Deserialize<ProductApiResponse>(jsonString, new JsonSerializerOptions
+            if (response.IsSuccessStatusCode)
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+                var jsonString = await response.Content.ReadAsStringAsync();
 
-            return resp?.Product;
+                var resp = JsonSerializer.Deserialize<ProductApiResponse>(jsonString, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+
+                return resp?.Product;
+            }
+
+            throw new InternalServerException(response.Content.ToString());
         }
+        catch (Exception ex)
+        {
 
-        throw new HttpRequestException("Failed to fetch stock data from external API.");
+            throw new InternalServerException(ex.InnerException.Message);
+        }
     }
 }

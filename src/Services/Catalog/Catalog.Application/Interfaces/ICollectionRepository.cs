@@ -7,5 +7,6 @@ public interface ICollectionRepository
     Task<List<Collection>> GetByIdsAsync(List<CollectionId> ids);
     Task AddAsync(Collection collection);
     Task RemoveAsync(Collection collection);
+    Task<List<Collection>> GetAllAsync();
     Task SaveChangesAsync();
 }

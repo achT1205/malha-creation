@@ -7,5 +7,6 @@ public interface IOccasionRepository
     Task<List<Occasion>> GetByIdsAsync(List<OccasionId> ids);
     Task AddAsync(Occasion occasion);
     Task RemoveAsync(Occasion occasion);
+    Task<List<Occasion>> GetAllAsync();
     Task SaveChangesAsync();
 }

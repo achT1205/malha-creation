@@ -7,6 +7,7 @@ public interface IProductTypeRepository
     Task<List<ProductType>> GetByIdsAsync(List<ProductTypeId> ids);
     Task AddAsync(ProductType productType);
     Task RemoveAsync(ProductType productType);
+    Task<List<ProductType>> GetAllAsync();
     Task SaveChangesAsync();
 }
 

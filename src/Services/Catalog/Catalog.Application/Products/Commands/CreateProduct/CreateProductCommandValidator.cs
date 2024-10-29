@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Enums;
+﻿using Catalog.Domain.Enums;
 using FluentValidation;
 
 namespace Catalog.Application.Products.Commands.CreateProduct;

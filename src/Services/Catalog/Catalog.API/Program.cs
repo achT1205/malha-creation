@@ -23,5 +23,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapProductEndpoints();
+app.MapCategoryEndpoints();
+app.MapCollectionEndpoints();
+app.MapMaterialEndpoints();
+app.MapOccasionEndpoints();
+app.MapProductTypeEndpoints();
 
 app.Run();

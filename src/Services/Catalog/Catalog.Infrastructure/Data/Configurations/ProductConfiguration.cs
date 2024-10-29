@@ -2,6 +2,8 @@
 
 
 
+using Catalog.Domain.Enums;
+
 namespace Catalog.Infrastructure.Data.Configurations;
 internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
@@ -93,6 +95,15 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                   .HasMaxLength(50);
             });
 
+            // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
+            cvb.Property<string>("Slug_Value")
+                  .HasColumnName("Slug")
+                  .HasMaxLength(200)
+                  .IsRequired();
+
+            // Set the unique constraint on the shadow property
+            cvb.HasIndex("Slug_Value").IsUnique();
+
             cvb.OwnsOne(cv => cv.Slug, slb =>
             {
                 slb.Property(c => c.Value)
@@ -100,6 +111,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                   .IsRequired()
                   .HasMaxLength(200);
             });
+            
 
             cvb.OwnsOne(cv => cv.Price, prb =>
             {
@@ -146,7 +158,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                         .HasColumnName("Price")
                         .IsRequired();
                 });
-            
+
 
                 svb.OwnsOne(sv => sv.Size, qb =>
                 {
@@ -184,22 +196,34 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 dbId => ProductId.Of(dbId));
 
         builder.ComplexProperty(
-        p => p.Name, nb =>
-        {
-            nb.Property(n => n.Value)
-                .HasColumnName(nameof(Product.Name))
-                .HasMaxLength(100)
-                .IsRequired();
-        });
+            p => p.Name, nb =>
+            {
+                nb.Property(n => n.Value)
+                    .HasColumnName(nameof(Product.Name))
+                    .HasMaxLength(100)
+                    .IsRequired()
+                    ;
+            });
+
+        // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
+        builder.Property<string>("UrlFriendlyName_Value")
+              .HasColumnName("UrlFriendlyName")
+              .HasMaxLength(100)
+              .IsRequired();
+
+        // Set the unique constraint on the shadow property
+        builder.HasIndex("UrlFriendlyName_Value").IsUnique();
+
 
         builder.ComplexProperty(
-                p => p.UrlFriendlyName, unb =>
-                {
-                    unb.Property(n => n.Value)
-                        .HasColumnName(nameof(Product.UrlFriendlyName))
-                        .HasMaxLength(100)
-                        .IsRequired();
-                });
+            p => p.UrlFriendlyName, unb =>
+            {
+                unb.Property(n => n.Value)
+                .HasColumnName(nameof(Product.UrlFriendlyName))
+                .HasMaxLength(100)
+                .IsRequired();
+            });
+
 
         builder.ComplexProperty(
                 p => p.Description, desb =>
@@ -231,6 +255,11 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                      .HasColumnName(nameof(Product.CoverImage.AltText))
                      .IsRequired();
               });
+
+        builder.Property(p => p.ProductType)
+        .HasConversion(
+            s => s.ToString(),
+            dbStatus => (ProductTypeEnum)Enum.Parse(typeof(ProductTypeEnum), dbStatus));
 
         builder.Property(p => p.IsHandmade);
 

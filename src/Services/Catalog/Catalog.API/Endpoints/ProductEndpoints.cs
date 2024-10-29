@@ -2,6 +2,7 @@
 using Catalog.Application.Dtos;
 using Catalog.Application.Products.Commands.DeleteProduct;
 using Catalog.Application.Products.Commands.UpdateProduct;
+using Catalog.Application.Products.Queries.GetProductById;
 using Catalog.Application.Products.Queries.GetProductBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
 
@@ -88,37 +89,38 @@ public static class ProductEndpoints
         .WithSummary("Update Product")
         .WithDescription("Update an existing product.");
 
-
-        app.MapGet("/api/products/{slug}", async (string slug, ISender sender) =>
+        app.MapGet("/api/products/by-slug/{slug:regex(^[a-zA-Z0-9_-]+$)}", async (string slug, ISender sender) =>
         {
-            // Créer la requête pour obtenir le produit par slug
             var query = new GetProductBySlugQuery(slug);
-
-            // Envoyer la requête via MediatR
             var result = await sender.Send(query);
-
-            if (result is null)
-            {
-                return Results.NotFound($"Product with slug '{slug}' not found.");
-            }
-
-            // Retourner la réponse avec un statut 200 OK
             return Results.Ok(result);
         })
         .WithName("GetProductBySlug")
         .Produces<ProductDto>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithSummary("Get Product by Slug")
-        .WithDescription("Retrieve product details by slug.");
+        .WithDescription("Retrieve product details by slug.")
+        .WithOrder(1);
+
+        app.MapGet("/api/products/by-id/{id:guid}", async (Guid id, ISender sender) =>
+        {
+            var query = new GetProductByIdQuery(id);
+            var result = await sender.Send(query);
+            return Results.Ok(result);
+        })
+       .WithName("GetProductById")
+       .Produces<ProductDto>(StatusCodes.Status200OK)
+       .ProducesProblem(StatusCodes.Status404NotFound)
+       .WithSummary("Get Product by Id")
+       .WithDescription("Retrieve product details by Id.")
+       .WithOrder(2);
+
+
 
         app.MapDelete("/api/products/{id}", async (Guid id, ISender sender) =>
         {
-            // Créer la requête pour obtenir le produit par slug
             var query = new DeleteProductCommand(id);
-
-            // Envoyer la requête via MediatR
             var result = await sender.Send(query);
-
             var response = result.Adapt<DeleteProductResponse>();
             return Results.Ok(response);
         })
@@ -131,13 +133,8 @@ public static class ProductEndpoints
 
         app.MapGet("/api/products", async (ISender sender) =>
         {
-            // Créer la requête pour obtenir tous les produits
             var query = new GetProductsQuery();
-
-            // Envoyer la requête via MediatR
             var result = await sender.Send(query);
-
-            // Retourner la réponse avec un statut 200 OK
             return Results.Ok(result);
         })
         .WithName("GetProducts")

@@ -9,7 +9,7 @@ public static class ProductExtensions
         return products.Select(product => DtoFromProduct(product, null, null, null, null, null)).ToList();
     }
 
-    public static ProductDto ToOrderDto(
+    public static ProductDto ToProductDto(
         this Product product,
         string material,
         string collection,

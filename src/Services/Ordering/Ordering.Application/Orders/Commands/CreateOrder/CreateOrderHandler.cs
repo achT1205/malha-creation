@@ -49,16 +49,16 @@ public class CreateOrderCommandHandler(IApplicationDbContext _context, IProductS
             }
             decimal price = 0;
             ColorVariant variant = new();
-            if (product?.ProductType == ProductTypeEnum.Clothing)
+            if (product?.ProductType == ProductTypeEnum.Clothing.ToString())
             {
                 variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
-                var size = variant?.Sizes?.FirstOrDefault(x => x.Size == orderItemDto.Size);
+                var size = variant?.SizeVariants?.FirstOrDefault(x => x.Size == orderItemDto.Size);
                 if (size != null) price = size.Price;
             }
             else
             {
                 variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
-                if (variant != null) price = variant.Price.Value;
+                if (variant != null) price = variant.Price.Amount;
             }
             newOrder.Add(OrderId.Of(orderId), ProductId.Of(orderItemDto.ProductId), orderItemDto.Quantity, price, orderItemDto.Color, orderItemDto.Size, product.Name, variant.Slug);
         }

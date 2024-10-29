@@ -1,52 +1,45 @@
-services:
+
+ services:
+
   mc-catalogdb:
     image: mcr.microsoft.com/azure-sql-edge:latest
 
-  # mc-stockdb:
-  #   image: postgres
+  mc-orderdb:
+    image: mcr.microsoft.com/azure-sql-edge:latest
 
-  # mc-cartdb:
-  #   image: postgres
+  mc-messagebroker:
+    image: rabbitmq:management
 
-  # mc-distributedcache:
-  #   image: redis
+  mc-cartdb:
+    image: postgres
 
-  # mc-orderdb:
-  #   image: mcr.microsoft.com/azure-sql-edge:latest
+  mc-distributedcache:
+    image: redis
 
-  # mc-identitydb:
-  #   image: postgres
+  mc-discount.grpc:
+    image: ${DOCKER_REGISTRY-}discountgrpc
+    build:
+      context: .
+      dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
-  # messagebroker:
-  #   image: rabbitmq:management
+  mc-catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
+    build:
+      context: .
+      dockerfile: Services/Catalog/Catalog.API/Dockerfile
 
-  # catalog.api:
-  #   image: ${DOCKER_REGISTRY-}catalogapi
-  #   build:
-  #     context: .
-  #     dockerfile: Services/Catalog/Catalog.API/Dockerfile
+  mc-shoppingcart.api:
+    image: ${DOCKER_REGISTRY-}shoppingcartapi
+    build:
+      context: .
+      dockerfile: Services/ShoppingCart/ShoppingCart.API/Dockerfile
 
-  # inventory.api:
-  #   image: ${DOCKER_REGISTRY-}inventoryapi
-  #   build:
-  #     context: .
-  #     dockerfile: Services/Inventory/Inventory.API/Dockerfile
+  mc-ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
 
-  # discount.grpc:
-  #   image: ${DOCKER_REGISTRY-}discountgrpc
-  #   build:
-  #     context: .
-  #     dockerfile: Services/Discount/Discount.Grpc/Dockerfile
-
-  # cart.api:
-  #   image: ${DOCKER_REGISTRY-}cartapi
-  #   build:
-  #     context: .
-  #     dockerfile: Services/Cart/Cart.API/Dockerfile
-
-# volumes:
-#   postgres-mccatalog:
-  # postgres-mcstock: 
-  # postgres-mccart: 
-  # postgres-mcorder: 
-  # postgres-mcidentity: 
+ volumes:
+  postgres_mccart:
+ 

@@ -52,4 +52,10 @@ public class OccasionRepository : IOccasionRepository
     {
         await _context.SaveChangesAsync();
     }
+
+
+    public async Task<List<Occasion>> GetAllAsync()
+    {
+        return await _context.Occasions.ToListAsync();
+    }
 }

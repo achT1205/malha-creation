@@ -1,6 +1,11 @@
 ﻿using BuildingBlocks.CQRS;
+using BuildingBlocks.Exceptions;
+using BuildingBlocks.Messaging.Events;
+using Catalog.Application.Extensions;
 using Catalog.Application.Interfaces;
 using Catalog.Domain.ValueObjects;
+using Mapster;
+using MassTransit;
 
 namespace Catalog.Application.Products.Commands.CreateProduct;
 
@@ -8,12 +13,15 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
 {
 
     private readonly IProductRepository _productRepository;
+    private readonly IPublishEndpoint _publishEndpoint;
 
     public CreateProductCommandHandler(
-        IProductRepository productRepository)
+        IProductRepository productRepository,
+        IPublishEndpoint publishEndpoint
+        )
     {
-
         _productRepository = productRepository;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
@@ -24,10 +32,16 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
 
             await _productRepository.AddAsync(product);
             await _productRepository.SaveChangesAsync();
+
+
+            var dto  = product.ToProductDto(null, null, null, null, null);
+            var eventMessage = dto.Adapt<ProductCreatedEvent>();
+            await _publishEndpoint.Publish(eventMessage, cancellationToken);
+
         }
         catch (Exception ex)
         {
-            throw;
+            throw new InternalServerException(ex.InnerException.Message);
         }
 
         return new CreateProductResult(product.Id.Value);
@@ -44,6 +58,7 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
             command.IsHandmade,
             coverImage,
             ProductTypeId.Of(command.ProductTypeId),
+            command.ProductType,
             MaterialId.Of(command.MaterialId),
             CollectionId.Of(command.CollectionId),
             AverageRating.Of(0m, 0)

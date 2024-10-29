@@ -4,7 +4,7 @@ using Catalog.Application.Interfaces;
 
 namespace Catalog.Application.Products.Queries.GetProductBySlug;
 
-public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery, GetProductBySlugQueryResult>
+public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery, GetProductByIdQueryResult>
 {
     private readonly IProductRepository _productRepository;
     private readonly IProductTypeRepository _productTypeRepository;
@@ -28,7 +28,7 @@ public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery,
         _occasionRepository = occasionRepository;
     }
 
-    public async Task<GetProductBySlugQueryResult> Handle(GetProductBySlugQuery query, CancellationToken cancellationToken)
+    public async Task<GetProductByIdQueryResult> Handle(GetProductBySlugQuery query, CancellationToken cancellationToken)
     {
         var product = await _productRepository.GetBySlugAsync(query.Slug);
 
@@ -42,13 +42,13 @@ public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery,
         var categories = await _categoryRepository.GetByIdsAsync(product.CategoryIds.ToList());
         var occasions = await _occasionRepository.GetByIdsAsync(product.OccasionIds.ToList());
 
-        var productDto = product.ToOrderDto(
+        var productDto = product.ToProductDto(
             material.Name,
             collection.Name,
             productType.Name,
             occasions.Select(o => o.Name.Value).ToList(),
             categories.Select(c => c.Name.Value).ToList());
 
-        return new GetProductBySlugQueryResult(productDto);
+        return new GetProductByIdQueryResult(productDto);
     }
 }

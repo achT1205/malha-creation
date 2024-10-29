@@ -211,8 +211,19 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<Guid>("MaterialId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("ProductTypeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UrlFriendlyName_Value")
+                        .IsRequired()
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("UrlFriendlyName");
 
                     b.ComplexProperty<Dictionary<string, object>>("AverageRating", "Product.AverageRating#AverageRating", b1 =>
                         {
@@ -270,12 +281,16 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                             b1.Property<string>("Value")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasMaxLength(100)
                                 .HasColumnType("nvarchar(100)")
                                 .HasColumnName("UrlFriendlyName");
                         });
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UrlFriendlyName_Value")
+                        .IsUnique();
 
                     b.ToTable("Products", (string)null);
                 });
@@ -303,9 +318,19 @@ namespace Catalog.Infrastructure.Data.Migrations
                             b1.Property<string>("LastModifiedBy")
                                 .HasColumnType("nvarchar(max)");
 
+                            b1.Property<string>("Slug_Value")
+                                .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("Slug");
+
                             b1.HasKey("Id", "ProductId");
 
                             b1.HasIndex("ProductId");
+
+                            b1.HasIndex("Slug_Value")
+                                .IsUnique();
 
                             b1.ToTable("ColorVariants", (string)null);
 
@@ -419,6 +444,7 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                                     b2.Property<string>("Value")
                                         .IsRequired()
+                                        .ValueGeneratedOnUpdateSometimes()
                                         .HasMaxLength(200)
                                         .HasColumnType("nvarchar(200)")
                                         .HasColumnName("Slug");
