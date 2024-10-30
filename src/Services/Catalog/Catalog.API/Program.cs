@@ -1,3 +1,4 @@
+using BuildingBlocks.Middlewares;
 using Catalog.API;
 using Catalog.API.Endpoints;
 using Catalog.Application;
@@ -21,6 +22,7 @@ if (app.Environment.IsDevelopment())
 {
     await app.InitialiseDatabaseAsync();
 }
+app.UseMiddleware<RetrictAccessMiddleware>();
 
 app.MapProductEndpoints();
 app.MapCategoryEndpoints();

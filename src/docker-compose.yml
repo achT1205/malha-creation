@@ -13,6 +13,9 @@
   mc-cartdb:
     image: postgres
 
+  mc-identitydb:
+    image: postgres
+
   mc-distributedcache:
     image: redis
 
@@ -42,4 +45,5 @@
 
  volumes:
   postgres_mccart:
+  postgres-mcidentity:
  

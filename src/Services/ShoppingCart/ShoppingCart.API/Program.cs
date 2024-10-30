@@ -6,10 +6,10 @@ using BuildingBlocks.Behaviors;
 using BuildingBlocks.Exceptions.Handler;
 using Discount.Grpc;
 using CartDiscount.Grpc;
-using Microsoft.Extensions.Configuration;
 using Cart.API.Configs;
 using Cart.API.Services.Interfaces;
 using Cart.API.Services;
+using BuildingBlocks.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,7 +90,7 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 //Configure the HTTP request pipeline
-
+app.UseMiddleware<RetrictAccessMiddleware>();
 app.MapCarter();
 app.UseExceptionHandler(options => { });
 app.UseHealthChecks("/health", new HealthCheckOptions

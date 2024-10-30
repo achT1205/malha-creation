@@ -6,7 +6,7 @@ public class ApplyCartDiscountEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/carts/appycoupon", async (ApplyCartDiscountRequest request, ISender sender) =>
+        app.MapPost("/api/carts/appycoupon", async (ApplyCartDiscountRequest request, ISender sender) =>
         {
             var command = request.Adapt<ApplyCartDiscountCommand>();
             var result = await sender.Send(command);

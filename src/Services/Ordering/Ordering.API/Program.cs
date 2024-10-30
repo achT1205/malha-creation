@@ -1,3 +1,4 @@
+using BuildingBlocks.Middlewares;
 using Ordering.API;
 using Ordering.API.Endpoints;
 using Ordering.Application;
@@ -25,6 +26,8 @@ internal class Program
         {
             app.InitialiseDatabase();
         }
+
+        app.UseMiddleware<RetrictAccessMiddleware>();
 
         app.MapOrderEndpoints();
 

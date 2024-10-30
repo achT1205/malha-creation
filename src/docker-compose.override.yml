@@ -35,17 +35,17 @@ services:
     ports:
       - "1434:1433"
 
-  # mc-identitydb:
-  #   container_name: mc-identitydb
-  #   environment:
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=postgres
-  #     - POSTGRES_DB=MCIdentityDb
-  #   restart: always
-  #   ports:
-  #       - "5435:5432"
-  #   volumes:
-  #     - postgres-mcidentity:/var/lib/postgresql/data/
+  mc-identitydb:
+    container_name: mc-identitydb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=MCIdentityDb
+    restart: always
+    ports:
+        - "5435:5432"
+    volumes:
+      - postgres-mcidentity:/var/lib/postgresql/data/
 
   mc-messagebroker:
     container_name: mc-messagebroker

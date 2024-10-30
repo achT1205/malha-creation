@@ -1,3 +1,4 @@
+using BuildingBlocks.Middlewares;
 using IdentityServer.Data;
 using IdentityServer.Data.Extensions;
 using IdentityServer.Models;
@@ -43,7 +44,7 @@ app.MapGet("users/me", async (ClaimsPrincipal claims, ApplicationDbContext conte
 .RequireAuthorization();
 
 app.UseHttpsRedirection();
-
+//app.UseMiddleware<RetrictAccessMiddleware>();
 app.MapIdentityApi<User>();
 
 app.Run();

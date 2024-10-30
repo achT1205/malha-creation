@@ -9,7 +9,7 @@ public class StoreCartEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/carts", async (StoreCartRequest request, ISender sender) =>
+        app.MapPost("/api/carts", async (StoreCartRequest request, ISender sender) =>
         {
             var command = request.Adapt<StoreCartCommand>();
             var result = await sender.Send(command);

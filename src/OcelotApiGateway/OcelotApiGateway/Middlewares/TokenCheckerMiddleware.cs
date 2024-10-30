@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace OcelotApiGateway.Middlewares;
+﻿namespace OcelotApiGateway.Middlewares;
 
 public class TokenCheckerMiddleware(RequestDelegate next)
 {
@@ -26,6 +24,6 @@ public class TokenCheckerMiddleware(RequestDelegate next)
                 await next(context);
             }
         }
-       
+
     }
 }
