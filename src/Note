@@ -1,7 +1,5 @@
 Add-Migration Create_Database -OutputDir Data/Migrations -Project Ordering.Infrastructure -StartupProject Ordering.API
 
-Add-Migration Create_Database -OutputDir Data/Migrations -Project Ordering.Infrastructure -StartupProject WebApplication1
-
 update-database
 
 Add-Migration Create_Database -OutputDir Data/Migrations -Project IdentityServer -StartupProject IdentityServer

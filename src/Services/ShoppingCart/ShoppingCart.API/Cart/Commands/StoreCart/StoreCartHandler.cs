@@ -46,7 +46,7 @@ public class StoreCartCommandHandler(
 
     private async Task<IEnumerable<ShoppingCartItem>> DeductDiscount(IEnumerable<CartItem> cartItems, CancellationToken cancellationToken)
     {
-        List<ShoppingCartItem> shoppingCartItems = new List<ShoppingCartItem>(); ;
+        List<ShoppingCartItem> shoppingCartItems = new List<ShoppingCartItem>();
 
         foreach (var item in cartItems)
         {

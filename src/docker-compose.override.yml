@@ -80,7 +80,7 @@ services:
       - ConnectionStrings__Database=Server=mc-cartdb;Port=5432;Database=MCCartDb;user Id=postgres;Password=postgres;Include Error Detail=true
       - ConnectionStrings__Redis=mc-distributedcache:6379
       - GrpcSettings__DiscountUrl=https://mc-discount.grpc:8081
-      - ExternalApiSettings__ProductApiUrl=https://mc-catalog.api:4040/api/products/by-id
+      - ExternalApiSettings__ProductApiUrl=http://mc-catalog.api:8080/api/products/by-id
       - MessageBroker__Host=amqp://ecommerce-mq:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
@@ -89,6 +89,7 @@ services:
       - mc-distributedcache
       - mc-discount.grpc
       - mc-messagebroker
+      - mc-catalog.api
     ports:
       - "4003:8080"
       - "4043:8081"
@@ -123,7 +124,7 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__Database=Server=mc-orderdb;Database=MCOrderDb;User Id=sa;Password=SwN12345678;Encrypt=False;TrustServerCertificate=True
-      - ExternalApiSettings__ProductApiUrl=https://mc-catalog.api:4040/api/products/by-id
+      - ExternalApiSettings__ProductApiUrl=http://mc-catalog.api:8080/api/products/by-id
       - MessageBroker__Host=amqp://ecommerce-mq:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
