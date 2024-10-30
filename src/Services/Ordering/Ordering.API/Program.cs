@@ -1,6 +1,8 @@
 using Ordering.API;
+using Ordering.API.Endpoints;
 using Ordering.Application;
 using Ordering.Infrastructure;
+using Ordering.Infrastructure.Data.Extentions;
 
 internal class Program
 {
@@ -19,10 +21,12 @@ internal class Program
         // Configure the HTTP request pipeline.
         app.UseApiServices();
 
-        //if (app.Environment.IsDevelopment())
-        //{
-        //    app.InitialiseDatabase();
-        //}
+        if (app.Environment.IsDevelopment())
+        {
+            app.InitialiseDatabase();
+        }
+
+        app.MapOrderEndpoints();
 
         app.Run();
     }

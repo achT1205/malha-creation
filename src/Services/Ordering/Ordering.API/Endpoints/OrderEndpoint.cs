@@ -38,7 +38,7 @@ public static class OrderEndpoints
     public record GetOrdersByCodeResponse(IEnumerable<OrderDto> Orders);
     public static void MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/orders", async (CreateOrderRequest request, ISender sender) =>
+        app.MapPost("/api/orders", async (CreateOrderRequest request, ISender sender) =>
         {
             var command = request.Adapt<CreateOrderCommand>();
 
@@ -46,7 +46,7 @@ public static class OrderEndpoints
 
             var response = result.Adapt<CreateOrderResponse>();
 
-            return Results.Created($"/orders/{response.Id}", response);
+            return Results.Created($"/api/orders/{response.Id}", response);
         })
        .WithName("CreateOrder")
        .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
@@ -54,7 +54,7 @@ public static class OrderEndpoints
        .WithSummary("Create Order")
        .WithDescription("Create Order");
 
-        app.MapPut("/orders", async (UpdateOrderRequest request, ISender sender) =>
+        app.MapPut("/api/orders", async (UpdateOrderRequest request, ISender sender) =>
         {
             var command = request.Adapt<UpdateOrderCommand>();
 
@@ -70,7 +70,7 @@ public static class OrderEndpoints
        .WithSummary("Update Order")
        .WithDescription("Update Order");
 
-        app.MapDelete("/orders/{id}", async (Guid Id, ISender sender) =>
+        app.MapDelete("/api/orders/{id}", async (Guid Id, ISender sender) =>
         {
             var result = await sender.Send(new DeleteOrderCommand(Id));
 
@@ -85,7 +85,7 @@ public static class OrderEndpoints
         .WithSummary("Delete Order")
         .WithDescription("Delete Order");
 
-        app.MapGet("/orders", async ([AsParameters] PaginationRequest request, ISender sender) =>
+        app.MapGet("/api/orders", async ([AsParameters] PaginationRequest request, ISender sender) =>
         {
             var result = await sender.Send(new GetOrdersQuery(request));
 
@@ -100,7 +100,7 @@ public static class OrderEndpoints
        .WithSummary("Get Orders")
        .WithDescription("Get Orders");
 
-        app.MapGet("/orders/{code}", async (string code, ISender sender) =>
+        app.MapGet("/api/orders/{code}", async (string code, ISender sender) =>
         {
             var result = await sender.Send(new GetOrdersByOrderCodeQuery(code));
 
@@ -115,7 +115,7 @@ public static class OrderEndpoints
        .WithSummary("Get Orders By Name")
        .WithDescription("Get Orders By Name");
 
-        app.MapGet("/orders/customer/{customerId}", async (Guid customerId, ISender sender) =>
+        app.MapGet("/api/orders/customer/{customerId}", async (Guid customerId, ISender sender) =>
         {
             var result = await sender.Send(new GetOrdersByCustomerQuery(customerId));
 
@@ -132,7 +132,4 @@ public static class OrderEndpoints
 
 
     }
-
-
-
 }

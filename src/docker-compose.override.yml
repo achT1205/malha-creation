@@ -129,6 +129,10 @@ services:
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
       - FeatureManagement__OrderFullfilment=false
+    depends_on:
+      - mc-orderdb
+      - mc-messagebroker
+      - mc-catalog.api
     ports:
       - "4004:8080"
       - "4044:8081"
