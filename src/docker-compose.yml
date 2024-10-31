@@ -45,7 +45,7 @@
       context: .
       dockerfile: Services/Ordering/Ordering.API/Dockerfile
 
-  mc-identityserver:
+  mc-auth.api:
     image: ${DOCKER_REGISTRY-}identityserver
     build:
       context: .

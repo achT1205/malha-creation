@@ -7,8 +7,8 @@ internal class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-        builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+        var  path = builder.Configuration["Ocelot:Path"]!;
+        builder.Configuration.AddJsonFile(path, optional: false, reloadOnChange: true);
         builder.Services.AddOcelot();
         builder.Services.AddCors(options =>
         {
@@ -24,8 +24,8 @@ internal class Program
 
 
         app.UseCors();
-        app.UseMiddleware<TokenCheckerMiddleware>();
         app.UseMiddleware<InterceptionMiddleware>();
+        app.UseMiddleware<TokenCheckerMiddleware>();
         app.UseOcelot().Wait();
         app.Run();
     }

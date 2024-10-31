@@ -207,8 +207,8 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
-  mc-identityserver:
-    container_name: mc-identityserver
+  mc-auth.api:
+    container_name: mc-auth.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -227,6 +227,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
+      - Ocelot__Path=ocelot.prod.json
+    depends_on:
+      - mc-catalog.api
+      - mc-shoppingcart.api
+      - mc-discount.grpc
+      - mc-ordering.api
+      - mc-auth.api
     ports:
       - "5001:8080"
       - "5051:8081"
