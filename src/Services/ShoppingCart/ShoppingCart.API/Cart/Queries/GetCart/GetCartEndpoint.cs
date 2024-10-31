@@ -6,7 +6,7 @@ public class GetCartEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/carts/{userId}", async (Guid userId, ISender sender) =>
+        app.MapGet("/api/carts/{userId}", async (Guid userId, ISender sender) =>
         {
             var result = await sender.Send(new GetCartQuery(userId));
 

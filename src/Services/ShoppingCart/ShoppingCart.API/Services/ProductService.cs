@@ -36,12 +36,12 @@ public class ProductService : IProductService
                 return resp?.Product;
             }
 
-            throw new InternalServerException(response.Content.ToString());
+            throw new InternalServerException(response.IsSuccessStatusCode.ToString());
         }
         catch (Exception ex) 
         {
 
-            throw new InternalServerException(ex.InnerException.Message);
+            throw new InternalServerException(ex.Message);
         }
     }
 }

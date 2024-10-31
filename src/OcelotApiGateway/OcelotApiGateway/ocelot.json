@@ -78,7 +78,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 3033
+          "Port": 3003
         }
       ],
       "UpstreamPathTemplate": "/api/carts/{everything}",
@@ -90,7 +90,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 3034
+          "Port": 3004
         }
       ],
       "UpstreamPathTemplate": "/api/orders/{everything}",
@@ -102,7 +102,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 3035
+          "Port": 3005
         }
       ],
       "UpstreamPathTemplate": "/{everything}",

@@ -1,6 +1,8 @@
 
  services:
 
+  mc-smtp4dev:
+    image: rnwood/smtp4dev:v3
   mc-catalogdb:
     image: mcr.microsoft.com/azure-sql-edge:latest
 
@@ -43,7 +45,22 @@
       context: .
       dockerfile: Services/Ordering/Ordering.API/Dockerfile
 
+  mc-identityserver:
+    image: ${DOCKER_REGISTRY-}identityserver
+    build:
+      context: .
+      dockerfile: Services/Auth/IdentityServer/Dockerfile
+
+  mc-ocelotapigateway:
+    image: ${DOCKER_REGISTRY-}ocelotapigateway
+    build:
+      context: .
+      dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
+
  volumes:
   postgres_mccart:
   postgres-mcidentity:
+  mcsmtp4dev-data:
  
+
+

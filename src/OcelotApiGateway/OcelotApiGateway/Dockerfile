@@ -13,6 +13,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["OcelotApiGateway/OcelotApiGateway/OcelotApiGateway.csproj", "OcelotApiGateway/OcelotApiGateway/"]
+COPY ["BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj", "BuildingBlocks/BuildingBlocks/"]
 RUN dotnet restore "./OcelotApiGateway/OcelotApiGateway/OcelotApiGateway.csproj"
 COPY . .
 WORKDIR "/src/OcelotApiGateway/OcelotApiGateway"
