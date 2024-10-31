@@ -1,5 +1,6 @@
 services:
   mc-smtp4dev:
+    container_name: mc-smtp4dev
     restart: always
     ports:
       # Change the number before : to the port the web interface should be accessible on
