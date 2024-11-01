@@ -30,7 +30,7 @@ public class RetrictAccessMiddleware
         if (string.IsNullOrEmpty(token) || !ValidateJwtToken(token))
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsync("Access forbidden");
+            await context.Response.WriteAsync("Access forbidden: Not from Gateway");
             return;
         }
 

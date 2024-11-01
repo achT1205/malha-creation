@@ -78,6 +78,22 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductTypes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -102,22 +118,24 @@ namespace Catalog.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProductTypes",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductTypes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_Collections_CollectionId",
+                        column: x => x.CollectionId,
+                        principalTable: "Collections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_Materials_MaterialId",
+                        column: x => x.MaterialId,
+                        principalTable: "Materials",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_ProductTypes_ProductTypeId",
+                        column: x => x.ProductTypeId,
+                        principalTable: "ProductTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -148,7 +166,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductCategoryIds",
+                name: "ProductCategory",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -158,9 +176,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductCategoryIds", x => x.Id);
+                    table.PrimaryKey("PK_ProductCategory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductCategoryIds_Products_ProductId",
+                        name: "FK_ProductCategory_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -168,7 +186,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductOccasionIds",
+                name: "ProductOccasion",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -178,9 +196,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductOccasionIds", x => x.Id);
+                    table.PrimaryKey("PK_ProductOccasion", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductOccasionIds_Products_ProductId",
+                        name: "FK_ProductOccasion_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -188,19 +206,25 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductReviewIds",
+                name: "Reviews",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ReviewId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DatePosted = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductReviewIds", x => x.Id);
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductReviewIds_Products_ProductId",
+                        name: "FK_Reviews_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -268,25 +292,40 @@ namespace Catalog.Infrastructure.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductCategoryIds_ProductId",
-                table: "ProductCategoryIds",
+                name: "IX_ProductCategory_ProductId",
+                table: "ProductCategory",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductOccasionIds_ProductId",
-                table: "ProductOccasionIds",
+                name: "IX_ProductOccasion_ProductId",
+                table: "ProductOccasion",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductReviewIds_ProductId",
-                table: "ProductReviewIds",
-                column: "ProductId");
+                name: "IX_Products_CollectionId",
+                table: "Products",
+                column: "CollectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_MaterialId",
+                table: "Products",
+                column: "MaterialId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_ProductTypeId",
+                table: "Products",
+                column: "ProductTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_UrlFriendlyName",
                 table: "Products",
                 column: "UrlFriendlyName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ProductId",
+                table: "Reviews",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SizeVariants_ColorVariantId_ProductId",
@@ -301,28 +340,19 @@ namespace Catalog.Infrastructure.Data.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Collections");
-
-            migrationBuilder.DropTable(
                 name: "ColorVariantImages");
-
-            migrationBuilder.DropTable(
-                name: "Materials");
 
             migrationBuilder.DropTable(
                 name: "Occasions");
 
             migrationBuilder.DropTable(
-                name: "ProductCategoryIds");
+                name: "ProductCategory");
 
             migrationBuilder.DropTable(
-                name: "ProductOccasionIds");
+                name: "ProductOccasion");
 
             migrationBuilder.DropTable(
-                name: "ProductReviewIds");
-
-            migrationBuilder.DropTable(
-                name: "ProductTypes");
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "SizeVariants");
@@ -332,6 +362,15 @@ namespace Catalog.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Collections");
+
+            migrationBuilder.DropTable(
+                name: "Materials");
+
+            migrationBuilder.DropTable(
+                name: "ProductTypes");
         }
     }
 }

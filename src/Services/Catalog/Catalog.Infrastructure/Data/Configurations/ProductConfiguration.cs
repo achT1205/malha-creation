@@ -13,25 +13,53 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         ConfigureColorVariantsTable(builder);
         ConfigureCategoryIdsTable(builder);
         ConfigureOccasionIdsTable(builder);
-        ConfigureProductReviewIdsTable(builder);
+        ConfigureProductReviewsTable(builder);
     }
-
-    private void ConfigureProductReviewIdsTable(EntityTypeBuilder<Product> builder)
+    private void ConfigureProductReviewsTable(EntityTypeBuilder<Product> builder)
     {
-        builder.OwnsMany(p => p.ProductReviewIds, rib =>
+        builder.OwnsMany(p => p.Reviews, rib =>
         {
-            rib.ToTable("ProductReviewIds");
+            rib.ToTable(nameof(Product.Reviews));
 
-            rib.WithOwner().HasForeignKey("ProductId");
+            rib.WithOwner().HasForeignKey(nameof(Review.ProductId));
 
-            rib.HasKey("Id");
+            rib.HasKey(r => r.Id);
 
-            rib.Property(r => r.Value)
-            .HasColumnName("ReviewId")
-            .ValueGeneratedNever();
+            rib.Property(r => r.Id)
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    dbId => ReviewId.Of(dbId));
+
+            rib.Property(r => r.ReviewerId)
+            .HasColumnName("ReviewerId")
+            .ValueGeneratedNever()
+            .IsRequired();
+
+            rib.Property(r => r.ReviewerId)
+            .ValueGeneratedNever().HasConversion(
+            id => id.Value,
+            dbId => UserId.Of(dbId));
+
+            rib.Property(r => r.DatePosted)
+            .HasColumnName("DatePosted")
+            .ValueGeneratedNever()
+            .IsRequired();
+
+            rib.Property(r => r.Comment)
+            .HasColumnName("Comment")
+            .ValueGeneratedNever()
+            .IsRequired();
+
+            rib.OwnsOne(r => r.Rating, rb =>
+            {
+                rb.Property(r => r.Value)
+                  .HasColumnName("Rating")
+                  .IsRequired();
+            });
         });
 
-        builder.Metadata.FindNavigation(nameof(Product.ProductReviewIds))!
+        builder.Metadata.FindNavigation(nameof(Product.Reviews))!
        .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
     private void ConfigureOccasionIdsTable(EntityTypeBuilder<Product> builder)
@@ -39,11 +67,17 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.OwnsMany(p => p.OccasionIds, ob =>
         {
-            ob.ToTable("ProductOccasionIds");
+            ob.ToTable("ProductOccasion");
 
             ob.WithOwner().HasForeignKey("ProductId");
 
             ob.HasKey("Id");
+
+            //ob.HasOne<Occasion>()
+            // .WithMany()
+            // .HasForeignKey("OccasionId")
+            // .IsRequired()
+            // .OnDelete(DeleteBehavior.Restrict);
 
             ob.Property(r => r.Value)
             .HasColumnName("OccasionId")
@@ -57,11 +91,17 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         builder.OwnsMany(p => p.CategoryIds, cb =>
         {
-            cb.ToTable("ProductCategoryIds");
+            cb.ToTable("ProductCategory");
 
             cb.WithOwner().HasForeignKey("ProductId");
 
             cb.HasKey("Id");
+
+            //cb.HasOne<Category>()
+            //  .WithMany()
+            //  .HasForeignKey("CategoryId")
+            //  .IsRequired()
+            //  .OnDelete(DeleteBehavior.Restrict);
 
             cb.Property(r => r.Value)
             .HasColumnName("CategoryId")
@@ -277,5 +317,21 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .ValueGeneratedNever().HasConversion(
             id => id.Value,
             dbId => CollectionId.Of(dbId));
+
+        builder.HasOne<Collection>()
+            .WithMany()
+            .HasForeignKey(p => p.CollectionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<ProductType>()
+            .WithMany()
+            .HasForeignKey(p => p.ProductTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<Material>()
+            .WithMany()
+            .HasForeignKey(p => p.MaterialId)
+            .OnDelete(DeleteBehavior.Restrict);
+
     }
 }

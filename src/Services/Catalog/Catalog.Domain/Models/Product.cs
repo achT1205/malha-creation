@@ -6,7 +6,7 @@ public class Product : Aggregate<ProductId>
     public IReadOnlyList<OccasionId> OccasionIds => _occasionIds.AsReadOnly();
     public IReadOnlyList<CategoryId> CategoryIds => _categoryIds.AsReadOnly();
     public IReadOnlyList<ColorVariant> ColorVariants => _colorVariants.AsReadOnly();
-    public IReadOnlyList<ProductReviewId>  ProductReviewIds => _productReviewIds.AsReadOnly();
+    public IReadOnlyList<Review>  Reviews => _reviews.AsReadOnly();
 
     public ProductName Name { get; private set; } = default!;
     public UrlFriendlyName UrlFriendlyName { get; private set; } = default!;
@@ -18,7 +18,7 @@ public class Product : Aggregate<ProductId>
     public ProductTypeEnum ProductType { get; private set; } = default!;
     public MaterialId MaterialId { get; private set; } = default!;
     public CollectionId CollectionId { get; private set; } = default!;
-    private readonly List<ProductReviewId>  _productReviewIds = new();
+    private readonly List<Review>  _reviews = new();
     private readonly List<OccasionId> _occasionIds = new();
     private readonly List<CategoryId> _categoryIds = new();
     private readonly List<ColorVariant> _colorVariants = new();
@@ -85,11 +85,11 @@ public class Product : Aggregate<ProductId>
     }
 
     // Ajout d'une nouvelle évaluation (ProductReview)
-    public void AddReview(ProductReviewId reviewId)
+    public void AddReview(Review review)
     {
-        if (!_productReviewIds.Contains(reviewId))
+        if (!_reviews.Contains(review))
         {
-            _productReviewIds.Add(reviewId);
+            _reviews.Add(review);
             AddDomainEvent(new ProductUpdatedEvent(this));
         }
     }

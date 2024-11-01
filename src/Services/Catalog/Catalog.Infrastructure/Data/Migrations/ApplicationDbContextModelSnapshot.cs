@@ -289,6 +289,12 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CollectionId");
+
+                    b.HasIndex("MaterialId");
+
+                    b.HasIndex("ProductTypeId");
+
                     b.HasIndex("UrlFriendlyName_Value")
                         .IsUnique();
 
@@ -297,6 +303,24 @@ namespace Catalog.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Product", b =>
                 {
+                    b.HasOne("Catalog.Domain.Models.Collection", null)
+                        .WithMany()
+                        .HasForeignKey("CollectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Models.Material", null)
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Models.ProductType", null)
+                        .WithMany()
+                        .HasForeignKey("ProductTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.OwnsMany("Catalog.Domain.Models.ColorVariant", "ColorVariants", b1 =>
                         {
                             b1.Property<Guid>("Id")
@@ -593,6 +617,69 @@ namespace Catalog.Infrastructure.Data.Migrations
                                 .IsRequired();
                         });
 
+                    b.OwnsMany("Catalog.Domain.Models.Review", "Reviews", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Comment")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("Comment");
+
+                            b1.Property<DateTime?>("CreatedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("CreatedBy")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<DateTime>("DatePosted")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("DatePosted");
+
+                            b1.Property<DateTime?>("LastModified")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("LastModifiedBy")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<Guid>("ReviewerId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("ReviewerId");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ProductId");
+
+                            b1.ToTable("Reviews", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId");
+
+                            b1.OwnsOne("Catalog.Domain.ValueObjects.Rating", "Rating", b2 =>
+                                {
+                                    b2.Property<Guid>("ReviewId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<int>("Value")
+                                        .HasColumnType("int")
+                                        .HasColumnName("Rating");
+
+                                    b2.HasKey("ReviewId");
+
+                                    b2.ToTable("Reviews");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ReviewId");
+                                });
+
+                            b1.Navigation("Rating")
+                                .IsRequired();
+                        });
+
                     b.OwnsMany("Catalog.Domain.ValueObjects.CategoryId", "CategoryIds", b1 =>
                         {
                             b1.Property<int>("Id")
@@ -612,7 +699,7 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                             b1.HasIndex("ProductId");
 
-                            b1.ToTable("ProductCategoryIds", (string)null);
+                            b1.ToTable("ProductCategory", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");
@@ -637,32 +724,7 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                             b1.HasIndex("ProductId");
 
-                            b1.ToTable("ProductOccasionIds", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("ProductId");
-                        });
-
-                    b.OwnsMany("Catalog.Domain.ValueObjects.ProductReviewId", "ProductReviewIds", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<Guid>("Value")
-                                .HasColumnType("uniqueidentifier")
-                                .HasColumnName("ReviewId");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("ProductId");
-
-                            b1.ToTable("ProductReviewIds", (string)null);
+                            b1.ToTable("ProductOccasion", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");
@@ -674,7 +736,7 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                     b.Navigation("OccasionIds");
 
-                    b.Navigation("ProductReviewIds");
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

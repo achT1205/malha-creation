@@ -17,7 +17,7 @@ public class TokenCheckerMiddleware(RequestDelegate next)
             if (authHeader.FirstOrDefault() == null)
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsync("Access denied");
+                await context.Response.WriteAsync("Access denied: Not authorized");
             }
             else
             {

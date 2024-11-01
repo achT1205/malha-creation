@@ -214,6 +214,8 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__Database=Server=mc-identitydb;Port=5432;Database=MCIdentityDb;user Id=postgres;Password=postgres;Include Error Detail=true
+    depends_on:
+      - mc-identitydb
     ports:
       - "4005:8080"
       - "4045:8081"
