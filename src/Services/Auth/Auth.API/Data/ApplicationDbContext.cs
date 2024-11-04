@@ -1,9 +1,8 @@
-﻿using IdentityServer.Models;
+﻿using Auth.API.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace IdentityServer.Data;
-
+namespace Auth.API.Data;
 
 public class ApplicationDbContext : IdentityDbContext<User>
 {
@@ -21,3 +20,4 @@ public class ApplicationDbContext : IdentityDbContext<User>
         builder.HasDefaultSchema("identity");
     }
 }
+

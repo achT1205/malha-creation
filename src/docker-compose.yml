@@ -67,12 +67,6 @@
       context: .
       dockerfile: Services/Ordering/Ordering.API/Dockerfile
 
-  # mc-auth.api:
-  #   image: ${DOCKER_REGISTRY-}identityserver
-  #   build:
-  #     context: .
-  #     dockerfile: Services/Auth/IdentityServer/Dockerfile
-
   mc-ocelotapigateway:
     image: ${DOCKER_REGISTRY-}ocelotapigateway
     networks:
@@ -81,13 +75,13 @@
       context: .
       dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
 
-  mc-identityserver:
-    image: ${DOCKER_REGISTRY-}identityserver
+  mc-auth.api:
+    image: ${DOCKER_REGISTRY-}authapi
     networks:
       - mc-network
     build:
       context: .
-      dockerfile: Services/Auth/IdentityServer/Dockerfile
+      dockerfile: Services/Auth/Auth.API/Dockerfile
 
  networks:
   mc-network:
@@ -97,6 +91,8 @@
   postgres-mcidentity:
   mcsmtp4dev-data:
  
+
+
 
 
 

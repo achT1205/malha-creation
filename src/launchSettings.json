@@ -12,7 +12,9 @@
         "shoppingcart.api": "StartDebugging",
         "ordering.api": "StartDebugging",
         "identityserver": "StartDebugging",
-        "ocelotapigateway": "StartDebugging"
+        "ocelotapigateway": "StartDebugging",
+        "auth.api": "StartDebugging",
+        "identity.api": "StartDebugging"
       }
     }
   }

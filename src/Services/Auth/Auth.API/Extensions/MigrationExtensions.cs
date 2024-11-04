@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Auth.API.Data;
+using Microsoft.EntityFrameworkCore;
 
-namespace IdentityServer.Data.Extensions;
-
+namespace Auth.API.Extensions;
 
 public static class MigrationExtensions
 {
