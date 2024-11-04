@@ -1,7 +1,7 @@
 ﻿
 namespace BuildingBlocks.Enums;
 
-public enum ProductType
+public enum ProductTypeEnum
 {
     Clothing,
     Accessory,

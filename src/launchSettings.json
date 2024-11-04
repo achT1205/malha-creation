@@ -8,7 +8,13 @@
         "catalog.api": "StartDebugging",
         "inventory.api": "StartDebugging",
         "discount.grpc": "StartDebugging",
-        "cart.api": "StartDebugging"
+        "cart.api": "StartDebugging",
+        "shoppingcart.api": "StartDebugging",
+        "ordering.api": "StartDebugging",
+        "identityserver": "StartDebugging",
+        "ocelotapigateway": "StartDebugging",
+        "auth.api": "StartDebugging",
+        "identity.api": "StartDebugging"
       }
     }
   }

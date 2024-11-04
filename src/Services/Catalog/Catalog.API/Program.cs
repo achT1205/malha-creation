@@ -1,64 +1,34 @@
-using Weasel.Core;
-using BuildingBlocks.Messaging.MassTransit;
-using Catalog.API.Services.Interfaces;
-using Catalog.API.Services;
-using Catalog.API.Configs;
 using BuildingBlocks.Middlewares;
+using Catalog.API;
+using Catalog.API.Endpoints;
+using Catalog.Application;
+using Catalog.Infrastructure;
+using Catalog.Infrastructure.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Add service to the dependence injection container (DI)
-
-var assembly = typeof(Program).Assembly;
-builder.Services.AddMediatR(config =>
-{
-    config.RegisterServicesFromAssembly(assembly);
-    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-    config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-});
-builder.Services.AddValidatorsFromAssembly(assembly);
-
-builder.Services.AddCarter();
-builder.Services.AddMarten((options) =>
-{
-    options.Connection(builder.Configuration.GetConnectionString("Database")!);
-
-    if (builder.Environment.IsDevelopment())
-    {
-        options.AutoCreateSchemaObjects = AutoCreate.All;
-    }
-}).UseLightweightSessions();
-
-builder.Services.AddExceptionHandler<CustomExceptionHandler>();
-
-//Async Communication Services
-builder.Services.AddMessageBroker(builder.Configuration);
-
-builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("Database")!);
-
-// Bind the ExternalApiSettings from appsettings.json
-builder.Services.Configure<ExternalApiSettings>(builder.Configuration.GetSection("ExternalApiSettings"));
-
-// Register HttpClient
-builder.Services.AddHttpClient();
-
-// Register the external API service
-builder.Services.AddScoped<ISctockApiService, SctockApiService>();
+// Add services to the container.
+builder.Services
+    .AddApplicationServices(builder.Configuration)
+    .AddInfrastructureServices(builder.Configuration)
+    .AddApiServices(builder.Configuration);
 
 var app = builder.Build();
 
-//Configure the HTTP request pipeline
+// Configure the HTTP request pipeline.
+app.UseApiServices();
 
+if (app.Environment.IsDevelopment())
+{
+    await app.InitialiseDatabaseAsync();
+}
 app.UseMiddleware<RetrictAccessMiddleware>();
 
-app.MapCarter();
-
-app.UseExceptionHandler(options => { });
-
-app.UseHealthChecks("/health", new HealthCheckOptions
-{
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+app.MapProductEndpoints();
+app.MapCategoryEndpoints();
+app.MapCollectionEndpoints();
+app.MapMaterialEndpoints();
+app.MapOccasionEndpoints();
+app.MapProductTypeEndpoints();
 
 app.Run();

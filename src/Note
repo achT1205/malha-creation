@@ -1,7 +1,63 @@
 Add-Migration Create_Database -OutputDir Data/Migrations -Project Ordering.Infrastructure -StartupProject Ordering.API
 
-Add-Migration Create_Database -OutputDir Data/Migrations -Project Ordering.Infrastructure -StartupProject WebApplication1
+Add-Migration Create_Database -OutputDir Data/Migrations -Project Identity.API -StartupProject Identity.API
+
+Add-Migration Create_Database -OutputDir Data/Migrations -Project Catalog.Infrastructure -StartupProject Catalog.API
 
 update-database
 
-Add-Migration Create_Database -OutputDir Data/Migrations -Project IdentityServer -StartupProject IdentityServer
+
+test 
+
+create product 
+{
+  "Name": "Sample Product",
+  "UrlFriendlyName": "sample-product",
+  "Description": "This is a sample product description.",
+  "IsHandmade": true,
+  "CoverImage": {
+    "ImageSrc": "/images/sample-cover.jpg",
+    "AltText": "Sample Product Cover Image"
+  },
+  "ProductTypeId": "e2f2d5b2-9d3a-4c8a-b2a5-d2d1b5b4a7e1",  // GUID format correct
+  "MaterialId": "e2f2d5b2-9d3a-4c8a-b2a5-d2d1b5b4a7e2",     // GUID format correct
+  "CollectionId": "e2f2d5b2-9d3a-4c8a-b2a5-d2d1b5b4a7e3",    // GUID format correct
+  "OccasionIds": [
+    "e2f2d5b2-9d3a-4c8a-b2a5-d2d1b5b4a7e4",                // GUID format correct
+    "e2f2d5b2-9d3a-4c8a-b2a5-d2d1b5b4a7e5"                 // GUID format correct
+  ],
+  "CategoryIds": [
+    "e2f2d5b2-9d3a-4c8a-b2a5-d2d1b5b4a7e6",                // GUID format correct
+    "e2f2d5b2-9d3a-4c8a-b2a5-d2d1b5b4a7e7"                 // GUID format correct
+  ],
+  "ColorVariants": [
+    {
+      "Color": "Red",
+      "Images": [
+        {
+          "ImageSrc": "/images/red-front.jpg",
+          "AltText": "Red variant front"
+        },
+        {
+          "ImageSrc": "/images/red-back.jpg",
+          "AltText": "Red variant back"
+        }
+      ],
+      "Price": 29.99,
+      "Quantity": 50,
+      "SizeVariants": [
+        {
+          "Size": "S",
+          "Price": 29.99,
+          "Quantity": 10
+        },
+        {
+          "Size": "M",
+          "Price": 31.99,
+          "Quantity": 20
+        }
+      ]
+    }
+  ]
+}
+

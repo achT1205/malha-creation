@@ -1,52 +1,98 @@
-services:
+
+ services:
+  mc-smtp4dev:
+    image: rnwood/smtp4dev:v3
+    networks:
+      - mc-network
+
   mc-catalogdb:
-    image: postgres
-
-  mc-stockdb:
-    image: postgres
-
-  mc-cartdb:
-    image: postgres
-
-  mc-distributedcache:
-    image: redis
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    networks:
+      - mc-network
 
   mc-orderdb:
     image: mcr.microsoft.com/azure-sql-edge:latest
+    networks:
+      - mc-network
+
+  mc-messagebroker:
+    image: rabbitmq:management
+    networks:
+      - mc-network
+
+  mc-cartdb:
+    image: postgres
+    networks:
+      - mc-network
 
   mc-identitydb:
     image: postgres
+    networks:
+      - mc-network
 
-  catalog.api:
-    image: ${DOCKER_REGISTRY-}catalogapi
-    build:
-      context: .
-      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+  mc-distributedcache:
+    image: redis
+    networks:
+      - mc-network
 
-  messagebroker:
-    image: rabbitmq:management
-
-  inventory.api:
-    image: ${DOCKER_REGISTRY-}inventoryapi
-    build:
-      context: .
-      dockerfile: Services/Inventory/Inventory.API/Dockerfile
-
-  discount.grpc:
+  mc-discount.grpc:
     image: ${DOCKER_REGISTRY-}discountgrpc
+    networks:
+      - mc-network
     build:
       context: .
       dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
-  cart.api:
-    image: ${DOCKER_REGISTRY-}cartapi
+  mc-catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
+    networks:
+      - mc-network
     build:
       context: .
-      dockerfile: Services/Cart/Cart.API/Dockerfile
+      dockerfile: Services/Catalog/Catalog.API/Dockerfile
 
-volumes:
-  postgres-mccatalog:
-  postgres-mcstock: 
-  postgres-mccart: 
-  postgres-mcorder: 
-  postgres-mcidentity: 
+  mc-shoppingcart.api:
+    image: ${DOCKER_REGISTRY-}shoppingcartapi
+    networks:
+      - mc-network
+    build:
+      context: .
+      dockerfile: Services/ShoppingCart/ShoppingCart.API/Dockerfile
+
+  mc-ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    networks:
+      - mc-network
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+
+  mc-ocelotapigateway:
+    image: ${DOCKER_REGISTRY-}ocelotapigateway
+    networks:
+      - mc-network
+    build:
+      context: .
+      dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
+
+  mc-auth.api:
+    image: ${DOCKER_REGISTRY-}authapi
+    networks:
+      - mc-network
+    build:
+      context: .
+      dockerfile: Services/Auth/Auth.API/Dockerfile
+
+ networks:
+  mc-network:
+
+ volumes:
+  postgres_mccart:
+  postgres-mcidentity:
+  mcsmtp4dev-data:
+ 
+
+
+
+
+
