@@ -45,7 +45,7 @@ if (app.Environment.IsDevelopment())
     app.ApplyMigrations();
 }
 
-app.MapGet("/users/me", async (ClaimsPrincipal claims, ApplicationDbContext context) =>
+app.MapGet("/api/users/me", async (ClaimsPrincipal claims, ApplicationDbContext context) =>
 {
     string userId = claims.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
 

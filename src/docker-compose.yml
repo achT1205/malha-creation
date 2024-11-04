@@ -1,66 +1,102 @@
 
  services:
-
   mc-smtp4dev:
     image: rnwood/smtp4dev:v3
+    networks:
+      - mc-network
+
   mc-catalogdb:
     image: mcr.microsoft.com/azure-sql-edge:latest
+    networks:
+      - mc-network
 
   mc-orderdb:
     image: mcr.microsoft.com/azure-sql-edge:latest
+    networks:
+      - mc-network
 
   mc-messagebroker:
     image: rabbitmq:management
+    networks:
+      - mc-network
 
   mc-cartdb:
     image: postgres
+    networks:
+      - mc-network
 
   mc-identitydb:
     image: postgres
+    networks:
+      - mc-network
 
   mc-distributedcache:
     image: redis
+    networks:
+      - mc-network
 
   mc-discount.grpc:
     image: ${DOCKER_REGISTRY-}discountgrpc
+    networks:
+      - mc-network
     build:
       context: .
       dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
   mc-catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
+    networks:
+      - mc-network
     build:
       context: .
       dockerfile: Services/Catalog/Catalog.API/Dockerfile
 
   mc-shoppingcart.api:
     image: ${DOCKER_REGISTRY-}shoppingcartapi
+    networks:
+      - mc-network
     build:
       context: .
       dockerfile: Services/ShoppingCart/ShoppingCart.API/Dockerfile
 
   mc-ordering.api:
     image: ${DOCKER_REGISTRY-}orderingapi
+    networks:
+      - mc-network
     build:
       context: .
       dockerfile: Services/Ordering/Ordering.API/Dockerfile
 
-  mc-auth.api:
+  # mc-auth.api:
+  #   image: ${DOCKER_REGISTRY-}identityserver
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Auth/IdentityServer/Dockerfile
+
+  mc-ocelotapigateway:
+    image: ${DOCKER_REGISTRY-}ocelotapigateway
+    networks:
+      - mc-network
+    build:
+      context: .
+      dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
+
+  mc-identityserver:
     image: ${DOCKER_REGISTRY-}identityserver
+    networks:
+      - mc-network
     build:
       context: .
       dockerfile: Services/Auth/IdentityServer/Dockerfile
 
-  mc-ocelotapigateway:
-    image: ${DOCKER_REGISTRY-}ocelotapigateway
-    build:
-      context: .
-      dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
+ networks:
+  mc-network:
 
  volumes:
   postgres_mccart:
   postgres-mcidentity:
   mcsmtp4dev-data:
  
+
 
 
