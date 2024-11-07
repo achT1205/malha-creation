@@ -120,6 +120,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
             cvb.HasKey(cv => new { cv.Id, cv.ProductId });
 
+            cvb.Property(cv => cv.OnOrdering);
+
             cvb.Property(cv => cv.Id)
             .HasColumnName(nameof(ColorVariantId))
             .ValueGeneratedNever()
@@ -186,6 +188,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 svb.WithOwner().HasForeignKey(nameof(ColorVariantId), nameof(ProductId));
 
                 svb.HasKey(nameof(SizeVariant.Id), nameof(ColorVariantId), nameof(ProductId));
+
+                svb.Property(sv => sv.OnOrdering);
 
                 svb.Property(sv => sv.Id)
                 .HasColumnName(nameof(SizeVariantId))

@@ -13,6 +13,7 @@ public class UpdateOccasionsCommandValidation : AbstractValidator<UpdateOccasion
     public UpdateOccasionsCommandValidation()
     {
         RuleFor(x => x.Id).NotEmpty().WithMessage("Product Id is required");
+        RuleFor(x => x.OccasionIds).NotEmpty().WithMessage("Occasions are required");
     }
 }
 public class UpdateOccasionsCommandHandler : ICommandHandler<UpdateOccasionsCommand, UpdateOccasionsResult>

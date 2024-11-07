@@ -5,6 +5,7 @@ public class SizeVariant : Entity<SizeVariantId>
     public ColorVariantId ColorVariantId { get; private set; } = default!;
     public Size Size { get; private set; } = default!;
     public Price Price { get; private set; } = default!;
+    public bool OnOrdering { get; private set; } = default!;
     public Quantity Quantity { get; private set; } = default!;
 
     // Available stock at which we should reorder

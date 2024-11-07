@@ -1,15 +1,19 @@
 ﻿using Catalog.Application.Dtos;
 using Catalog.Application.Products.Commands.AddColorVariant;
+using Catalog.Application.Products.Commands.AddColorVariantStock;
 using Catalog.Application.Products.Commands.AddSizeVariant;
+using Catalog.Application.Products.Commands.AddSizeVariantStock;
 using Catalog.Application.Products.Commands.DeleteProduct;
 using Catalog.Application.Products.Commands.RemoveColorVariant;
 using Catalog.Application.Products.Commands.RemoveSizeVariant;
 using Catalog.Application.Products.Commands.UpdateCategories;
+using Catalog.Application.Products.Commands.UpdateColorVariantPrice;
 using Catalog.Application.Products.Commands.UpdateOccasions;
 using Catalog.Application.Products.Commands.UpdateProductInfos;
 using Catalog.Application.Products.Queries.GetProductById;
 using Catalog.Application.Products.Queries.GetProductBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
+using Catalog.Domain.ValueObjects;
 
 namespace Catalog.API.Endpoints;
 
@@ -43,6 +47,9 @@ public static class ProductEndpoints
        );
     public record UpdateOccasionsRequest(Guid Id, List<Guid> OccasionIds);
     public record UpdateCategoriesRequest(Guid Id, List<Guid> CategoryIds);
+    public record UpdateColorVariantPriceRequest(Guid Id, Guid ColorVariantId, decimal Price);
+    public record AddSizeVariantStockRequest(Guid Id, Guid ColorVariantId, Guid SizeVariantId, int Quantity);
+    public record AddColorVariantStockRequest(Guid Id, Guid ColorVariantId, int Quantity);
     public record AddColorVariantRequest(
     Guid Id,
     string Color,
@@ -118,6 +125,57 @@ public static class ProductEndpoints
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product categories.")
         .WithDescription("Update Product categories.");
+
+
+        app.MapPut("/api/products/{id}/color-variants/{colorVariantId}/add-stock", async (
+            Guid id,
+            Guid colorVariantId,
+            AddColorVariantStockRequest requst,
+            ISender sender) =>
+                {
+                    var command = requst.Adapt<AddColorVariantStockCommand>();
+                    var result = await sender.Send(command);
+                    var response = result.Adapt<UpdateProductResponse>();
+                    return Results.Ok(response);
+                })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Add ColorVariant Stock.")
+        .WithDescription("Update Product: Add ColorVariant Stock.");
+
+
+        app.MapPut("/api/products/{id}/color-variants/{colorVariantId}/size-variants/{sizeVariantId}/add-stock", async (
+            Guid id, 
+            Guid colorVariantId, 
+            Guid SizeVariantId, 
+            AddSizeVariantStockRequest requst, 
+            ISender sender) =>
+        {
+            var command = requst.Adapt<AddSizeVariantStockCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Add SizeVariant Stock.")
+        .WithDescription("Update Product: Add SizeVariant Stock.");
+
+
+        app.MapPut("/api/products/{id}/color-variants/{colorVariantId}/update-price", async (Guid id, Guid colorVariantId, UpdateColorVariantPriceRequest requst, ISender sender) =>
+        {
+            var command = requst.Adapt<UpdateColorVariantPriceCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Update ColorVariant Price.")
+        .WithDescription("Update Product: Update ColorVariant Price.");
 
         app.MapDelete("/api/products/{id}/color-variants/{colorVariantId}", async (Guid id, Guid colorVariantId, ISender sender) =>
         {

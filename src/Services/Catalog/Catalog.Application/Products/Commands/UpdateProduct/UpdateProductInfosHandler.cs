@@ -30,10 +30,16 @@ public class UpdateProductInfosCommandValidation : AbstractValidator<UpdateProdu
     public UpdateProductInfosCommandValidation()
     {
         RuleFor(x => x.Id).NotEmpty().WithMessage("Product Id is required");
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Product name is required");
         RuleFor(x => x.UrlFriendlyName).NotEmpty().WithMessage("UrlFriendlyName is required.");
         RuleFor(x => x.UrlFriendlyName)
             .Matches(@"^[a-zA-Z0-9 \-]*$")
             .WithMessage("The field must not contain special characters.");
+        RuleFor(x => x.Description).NotEmpty().WithMessage("Product Description  is required");
+        RuleFor(x => x.MaterialId).NotEmpty().WithMessage("Product Material is required");
+        RuleFor(x => x.BrandId).NotEmpty().WithMessage("Product Brand  is required");
+        RuleFor(x => x.CollectionId).NotEmpty().WithMessage("Product Collection is required");
+        RuleFor(x => x.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
     }
 }
 public class UpdateProductInfosCommandHandler : ICommandHandler<UpdateProductInfosCommand, UpdateProductInfosResult>
@@ -66,7 +72,7 @@ public class UpdateProductInfosCommandHandler : ICommandHandler<UpdateProductInf
     private Product UpdateProductInfosEntity(Product product, UpdateProductInfosCommand command)
     {
         product.UpdateNames(ProductName.Of(command.Name), UrlFriendlyName.Of(command.UrlFriendlyName));
-        product.UpdateDescription(ProductDescription.Of(command.Description)); 
+        product.UpdateDescription(ProductDescription.Of(command.Description));
         product.UpdateMaterial(MaterialId.Of(command.MaterialId));
         product.UpdateCollection(CollectionId.Of(command.CollectionId));
         product.UpdateBrand(BrandId.Of(command.BrandId));

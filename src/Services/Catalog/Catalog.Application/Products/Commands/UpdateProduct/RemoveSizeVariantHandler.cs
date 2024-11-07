@@ -34,12 +34,7 @@ public class RemoveSizeVariantCommandHandler : ICommandHandler<RemoveSizeVariant
             {
                 throw new NotFoundException($"The product {command.Id} was not found");
             }
-            var cv = product.ColorVariants.FirstOrDefault(_ => _.Equals(command.ColorVariantId));
-            if (cv == null)
-            {
-                throw new NotFoundException($"The ColorVariant {command.ColorVariantId} was not found");
-            }
-            cv.RemoveSizeVariant(SizeVariantId.Of(command.SizeVariantId));
+            product.RemoveSizeVariant(ColorVariantId.Of(command.ColorVariantId), SizeVariantId.Of(command.SizeVariantId));
 
             _productRepository.UpdateAsync(product);
             await _productRepository.SaveChangesAsync();

@@ -23,6 +23,8 @@ public class AddColorVariantCommandValidation : AbstractValidator<AddColorVarian
     public AddColorVariantCommandValidation()
     {
         RuleFor(x => x.Id).NotEmpty().WithMessage("Product Id is required");
+        RuleFor(x => x.Color).NotEmpty().WithMessage("Color is required.");
+        RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0.");
     }
 }
 public class AddColorVariantCommandHandler : ICommandHandler<AddColorVariantCommand, AddColorVariantResult>
@@ -43,6 +45,16 @@ public class AddColorVariantCommandHandler : ICommandHandler<AddColorVariantComm
             {
                 throw new NotFoundException($"The product {command.Id} was not found");
             }
+            if (product.ProductType != Domain.Enums.ProductTypeEnum.Clothing)
+            {
+                if (!command.Price.HasValue || command.Price.Value <= 0)
+                    throw new ArgumentException("Price must greater than 0.", nameof(Price));
+                if (!command.Quantity.HasValue || command.Quantity.Value <= 0)
+                    throw new ArgumentException("Quantity must greater than 0.", nameof(Quantity));
+                if (!command.RestockThreshold.HasValue || command.RestockThreshold.Value <= 0)
+                    throw new ArgumentException("RestockThreshold must greater than 0.", nameof(Quantity));
+            }
+
 
             var newColorVariant = ColorVariant.Create(
                     product.Id,
@@ -57,17 +69,19 @@ public class AddColorVariantCommandHandler : ICommandHandler<AddColorVariantComm
                 var newImage = Image.Of(image.ImageSrc, image.AltText);
                 newColorVariant.AddImage(newImage);
             }
-
-            foreach (var sizeVariant in command.sizeVariants)
+            if (product.ProductType == Domain.Enums.ProductTypeEnum.Clothing && command.sizeVariants.Any())
             {
-                var newSizeVariant = SizeVariant.Create(
-                    newColorVariant.Id,
-                    SizeVariantId.Of(Guid.NewGuid()),
-                    Size.Of(sizeVariant.Size),
-                    Price.Of("USD", sizeVariant.Price),
-                    Quantity.Of(sizeVariant.Quantity),
-                    Quantity.Of(sizeVariant.RestockThreshold));
-                newColorVariant.AddSizeVariant(newSizeVariant);
+                foreach (var sizeVariant in command.sizeVariants)
+                {
+                    var newSizeVariant = SizeVariant.Create(
+                        newColorVariant.Id,
+                        SizeVariantId.Of(Guid.NewGuid()),
+                        Size.Of(sizeVariant.Size),
+                        Price.Of("USD", sizeVariant.Price),
+                        Quantity.Of(sizeVariant.Quantity),
+                        Quantity.Of(sizeVariant.RestockThreshold));
+                    newColorVariant.AddSizeVariant(newSizeVariant);
+                }
             }
             product.AddColorVariant(newColorVariant);
 

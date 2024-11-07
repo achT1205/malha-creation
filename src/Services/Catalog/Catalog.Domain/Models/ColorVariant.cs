@@ -5,6 +5,7 @@ public class ColorVariant : Entity<ColorVariantId>
     public ProductId ProductId { get; private set; } = default!;
     public Color Color { get; protected set; } = default!;
     public Slug Slug { get; protected set; } = default!;
+    public bool OnOrdering { get; private set; } = default!;
 
     // Available stock at which we should reorder
     public ColorVariantQuantity RestockThreshold { get; private set; } = default!;
@@ -37,7 +38,7 @@ public class ColorVariant : Entity<ColorVariantId>
     {
         return new ColorVariant(productId, color, slug, price, quantity, restockThreshold);
     }
-    public void UpdatePrice(ColorVariantPrice newPrice)
+    public void UpdatePrice( ColorVariantPrice newPrice)
     {
         if (!Price.Equals(newPrice))
         {
@@ -95,6 +96,10 @@ public class ColorVariant : Entity<ColorVariantId>
         var size = _sizeVariants.FirstOrDefault(_ => _.Id.Value == sizeVariantId.Value);
         if (size != null)
         {
+            if (size.OnOrdering)
+            {
+                throw new CatalogDomainException($"This sizeVariant is on ordering, can not remove it.");
+            }
             _sizeVariants.Remove(size);
         }
     }
