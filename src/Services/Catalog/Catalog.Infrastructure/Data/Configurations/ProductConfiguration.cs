@@ -168,6 +168,12 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                   .HasColumnName("Quantity");
             });
 
+            cvb.OwnsOne(sv => sv.RestockThreshold, rb =>
+            {
+                rb.Property(r => r.Value)
+                  .HasColumnName("RestockThreshold");
+            });
+
             cvb.OwnsMany(cv => cv.Images, imsb =>
             {
                 imsb.ToTable("ColorVariantImages");
@@ -200,9 +206,9 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 });
 
 
-                svb.OwnsOne(sv => sv.Size, qb =>
+                svb.OwnsOne(sv => sv.Size, sb =>
                 {
-                    qb.Property(q => q.Value)
+                    sb.Property(s => s.Value)
                       .HasColumnName("Size")
                       .HasMaxLength(5)
                       .IsRequired();
@@ -212,6 +218,13 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 {
                     qb.Property(q => q.Value)
                       .HasColumnName("Quantity")
+                      .IsRequired();
+                });
+
+                svb.OwnsOne(sv => sv.RestockThreshold, rb =>
+                {
+                    rb.Property(r => r.Value)
+                      .HasColumnName("RestockThreshold")
                       .IsRequired();
                 });
             });
@@ -302,6 +315,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             dbStatus => (ProductTypeEnum)Enum.Parse(typeof(ProductTypeEnum), dbStatus));
 
         builder.Property(p => p.IsHandmade);
+        builder.Property(p => p.OnReorder);
 
         builder.Property(p => p.ProductTypeId)
             .ValueGeneratedNever().HasConversion(
@@ -318,9 +332,19 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             id => id.Value,
             dbId => CollectionId.Of(dbId));
 
+        builder.Property(p => p.BrandId)
+            .ValueGeneratedNever().HasConversion(
+            id => id.Value,
+            dbId => BrandId.Of(dbId));
+
         builder.HasOne<Collection>()
             .WithMany()
             .HasForeignKey(p => p.CollectionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<Brand>()
+            .WithMany()
+            .HasForeignKey(p => p.BrandId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne<ProductType>()

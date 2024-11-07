@@ -1,6 +1,6 @@
 ﻿using BuildingBlocks.CQRS;
 using BuildingBlocks.Exceptions;
-using BuildingBlocks.Messaging.Events;
+using Catalog.Application.Events.IntegrationEvents;
 using Catalog.Application.Extensions;
 using Catalog.Application.Interfaces;
 using Catalog.Domain.ValueObjects;
@@ -56,10 +56,12 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
             UrlFriendlyName.Of(command.UrlFriendlyName),
             ProductDescription.Of(command.Description),
             command.IsHandmade,
+            command.OnReorder,
             coverImage,
             ProductTypeId.Of(command.ProductTypeId),
             command.ProductType,
             MaterialId.Of(command.MaterialId),
+            BrandId.Of(command.BrandId),    
             CollectionId.Of(command.CollectionId),
             AverageRating.Of(0m, 0)
         );
@@ -81,7 +83,8 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                     Color.Of(colorVariant.Color),
                     Slug.Of(command.UrlFriendlyName, colorVariant.Color),
                     ColorVariantPrice.Of(colorVariant.Price.HasValue ? "USD" : null, colorVariant.Price),
-                    ColorVariantQuantity.Of(colorVariant.Quantity));
+                    ColorVariantQuantity.Of(colorVariant.Quantity),
+                    ColorVariantQuantity.Of(colorVariant.RestockThreshold));
 
                 foreach (var image in colorVariant.Images)
                 {
@@ -96,7 +99,8 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                         SizeVariantId.Of(Guid.NewGuid()),
                         Size.Of(sizeVariant.Size),
                         Price.Of("USD", sizeVariant.Price),
-                    Quantity.Of(sizeVariant.Quantity));
+                        Quantity.Of(sizeVariant.Quantity),
+                        Quantity.Of(sizeVariant.RestockThreshold));
                     newColorVariant.AddSizeVariant(newSizeVariant);
                 }
                 product.AddColorVariant(newColorVariant);

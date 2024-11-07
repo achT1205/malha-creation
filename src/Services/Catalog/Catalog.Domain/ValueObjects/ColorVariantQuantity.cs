@@ -20,13 +20,18 @@ public record ColorVariantQuantity
         return new ColorVariantQuantity(Value + amount);
     }
 
+
     public ColorVariantQuantity Decrease(int amount)
     {
+        if (Value - amount < 0)
+        {
+            throw new InvalidOperationException("Quantity cannot be reduced below zero");
+        }
         return new ColorVariantQuantity(Value - amount);
     }
 
     public override string ToString()
     {
-        return Value.ToString();
+        return Value.Value.ToString();
     }
 }

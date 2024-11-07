@@ -14,7 +14,7 @@ public record SizeVariantId
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("SizeVariantId cannot be empty.");
+            throw new CatalogDomainException("SizeVariantId cannot be empty.");
         }
 
         return new SizeVariantId(value);

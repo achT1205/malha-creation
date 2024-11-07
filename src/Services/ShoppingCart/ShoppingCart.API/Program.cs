@@ -30,7 +30,7 @@ builder.Services.AddCarter();
 builder.Services.AddMarten((options) =>
 {
     options.Connection(builder.Configuration.GetConnectionString("Database")!);
-    options.Schema.For<ShoppingCart>().Identity(_ => _.UserId);
+    options.Schema.For<Basket>().Identity(_ => _.UserId);
 }).UseLightweightSessions();
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();

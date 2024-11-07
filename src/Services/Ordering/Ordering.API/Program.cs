@@ -4,6 +4,7 @@ using Ordering.API.Endpoints;
 using Ordering.Application;
 using Ordering.Infrastructure;
 using Ordering.Infrastructure.Data.Extentions;
+using Ordering.Processor;
 
 internal class Program
 {
@@ -15,7 +16,8 @@ internal class Program
         builder.Services
             .AddApplicationServices(builder.Configuration)
             .AddInfrastructureServices(builder.Configuration)
-            .AddApiServices(builder.Configuration);
+            .AddApiServices(builder.Configuration)
+            .AddProcessorServices();
 
         var app = builder.Build();
 

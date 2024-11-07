@@ -6,8 +6,11 @@ public class ColorVariant : Entity<ColorVariantId>
     public Color Color { get; protected set; } = default!;
     public Slug Slug { get; protected set; } = default!;
 
+    // Available stock at which we should reorder
+    public ColorVariantQuantity RestockThreshold { get; private set; } = default!;
+
     private readonly List<Image> _images = new();
-    public IReadOnlyList<Image>  Images => _images.AsReadOnly();
+    public IReadOnlyList<Image> Images => _images.AsReadOnly();
 
     private readonly List<SizeVariant> _sizeVariants = new();
     public IReadOnlyList<SizeVariant> SizeVariants => _sizeVariants.AsReadOnly();
@@ -17,23 +20,23 @@ public class ColorVariant : Entity<ColorVariantId>
 
     private ColorVariant()
     {
-        
+
     }
-    private ColorVariant(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity)
+    private ColorVariant(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold)
     {
         Id = ColorVariantId.Of(Guid.NewGuid());
-        Price = price ;
-        Quantity = quantity ;
+        Price = price;
+        Quantity = quantity;
         ProductId = productId;
         Color = color ?? throw new ArgumentNullException(nameof(color));
         Slug = slug ?? throw new ArgumentNullException(nameof(slug));
+        RestockThreshold = restockThreshold;
     }
 
-    public static ColorVariant Create(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity)
+    public static ColorVariant Create(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold)
     {
-        return new ColorVariant(productId, color, slug, price, quantity);
+        return new ColorVariant(productId, color, slug, price, quantity, restockThreshold);
     }
-
     public void UpdatePrice(ColorVariantPrice newPrice)
     {
         if (!Price.Equals(newPrice))
@@ -41,7 +44,6 @@ public class ColorVariant : Entity<ColorVariantId>
             Price = newPrice ?? throw new ArgumentNullException(nameof(newPrice));
         }
     }
-
     public void UpdateQuantity(ColorVariantQuantity newQuantity)
     {
         if (!Quantity.Equals(newQuantity))
@@ -49,7 +51,28 @@ public class ColorVariant : Entity<ColorVariantId>
             Quantity = newQuantity ?? throw new ArgumentNullException(nameof(newQuantity));
         }
     }
+    public void AddStock(int newQuantity)
+    {
 
+        if (newQuantity <= 0)
+        {
+            throw new CatalogDomainException($"Item units desired should be greater than zero");
+        }
+        Quantity = Quantity.Increase(newQuantity);
+    }
+    public void RemoveStock(int newQuantity)
+    {
+        if (Quantity.Equals(0))
+        {
+            throw new CatalogDomainException($"Empty stock, product item {Slug.Value} is sold out");
+        }
+
+        if (newQuantity <= 0)
+        {
+            throw new CatalogDomainException($"Item units desired should be greater than zero");
+        }
+        Quantity = Quantity.Decrease(newQuantity);
+    }
     public void AddSizeVariant(SizeVariant sizeVariant)
     {
         if (sizeVariant == null)
@@ -67,56 +90,28 @@ public class ColorVariant : Entity<ColorVariantId>
 
         _sizeVariants.Add(sizeVariant);
     }
-
-    public void AddImage(Image  image)
+    public void RemoveSizeVariant(SizeVariantId sizeVariantId)
+    {
+        var size = _sizeVariants.FirstOrDefault(_ => _.Id.Value == sizeVariantId.Value);
+        if (size != null)
+        {
+            _sizeVariants.Remove(size);
+        }
+    }
+    public void AddImage(Image image)
     {
         if (_images.Contains(image))
             return;
 
         _images.Add(image);
     }
+    public void RemoveImage(string src)
+    {
+        var image = _images.FirstOrDefault(_ => _.ImageSrc.ToLower() == src.ToLower());
+        if (image != null)
+        {
+            _images.Remove(image);
+        }
+    }
 
-
-
-    // Method to update the quantity of a specific SizeVariant
-    //public void UpdateSizeVariantQuantity(Size size, Quantity newQuantity)
-    //{
-    //    var existingVariant = SizeVariants.FirstOrDefault(sv => sv.Size.Equals(size));
-
-    //    if (existingVariant != null)
-    //    {
-    //        var updatedVariant = SizeVariant.Create(existingVariant.Size, existingVariant.Price, newQuantity);
-    //        ReplaceSizeVariant(existingVariant, updatedVariant);
-    //    }
-    //    else
-    //    {
-    //        throw new InvalidOperationException("Size variant not found.");
-    //    }
-    //}
-
-
-    //public void UpdateSizeVariantPrice(Size size, Price newPrice)
-    //{
-    //    var existingVariant = SizeVariants.FirstOrDefault(sv => sv.Size.Equals(size));
-
-    //    if (existingVariant != null)
-    //    {
-    //        var updatedVariant = SizeVariant.Create(existingVariant.Size, newPrice, existingVariant.Quantity);
-    //        ReplaceSizeVariant(existingVariant, updatedVariant);
-    //    }
-    //    else
-    //    {
-    //        throw new InvalidOperationException("Size variant not found.");
-    //    }
-    //}
-
-    //// Helper method to replace the old SizeVariant with the new one
-    //private void ReplaceSizeVariant(SizeVariant oldVariant, SizeVariant newVariant)
-    //{
-    //    var index = _sizeVariants.IndexOf(oldVariant);
-    //    if (index >= 0)
-    //    {
-    //        _sizeVariants[index] = newVariant;
-    //    }
-    //}
 }

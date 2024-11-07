@@ -1,17 +1,27 @@
 ﻿using Ordering.Application.Abstractions.Services;
 using Ordering.Application.Orders.Helpers;
+using Ordering.Application.Orders.IntegrationEvents;
 
 namespace Ordering.Application.Orders.Commands.CreateOrder;
 
-public class AutoCreateOrderCommandHandler(IApplicationDbContext _context, IProductService productService)
+public class AutoCreateOrderCommandHandler(
+    ILogger<AutoCreateOrderCommandHandler> _logger,
+    IApplicationDbContext _context, 
+    IProductService productService,
+    IPublishEndpoint publishEndpoint)
     : ICommandHandler<AutoCreateOrderCommand, CreateOrderResult>
 {
     public async Task<CreateOrderResult> Handle(AutoCreateOrderCommand command, CancellationToken cancellationToken)
     {
-        var order = await CreateNewOrder(command);
+        // Add Integration event to clean the basket
+        var orderStartedEvent = new OrderStartedEvent(command.CustomerId);
+        await publishEndpoint.Publish(orderStartedEvent);
 
+        var order = await CreateNewOrder(command);
+        order.SubmitForProcessing();
         try
         {
+            _logger.LogInformation("Creating Order - Order: {@Order}", order);
             _context.Orders.Add(order);
             await _context.SaveChangesAsync(cancellationToken);
 

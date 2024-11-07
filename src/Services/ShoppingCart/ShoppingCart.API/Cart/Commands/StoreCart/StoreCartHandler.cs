@@ -10,7 +10,7 @@ public record StoreCartCommand : ICommand<StoreCartResult>
     public Guid UserId { get; set; } = default!;
     public List<CartItem> Items { get; set; } = new();
 };
-public record StoreCartResult(ShoppingCart ShoppingCart);
+public record StoreCartResult(Basket Basket);
 
 public class StoreCartCommandValidator : AbstractValidator<StoreCartCommand>
 {
@@ -32,7 +32,7 @@ public class StoreCartCommandHandler(
         {
 
             var items = await DeductDiscount(command.Items, cancellationToken);
-            var cart = new ShoppingCart { UserId = command.UserId, Items = items.ToList() };
+            var cart = new Basket { UserId = command.UserId, Items = items.ToList() };
 
             await repository.StoreCart(cart, cancellationToken);
 
@@ -44,9 +44,9 @@ public class StoreCartCommandHandler(
         }
     }
 
-    private async Task<IEnumerable<ShoppingCartItem>> DeductDiscount(IEnumerable<CartItem> cartItems, CancellationToken cancellationToken)
+    private async Task<IEnumerable<BasketItem>> DeductDiscount(IEnumerable<CartItem> cartItems, CancellationToken cancellationToken)
     {
-        List<ShoppingCartItem> shoppingCartItems = new List<ShoppingCartItem>();
+        List<BasketItem> BasketItems = new List<BasketItem>();
 
         foreach (var item in cartItems)
         {
@@ -56,7 +56,7 @@ public class StoreCartCommandHandler(
                 throw new ProductNotFoundException(item.ProductId);
             }
 
-            var shoppingCartItem = new ShoppingCartItem
+            var BasketItem = new BasketItem
             {
                 Quantity = item.Quantity,
                 Color = item.Color,
@@ -71,7 +71,7 @@ public class StoreCartCommandHandler(
             {
                 throw new ProductNotFoundException($"No variant exists for this product in the color {item.Color}");
             }
-            shoppingCartItem.Slug = variant.Slug;
+            BasketItem.Slug = variant.Slug;
             if (product.ProductType == ProductTypeEnum.Clothing.ToString())
             {
                 var size = variant?.SizeVariants?.FirstOrDefault(x => x.Size.ToLower() == item.Size.ToLower());
@@ -79,18 +79,18 @@ public class StoreCartCommandHandler(
                 {
                     throw new ProductNotFoundException($"No size {item.Size} exists for this product in the color {item.Color} ");
                 }
-                shoppingCartItem.Price = size.Price;
+                BasketItem.Price = size.Price;
             }
             else
             {
-                shoppingCartItem.Price = variant.Price.Amount;
+                BasketItem.Price = variant.Price.Amount;
             }
             var coupon = await discountProto.GetDiscountAsync(new GetDiscountRequest { ProductId = item.ProductId.ToString() }, cancellationToken: cancellationToken);
-            shoppingCartItem.Price -= coupon.Amount;
+            BasketItem.Price -= coupon.Amount;
 
-            shoppingCartItems.Add(shoppingCartItem);
+            BasketItems.Add(BasketItem);
         }
 
-        return shoppingCartItems;
+        return BasketItems;
     }
 }

@@ -57,7 +57,7 @@ public static class ProductExtensions
                 Quantity: cv.Quantity.Value,
                 Slug: cv.Slug.Value,
                 SizeVariants: cv.SizeVariants.Select(
-                    sv => new SizeVariantDto(sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value)).ToList()
+                    sv => new SizeVariantDto(sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value, sv.RestockThreshold.Value)).ToList()
                 )).ToList(),
             ProductType: productType,
             Material: material,

@@ -1,4 +1,5 @@
-﻿using Ordering.Domain.Orders.Enums;
+﻿using Ordering.Domain.Orders.AllowedTransitions;
+using Ordering.Domain.Orders.Enums;
 using Ordering.Domain.Orders.Events;
 
 namespace Ordering.Domain.Orders.Models;
@@ -13,6 +14,8 @@ public class Order : Aggregate<OrderId>
     public Address BillingAddress { get; private set; } = default!;
     public Payment Payment { get; private set; } = default!;
     public OrderStatus Status { get; private set; } = OrderStatus.Pending;
+    public DateTime GracePeriodEnd { get; private set; }
+
     public decimal TotalPrice
     {
         get => _orderItems.Sum(x => x.Price * x.Quantity);
@@ -29,23 +32,118 @@ public class Order : Aggregate<OrderId>
             ShippingAddress = shippingAddress,
             BillingAddress = billingAddress,
             Payment = payment,
-            Status = OrderStatus.Pending,
+            Status = OrderStatus.Draft,
             CreatedAt = DateTime.UtcNow,
+            GracePeriodEnd = DateTime.UtcNow.AddMinutes(10)
         };
         order.AddDomainEvent(new OrderCreatedEvent(order));
         return order;
     }
 
-    public void Update(Address shippingAddress, Address billingAddress, Payment payment)
+    // Method to perform transitions with validation
+    private void TransitionToStatus(OrderStatus newStatus)
     {
-        ShippingAddress = shippingAddress;
-        BillingAddress = billingAddress;
-        Payment = payment;
-        Status = OrderStatus.Updated;
+        if (!OrderStatusTransitions.CanTransition(Status, newStatus))
+        {
+            throw new InvalidOperationException($"Transition from {Status} to {newStatus} is not allowed.");
+        }
+
+        Status = newStatus;
         LastModified = DateTime.UtcNow;
 
-        AddDomainEvent(new OrderUpdatedEvent(this));
+        AddDomainEvent(new OrderStatusChangedEvent(this, newStatus));
     }
+
+    // Draft -> Pending
+    public void SubmitForProcessing()
+    {
+        if (Status != OrderStatus.Draft)
+            throw new InvalidOperationException("Order must be in Draft to submit for processing.");
+
+        TransitionToStatus(OrderStatus.Pending);
+    }
+
+    // Draft or Pending -> Cancelled
+    public void CancelOrder()
+    {
+        if (Status != OrderStatus.Draft && Status != OrderStatus.Pending)
+            throw new InvalidOperationException("Order can only be cancelled in Draft or Pending.");
+
+        TransitionToStatus(OrderStatus.Cancelled);
+    }
+
+    // Draft or Pending -> Deleted
+    public void DeleteOrder()
+    {
+        if (Status != OrderStatus.Draft && Status != OrderStatus.Pending)
+            throw new InvalidOperationException("Order can only be deleted in Draft or Pending.");
+
+        TransitionToStatus(OrderStatus.Deleted);
+    }
+
+    // Pending -> ConfirmGracePeriod
+    public void ConfirmGracePeriod()
+    {
+        if (Status != OrderStatus.Pending)
+            throw new InvalidOperationException("Order must be in Pending to confirm grace period.");
+
+        TransitionToStatus(OrderStatus.GracePeriodConfirmed);
+    }
+
+    // GracePeriodConfirmed -> Validated
+    public void ValidateOrder()
+    {
+        if (Status != OrderStatus.GracePeriodConfirmed)
+            throw new InvalidOperationException("Order must be in GracePeriodConfirmed to be validated.");
+
+        TransitionToStatus(OrderStatus.Validated);
+    }
+
+    // GracePeriodConfirmed -> Rejected
+    public void RejectOrder()
+    {
+        if (Status != OrderStatus.GracePeriodConfirmed)
+            throw new InvalidOperationException("Order must be in GracePeriodConfirmed to be rejected.");
+
+        TransitionToStatus(OrderStatus.Rejected);
+    }
+
+    // Validated -> StockConfirmed
+    public void ConfirmStock()
+    {
+        if (Status != OrderStatus.Validated)
+            throw new InvalidOperationException("Order must be Validated before stock confirmation.");
+
+        TransitionToStatus(OrderStatus.StockConfirmed);
+    }
+
+    // StockConfirmed -> Paid
+    public void MarkAsPaid()
+    {
+        if (Status != OrderStatus.StockConfirmed)
+            throw new InvalidOperationException("Order must be StockConfirmed to be marked as paid.");
+
+        TransitionToStatus(OrderStatus.Paid);
+    }
+
+    // Paid -> Shipped
+    public void ShipOrder()
+    {
+        if (Status != OrderStatus.Paid)
+            throw new InvalidOperationException("Order must be Paid to be shipped.");
+
+        TransitionToStatus(OrderStatus.Shipped);
+    }
+
+    // Shipped -> Completed
+    public void CompleteOrder()
+    {
+        if (Status != OrderStatus.Shipped)
+            throw new InvalidOperationException("Order must be Shipped to be completed.");
+
+        TransitionToStatus(OrderStatus.Completed);
+    }
+
 
     public void Add(OrderId id, ProductId productId, int quantity, decimal price, string color, string size, string productName, string slug)
     {
@@ -63,5 +161,41 @@ public class Order : Aggregate<OrderId>
         {
             _orderItems.Remove(orderItem);
         }
+    }
+
+    public void UpdateShippingAddress(Address newShippingAddress)
+    {
+        if (Status != OrderStatus.Pending)
+        {
+            throw new InvalidOperationException("Cannot update shipping address when the order is not in Pending status.");
+        }
+
+        ShippingAddress = newShippingAddress;
+        LastModified = DateTime.UtcNow;
+        AddDomainEvent(new ShippingAddressUpdatedEvent(this));
+    }
+
+    public void UpdateBillingAddress(Address newBillingAddress)
+    {
+        if (Status != OrderStatus.Pending)
+        {
+            throw new InvalidOperationException("Cannot update billing address when the order is not in Pending status.");
+        }
+
+        BillingAddress = newBillingAddress;
+        LastModified = DateTime.UtcNow;
+        AddDomainEvent(new BillingAddressUpdatedEvent(this));
+    }
+
+    public void UpdatePayment(Payment newPayment)
+    {
+        if (Status != OrderStatus.Pending)
+        {
+            throw new InvalidOperationException("Cannot update payment when the order is not in Pending status.");
+        }
+
+        Payment = newPayment;
+        LastModified = DateTime.UtcNow;
+        AddDomainEvent(new PaymentUpdatedEvent(this));
     }
 }

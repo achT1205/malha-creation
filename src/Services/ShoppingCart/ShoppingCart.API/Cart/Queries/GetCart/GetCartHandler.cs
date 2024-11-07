@@ -1,7 +1,7 @@
 ﻿namespace Cart.API.Cart.Queries.GetCart;
 
 public record GetCartQuery(Guid UserId) : IQuery<GetCartResult>;
-public record GetCartResult(ShoppingCart Cart);
+public record GetCartResult(Basket Cart);
 internal class GetCartQueryHandler(ICartRepository repository) : IQueryHandler<GetCartQuery, GetCartResult>
 {
     public async Task<GetCartResult> Handle(GetCartQuery query, CancellationToken cancellationToken)

@@ -1,6 +1,5 @@
-﻿using BuildingBlocks.Messaging.Events;
-using BuildingBlocks.Messaging.Models;
-using MassTransit;
+﻿using MassTransit;
+using ShoppingCart.API.Events.IntegrationEvent;
 
 namespace Cart.API.Cart.Commands.CheckoutCart;
 

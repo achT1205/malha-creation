@@ -1,7 +1,12 @@
-﻿using BuildingBlocks.Enums;
-using Catalog.Application.Dtos;
+﻿using Catalog.Application.Dtos;
+using Catalog.Application.Products.Commands.AddColorVariant;
+using Catalog.Application.Products.Commands.AddSizeVariant;
 using Catalog.Application.Products.Commands.DeleteProduct;
-using Catalog.Application.Products.Commands.UpdateProduct;
+using Catalog.Application.Products.Commands.RemoveColorVariant;
+using Catalog.Application.Products.Commands.RemoveSizeVariant;
+using Catalog.Application.Products.Commands.UpdateCategories;
+using Catalog.Application.Products.Commands.UpdateOccasions;
+using Catalog.Application.Products.Commands.UpdateProductInfos;
 using Catalog.Application.Products.Queries.GetProductById;
 using Catalog.Application.Products.Queries.GetProductBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
@@ -10,56 +15,62 @@ namespace Catalog.API.Endpoints;
 
 public static class ProductEndpoints
 {
-
     public record CreateProductRequest(
     string Name,
     string UrlFriendlyName,
     string Description,
     bool IsHandmade,
+    bool OnReorder,
     ImageDto CoverImage,
     Guid ProductTypeId,
     Guid MaterialId,
+    Guid BrandId,
     Guid CollectionId,
     List<Guid> OccasionIds,
     List<Guid> CategoryIds,
     List<ColorVariantDto> ColorVariants
 );
-
-    public record UpdateProductRequest(
+    public record UpdateProductInfosRequest(
         Guid Id,
         string Name,
         string UrlFriendlyName,
         string Description,
         bool IsHandmade,
         ImageDto CoverImage,
-        Guid ProductTypeId,
-        ProductTypeEnum ProductType,
         Guid MaterialId,
-        Guid CollectionId,
-        List<Guid> OccasionIds,
-        List<Guid> CategoryIds,
-        List<ColorVariantDto> ColorVariants,
-        RemovedItems? RemovedItems
+        Guid BrandId,
+        Guid CollectionId
        );
+    public record UpdateOccasionsRequest(Guid Id, List<Guid> OccasionIds);
+    public record UpdateCategoriesRequest(Guid Id, List<Guid> CategoryIds);
+    public record AddColorVariantRequest(
+    Guid Id,
+    string Color,
+    List<ImageDto> Images,
+    decimal? Price,
+    int? Quantity,
+    List<SizeVariantDto>? sizeVariants,
+    int? RestockThreshold
+    );
+    public record AddSizeVariantRequest(
+    Guid Id,
+    Guid ColorVariantId,
+    string Size,
+    decimal Price,
+    string Currency,
+    int Quantity,
+    int RestockThreshold);
     public record UpdateProductResponse(bool IsSuccess);
     public record DeleteProductResponse(bool IsSuccess);
     public record CreateProductResponse(Guid Id);
-    public record AddProductVariantResponse(Guid Id);
 
     public static void MapProductEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/products", async (CreateProductRequest request, ISender sender) =>
         {
-            // Adapter la requête en commande
             var command = request.Adapt<CreateProductCommand>();
-
-            // Envoyer la commande via MediatR
             var result = await sender.Send(command);
-
-            // Adapter le résultat en réponse
             var response = result.Adapt<CreateProductResponse>();
-
-            // Retourner la réponse avec un statut 201 Created
             return Results.Created($"/api/products/{command.UrlFriendlyName}", response);
         })
         .WithName("CreateProduct")
@@ -68,26 +79,98 @@ public static class ProductEndpoints
         .WithSummary("Create Product")
         .WithDescription("Create a new product.");
 
-
-        app.MapPut("/api/products", async (UpdateProductRequest request, ISender sender) =>
+        app.MapPut("/api/products/{id}/infos", async (Guid Id, UpdateProductInfosRequest request, ISender sender) =>
         {
-            // Adapter la requête en commande
-            var command = request.Adapt<UpdateProductCommand>();
-
-            // Envoyer la commande via MediatR
+            var command = request.Adapt<UpdateProductInfosCommand>();
             var result = await sender.Send(command);
-
-            // Adapter le résultat en réponse
-            var response = result.Adapt<UpdateProductResult>();
-
-            // Retourner la réponse avec un statut 201 Created
+            var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
         .WithName("UpdateProduct")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Update Product")
-        .WithDescription("Update an existing product.");
+        .WithSummary("Update Product infos.")
+        .WithDescription("Update Product infos.");
+
+
+        app.MapPut("/api/products/{id}/occasions", async (Guid Id, UpdateOccasionsRequest request, ISender sender) =>
+        {
+            var command = request.Adapt<UpdateOccasionsCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product occasions.")
+        .WithDescription("Update Product occasions.");
+
+        app.MapPut("/api/products/{id}/categories", async (Guid Id, UpdateCategoriesRequest request, ISender sender) =>
+        {
+            var command = request.Adapt<UpdateCategoriesCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product categories.")
+        .WithDescription("Update Product categories.");
+
+        app.MapDelete("/api/products/{id}/color-variants/{colorVariantId}", async (Guid id, Guid colorVariantId, ISender sender) =>
+        {
+            var command = new RemoveColorVariantCommand(id, colorVariantId);
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Remove colorVariant.")
+        .WithDescription("Update Product: Remove colorVariant.");
+
+        app.MapDelete("/api/products/{id}/color-variants/{colorVariantId}/size-variants/{sizeVariantId}/", async (Guid id, Guid colorVariantId, Guid sizeVariantId, ISender sender) =>
+        {
+            var command = new RemoveSizeVariantCommand(id, colorVariantId, sizeVariantId);
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Remove SizeVariant.")
+        .WithDescription("Update Product: Remove SizeVariant.");
+
+        app.MapPost("/api/products/{id}/color-variants/{colorVariantId}/size-variants/", async (Guid id, Guid colorVariantId, AddColorVariantRequest request, ISender sender) =>
+        {
+            var command = request.Adapt<AddColorVariantCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Add ColorVariant.")
+        .WithDescription("Update Product: Add ColorVariant.");
+
+        app.MapPost("/api/products/{id}/color-variants", async (Guid id, AddSizeVariantRequest request, ISender sender) =>
+        {
+            var command = request.Adapt<AddSizeVariantCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("UpdateProduct")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Add ColorVariant.")
+        .WithDescription("Update Product: Add ColorVariant.");
+
 
         app.MapGet("/api/products/by-slug/{slug:regex(^[a-zA-Z0-9_-]+$)}", async (string slug, ISender sender) =>
         {

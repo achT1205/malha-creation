@@ -1,12 +1,19 @@
-﻿using Ordering.Domain.Orders.Events;
+﻿using Ordering.Application.Orders.IntegrationEvents;
+using Ordering.Domain.Orders.Events;
 
 namespace Ordering.Application.Orders.EventHandlers.Domain;
-public class OrderUpdatedEventHandler(ILogger<OrderUpdatedEventHandler> logger)
-    : INotificationHandler<OrderUpdatedEvent>
+public class OrderUpdatedEventHandler(IPublishEndpoint publishEndpoint, ILogger<OrderUpdatedEventHandler> logger)
+    : INotificationHandler<OrderStatusChangedEvent>
 {
-    public Task Handle(OrderUpdatedEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(OrderStatusChangedEvent domainEvent, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Domain Event handled: {DomainEvent}", notification.GetType().Name);
-        return Task.CompletedTask;
+        logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
+
+        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.StockConfirmed)
+        {
+            var evt = new OrderStatusChangedToStockConfirmedEvent(domainEvent.order.Id.Value, domainEvent.status.ToString());
+
+            await publishEndpoint.Publish(evt, cancellationToken);
+        }
     }
 }

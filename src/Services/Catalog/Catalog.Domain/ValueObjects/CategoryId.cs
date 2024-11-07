@@ -14,7 +14,7 @@ public record CategoryId
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("CategoryId cannot be empty.");
+            throw new CatalogDomainException("CategoryId cannot be empty.");
         }
 
         return new CategoryId(value);

@@ -6,6 +6,7 @@ public class ColorVariantDto
     public decimal ? Price { get; set; }
     public int ? Quantity { get; set; }
     public List<SizeVariantDto> ? sizeVariants { get; set; } = new();
+    public int? RestockThreshold { get; internal set; }
 }
 
 

@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Messaging.Events;
 using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Orders.IntegrationEvents;
 
 namespace Ordering.Application.Orders.EventHandlers.Integration;
 public class BasketCheckoutEventHandler

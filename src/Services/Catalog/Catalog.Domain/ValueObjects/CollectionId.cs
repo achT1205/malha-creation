@@ -13,7 +13,7 @@ public record CollectionId
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("CollectionId cannot be empty.");
+            throw new CatalogDomainException("CollectionId cannot be empty.");
         }
 
         return new CollectionId(value);
