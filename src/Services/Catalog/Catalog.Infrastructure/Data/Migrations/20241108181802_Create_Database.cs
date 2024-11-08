@@ -12,6 +12,22 @@ namespace Catalog.Infrastructure.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Brands",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Brands", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -99,9 +115,11 @@ namespace Catalog.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsHandmade = table.Column<bool>(type: "bit", nullable: false),
+                    OnReorder = table.Column<bool>(type: "bit", nullable: false),
                     ProductTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BrandId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CollectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UrlFriendlyName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     TotalRatingsCount = table.Column<int>(type: "int", nullable: false),
@@ -118,6 +136,12 @@ namespace Catalog.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_Brands_BrandId",
+                        column: x => x.BrandId,
+                        principalTable: "Brands",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Products_Collections_CollectionId",
                         column: x => x.CollectionId,
@@ -146,6 +170,8 @@ namespace Catalog.Infrastructure.Data.Migrations
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Color = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Slug = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    OnOrdering = table.Column<bool>(type: "bit", nullable: false),
+                    RestockThreshold = table.Column<int>(type: "int", nullable: true),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: true),
@@ -263,7 +289,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                     Size = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OnOrdering = table.Column<bool>(type: "bit", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
+                    RestockThreshold = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -300,6 +328,11 @@ namespace Catalog.Infrastructure.Data.Migrations
                 name: "IX_ProductOccasion_ProductId",
                 table: "ProductOccasion",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_BrandId",
+                table: "Products",
+                column: "BrandId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_CollectionId",
@@ -362,6 +395,9 @@ namespace Catalog.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Brands");
 
             migrationBuilder.DropTable(
                 name: "Collections");

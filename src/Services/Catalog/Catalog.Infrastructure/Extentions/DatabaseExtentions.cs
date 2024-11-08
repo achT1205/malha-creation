@@ -24,6 +24,7 @@ public static class DatabaseExtentions
         await SeedMaterialAsync(context);
         await SeedProductTypeAsync(context);
         await SeedCollectionAsync(context);
+        await SeedBrandsAsync(context);
     }
 
 
@@ -68,6 +69,15 @@ public static class DatabaseExtentions
         if (!await context.Collections.AnyAsync())
         {
             await context.Collections.AddRangeAsync(InitialData.Collections);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedBrandsAsync(ApplicationDbContext context)
+    {
+        if (!await context.Brands.AnyAsync())
+        {
+            await context.Brands.AddRangeAsync(InitialData.Brands);
             await context.SaveChangesAsync();
         }
     }

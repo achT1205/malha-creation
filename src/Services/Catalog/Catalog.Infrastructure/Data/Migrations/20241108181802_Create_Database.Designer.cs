@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241101201241_Create_Database")]
+    [Migration("20241108181802_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -25,6 +25,39 @@ namespace Catalog.Infrastructure.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Catalog.Domain.Models.Brand", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ComplexProperty<Dictionary<string, object>>("Name", "Catalog.Domain.Models.Brand.Name#BrandName", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)")
+                                .HasColumnName("Name");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Brands", (string)null);
+                });
 
             modelBuilder.Entity("Catalog.Domain.Models.Category", b =>
                 {
@@ -193,6 +226,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BrandId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CollectionId")
                         .HasColumnType("uniqueidentifier");
 
@@ -213,6 +249,9 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                     b.Property<Guid>("MaterialId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("OnReorder")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ProductType")
                         .IsRequired()
@@ -292,6 +331,8 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BrandId");
+
                     b.HasIndex("CollectionId");
 
                     b.HasIndex("MaterialId");
@@ -306,6 +347,12 @@ namespace Catalog.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Product", b =>
                 {
+                    b.HasOne("Catalog.Domain.Models.Brand", null)
+                        .WithMany()
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Catalog.Domain.Models.Collection", null)
                         .WithMany()
                         .HasForeignKey("CollectionId")
@@ -345,6 +392,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                             b1.Property<string>("LastModifiedBy")
                                 .HasColumnType("nvarchar(max)");
 
+                            b1.Property<bool>("OnOrdering")
+                                .HasColumnType("bit");
+
                             b1.Property<string>("Slug_Value")
                                 .IsRequired()
                                 .ValueGeneratedOnUpdateSometimes()
@@ -363,6 +413,46 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");
+
+                            b1.OwnsOne("Catalog.Domain.ValueObjects.ColorVariantQuantity", "Quantity", b2 =>
+                                {
+                                    b2.Property<Guid>("ColorVariantId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<Guid>("ColorVariantProductId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<int?>("Value")
+                                        .HasColumnType("int")
+                                        .HasColumnName("Quantity");
+
+                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
+
+                                    b2.ToTable("ColorVariants");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
+                                });
+
+                            b1.OwnsOne("Catalog.Domain.ValueObjects.ColorVariantQuantity", "RestockThreshold", b2 =>
+                                {
+                                    b2.Property<Guid>("ColorVariantId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<Guid>("ColorVariantProductId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<int?>("Value")
+                                        .HasColumnType("int")
+                                        .HasColumnName("RestockThreshold");
+
+                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
+
+                                    b2.ToTable("ColorVariants");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
+                                });
 
                             b1.OwnsOne("Catalog.Domain.ValueObjects.Color", "Color", b2 =>
                                 {
@@ -402,26 +492,6 @@ namespace Catalog.Infrastructure.Data.Migrations
                                         .IsRequired()
                                         .HasColumnType("nvarchar(max)")
                                         .HasColumnName("Currency");
-
-                                    b2.HasKey("ColorVariantId", "ColorVariantProductId");
-
-                                    b2.ToTable("ColorVariants");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
-                                });
-
-                            b1.OwnsOne("Catalog.Domain.ValueObjects.ColorVariantQuantity", "Quantity", b2 =>
-                                {
-                                    b2.Property<Guid>("ColorVariantId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ColorVariantProductId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<int?>("Value")
-                                        .HasColumnType("int")
-                                        .HasColumnName("Quantity");
 
                                     b2.HasKey("ColorVariantId", "ColorVariantProductId");
 
@@ -508,6 +578,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                                     b2.Property<string>("LastModifiedBy")
                                         .HasColumnType("nvarchar(max)");
 
+                                    b2.Property<bool>("OnOrdering")
+                                        .HasColumnType("bit");
+
                                     b2.HasKey("Id", "ColorVariantId", "ProductId");
 
                                     b2.HasIndex("ColorVariantId", "ProductId");
@@ -516,6 +589,52 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                                     b2.WithOwner()
                                         .HasForeignKey("ColorVariantId", "ProductId");
+
+                                    b2.OwnsOne("Catalog.Domain.ValueObjects.Quantity", "Quantity", b3 =>
+                                        {
+                                            b3.Property<Guid>("SizeVariantId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<Guid>("SizeVariantColorVariantId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<Guid>("SizeVariantProductId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<int>("Value")
+                                                .HasColumnType("int")
+                                                .HasColumnName("Quantity");
+
+                                            b3.HasKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
+
+                                            b3.ToTable("SizeVariants");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
+                                        });
+
+                                    b2.OwnsOne("Catalog.Domain.ValueObjects.Quantity", "RestockThreshold", b3 =>
+                                        {
+                                            b3.Property<Guid>("SizeVariantId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<Guid>("SizeVariantColorVariantId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<Guid>("SizeVariantProductId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<int>("Value")
+                                                .HasColumnType("int")
+                                                .HasColumnName("RestockThreshold");
+
+                                            b3.HasKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
+
+                                            b3.ToTable("SizeVariants");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
+                                        });
 
                                     b2.OwnsOne("Catalog.Domain.ValueObjects.Price", "Price", b3 =>
                                         {
@@ -536,29 +655,6 @@ namespace Catalog.Infrastructure.Data.Migrations
                                                 .IsRequired()
                                                 .HasColumnType("nvarchar(max)")
                                                 .HasColumnName("Currency");
-
-                                            b3.HasKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
-
-                                            b3.ToTable("SizeVariants");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
-                                        });
-
-                                    b2.OwnsOne("Catalog.Domain.ValueObjects.Quantity", "Quantity", b3 =>
-                                        {
-                                            b3.Property<Guid>("SizeVariantId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("SizeVariantColorVariantId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<Guid>("SizeVariantProductId")
-                                                .HasColumnType("uniqueidentifier");
-
-                                            b3.Property<int>("Value")
-                                                .HasColumnType("int")
-                                                .HasColumnName("Quantity");
 
                                             b3.HasKey("SizeVariantId", "SizeVariantColorVariantId", "SizeVariantProductId");
 
@@ -599,6 +695,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                                     b2.Navigation("Quantity")
                                         .IsRequired();
 
+                                    b2.Navigation("RestockThreshold")
+                                        .IsRequired();
+
                                     b2.Navigation("Size")
                                         .IsRequired();
                                 });
@@ -612,6 +711,9 @@ namespace Catalog.Infrastructure.Data.Migrations
                                 .IsRequired();
 
                             b1.Navigation("Quantity")
+                                .IsRequired();
+
+                            b1.Navigation("RestockThreshold")
                                 .IsRequired();
 
                             b1.Navigation("SizeVariants");

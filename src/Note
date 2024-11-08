@@ -1,6 +1,6 @@
 Add-Migration Create_Database -OutputDir Data/Migrations -Project Ordering.Infrastructure -StartupProject Ordering.API
 
-Add-Migration Create_Database -OutputDir Data/Migrations -Project Identity.API -StartupProject Identity.API
+Add-Migration Create_Database -OutputDir Data/Migrations -Project Auth.API -StartupProject Auth.API
 
 Add-Migration Create_Database -OutputDir Data/Migrations -Project Catalog.Infrastructure -StartupProject Catalog.API
 

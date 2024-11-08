@@ -31,6 +31,9 @@ namespace Ordering.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("GracePeriodEnd")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
@@ -59,6 +62,7 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("EmailAddress")
+                                .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
 
@@ -112,6 +116,7 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasColumnType("nvarchar(3)");
 
                             b1.Property<string>("CardName")
+                                .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
 
@@ -144,6 +149,7 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("EmailAddress")
+                                .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
 

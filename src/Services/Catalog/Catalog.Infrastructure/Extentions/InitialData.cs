@@ -53,14 +53,10 @@ internal class InitialData
          ProductType.Create("Outerwear")
     };
 
-    //public static IEnumerable<SizeVariant> SizeVariants =>
-    //new List<SizeVariant>
-    //{
-    //     SizeVariant.Create(Size.Of("S"), Price.Of(19.99m), Quantity.Of(10)),
-    //     SizeVariant.Create(Size.Of("M"), Price.Of(21.99m), Quantity.Of(15)),
-    //     SizeVariant.Create(Size.Of("L"), Price.Of(23.99m), Quantity.Of(5)),
-    //     SizeVariant.Create(Size.Of("XL"), Price.Of(25.99m), Quantity.Of(8)),
-    //     SizeVariant.Create(Size.Of("XXL"), Price.Of(27.99m), Quantity.Of(3))
-    //};
+    public static IEnumerable<Brand> Brands =>
+        new List<Brand>
+        {
+                 Brand.Create(BrandName.Of("ZARA")),
+        };
 
 }

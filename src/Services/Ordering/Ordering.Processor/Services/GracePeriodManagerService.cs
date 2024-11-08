@@ -14,21 +14,20 @@ public class GracePeriodManagerService : BackgroundService
 {
     private readonly BackgroundTaskOptions _options;
     private readonly ILogger _logger;
-    private readonly IPublishEndpoint _publishEndpoint;
     private readonly ISender _sender;
+    private readonly IMediator _mediator;
 
 
     public GracePeriodManagerService(
         ISender sender,
+        IMediator mediator,
         IOptions<BackgroundTaskOptions> options,
-        ILogger<GracePeriodManagerService> logger,
-        IPublishEndpoint publishEndpoint)
+        ILogger<GracePeriodManagerService> logger)
     {
         _logger = logger;
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-        _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
         _sender = sender;
-
+        _mediator = mediator;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -79,7 +78,7 @@ public class GracePeriodManagerService : BackgroundService
 
             _logger.LogInformation("Publishing integration event: {IntegrationEventId} - ({@IntegrationEvent})", confirmGracePeriodEvent.OrderId, confirmGracePeriodEvent);
 
-            await _publishEndpoint.Publish(confirmGracePeriodEvent);
+            await _mediator.Publish(confirmGracePeriodEvent);
         }
     }
 }

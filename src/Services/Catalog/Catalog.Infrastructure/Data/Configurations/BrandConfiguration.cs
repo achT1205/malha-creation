@@ -8,15 +8,22 @@ internal sealed class BrandConfiguration : IEntityTypeConfiguration<Brand>
     {
         builder.ToTable("Brands");
 
-        builder.HasKey(c => c.Id);
+        builder.HasKey(b => b.Id);
 
-        builder.Property(c => c.Id)
+        builder.Property(b => b.Id)
                 .ValueGeneratedNever()
                 .HasConversion(
                     id => id.Value,
                     dbId => BrandId.Of(dbId));
 
-        builder.Property(c => c.Name)
-            .HasMaxLength(100);
+        builder.ComplexProperty(
+            b => b.Name, nb =>
+            {
+                nb.Property(n => n.Value)
+                    .HasColumnName(nameof(Brand.Name))
+                    .HasMaxLength(100)
+                    .IsRequired()
+                    ;
+            });
     }
 }

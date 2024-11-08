@@ -13,7 +13,7 @@ using Ordering.Infrastructure.Data;
 namespace Ordering.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241030161311_Create_Database")]
+    [Migration("20241108183312_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -32,6 +32,9 @@ namespace Ordering.Infrastructure.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("GracePeriodEnd")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("LastModified")
@@ -62,6 +65,7 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("EmailAddress")
+                                .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
 
@@ -115,6 +119,7 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasColumnType("nvarchar(3)");
 
                             b1.Property<string>("CardName")
+                                .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
 
@@ -147,6 +152,7 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("EmailAddress")
+                                .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
 

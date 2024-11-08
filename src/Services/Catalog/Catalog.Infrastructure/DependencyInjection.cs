@@ -30,7 +30,14 @@ public static class DependencyInjection
         services.AddScoped<IOccasionRepository, OccasionRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
+        services.AddScoped<IBrandRepository, BrandRepository>();
         services.AddScoped<IOrderingService, OrderingService>();
+
+        // Bind the ExternalApiSettings from appsettings.json
+        services.Configure<ExternalApiSettings>(configuration.GetSection("ExternalApiSettings"));
+
+        // Register HttpClient
+        services.AddHttpClient();
 
         return services;
     }
