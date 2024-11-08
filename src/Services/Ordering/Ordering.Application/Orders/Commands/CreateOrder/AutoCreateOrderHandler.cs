@@ -1,12 +1,29 @@
-﻿using Ordering.Application.Abstractions.Services;
-using Ordering.Application.Orders.Helpers;
-using Ordering.Application.Orders.IntegrationEvents;
+﻿namespace Ordering.Application.Orders.Commands.CreateOrder;
 
-namespace Ordering.Application.Orders.Commands.CreateOrder;
+public record AutoCreateOrderCommand : ICommand<CreateOrderResult>
+{
+    public required Guid CustomerId { get; set; }
+    public required AddressDto ShippingAddress { get; set; }
+    public required AddressDto BillingAddress { get; set; }
+    public required PaymentDto Payment { get; set; }
+    public required List<OrderItemDto> OrderItems { get; set; }
+}
+
+public class AutoCreateOrderCommandValidator : AbstractValidator<AutoCreateOrderCommand>
+{
+    public AutoCreateOrderCommandValidator()
+    {
+        RuleFor(x => x.CustomerId).NotNull().WithMessage("CustomerId is required");
+        RuleFor(x => x.OrderItems).NotEmpty().WithMessage("OrderItems should not be empty");
+        RuleFor(x => x.BillingAddress).NotEmpty().WithMessage("BillingAddress is required");
+        RuleFor(x => x.ShippingAddress).NotEmpty().WithMessage("ShippingAddress is required");
+        RuleFor(x => x.Payment).NotEmpty().WithMessage("Payment is required");
+    }
+}
 
 public class AutoCreateOrderCommandHandler(
     ILogger<AutoCreateOrderCommandHandler> _logger,
-    IApplicationDbContext _context, 
+    IApplicationDbContext _context,
     IProductService productService,
     IPublishEndpoint publishEndpoint)
     : ICommandHandler<AutoCreateOrderCommand, CreateOrderResult>

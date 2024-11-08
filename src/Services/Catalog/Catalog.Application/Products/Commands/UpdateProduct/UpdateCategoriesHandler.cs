@@ -1,9 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Products.Commands.UpdateCategories;
+﻿namespace Catalog.Application.Products.Commands.UpdateCategories;
 
 public record UpdateCategoriesCommand(Guid Id, List<Guid> CategoryIds) : ICommand<UpdateCategoriesResult>;
 public record UpdateCategoriesResult(bool IsSuccess);

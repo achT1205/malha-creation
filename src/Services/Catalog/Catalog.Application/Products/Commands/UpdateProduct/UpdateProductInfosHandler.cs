@@ -1,10 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Dtos;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Products.Commands.UpdateProductInfos;
+﻿namespace Catalog.Application.Products.Commands.UpdateProductInfos;
 
 public record UpdateProductInfosCommand(
     Guid Id,

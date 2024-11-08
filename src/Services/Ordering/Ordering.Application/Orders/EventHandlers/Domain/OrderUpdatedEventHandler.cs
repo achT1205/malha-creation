@@ -1,7 +1,4 @@
-﻿using Ordering.Application.Orders.IntegrationEvents;
-using Ordering.Domain.Orders.Events;
-
-namespace Ordering.Application.Orders.EventHandlers.Domain;
+﻿namespace Ordering.Application.Orders.EventHandlers.Domain;
 public class OrderUpdatedEventHandler(IPublishEndpoint publishEndpoint, ILogger<OrderUpdatedEventHandler> logger)
     : INotificationHandler<OrderStatusChangedEvent>
 {

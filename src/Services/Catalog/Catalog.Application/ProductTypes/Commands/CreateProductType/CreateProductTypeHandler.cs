@@ -1,8 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using FluentValidation;
-
-namespace Catalog.Application.ProductTypes.Commands.CreateProductType;
+﻿namespace Catalog.Application.ProductTypes.Commands.CreateProductType;
 
 
 public record CreateProductTypeCommand(string Name) : ICommand<CreateProductTypeResult>;

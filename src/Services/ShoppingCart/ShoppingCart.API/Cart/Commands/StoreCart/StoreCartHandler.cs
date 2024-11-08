@@ -1,7 +1,7 @@
-﻿using BuildingBlocks.Enums;
-using BuildingBlocks.Exceptions;
+﻿using BuildingBlocks.Exceptions;
 using Cart.API.Services.Interfaces;
 using Discount.Grpc;
+using ShoppingCart.API.Enums;
 
 namespace Cart.API.Cart.Commands.StoreCart;
 
@@ -72,7 +72,7 @@ public class StoreCartCommandHandler(
                 throw new ProductNotFoundException($"No variant exists for this product in the color {item.Color}");
             }
             BasketItem.Slug = variant.Slug;
-            if (product.ProductType == ProductTypeEnum.Clothing.ToString())
+            if (product.ProductType == ProductType.Clothing.ToString())
             {
                 var size = variant?.SizeVariants?.FirstOrDefault(x => x.Size.ToLower() == item.Size.ToLower());
                 if (size == null)

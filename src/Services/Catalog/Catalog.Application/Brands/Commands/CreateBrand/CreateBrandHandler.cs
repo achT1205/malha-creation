@@ -1,9 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Brands.Commands.CreateBrand;
+﻿namespace Catalog.Application.Brands.Commands.CreateBrand;
 
 
 public record CreateBrandCommand(string Name)

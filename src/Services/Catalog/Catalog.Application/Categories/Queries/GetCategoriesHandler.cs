@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-
-namespace Catalog.Application.Categories.Queries;
+﻿namespace Catalog.Application.Categories.Queries;
 
 public record GetCategoriesQuery : IQuery<GetCategoriesResult>;
 public record GetCategoriesResult(IEnumerable<CategoryDto> Categories);

@@ -1,9 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Collections.Commands.CreateCollection;
+﻿namespace Catalog.Application.Collections.Commands.CreateCollection;
 
 
 public record CreateCollectionCommand(

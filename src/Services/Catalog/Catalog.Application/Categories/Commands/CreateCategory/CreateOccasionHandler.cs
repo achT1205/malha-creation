@@ -1,9 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Categories.Commands.CreateCategory;
+﻿namespace Catalog.Application.Categories.Commands.CreateCategory;
 
 
 public record CreateCategoryCommand(

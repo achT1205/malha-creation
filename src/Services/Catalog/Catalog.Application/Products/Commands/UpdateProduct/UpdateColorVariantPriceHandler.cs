@@ -1,11 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-
-namespace Catalog.Application.Products.Commands.UpdateColorVariantPrice;
+﻿namespace Catalog.Application.Products.Commands.UpdateColorVariantPrice;
 
 public record UpdateColorVariantPriceCommand(Guid Id, Guid ColorVariantId, decimal Price) : ICommand<UpdateColorVariantPriceResult>;
 public record UpdateColorVariantPriceResult(bool IsSuccess);

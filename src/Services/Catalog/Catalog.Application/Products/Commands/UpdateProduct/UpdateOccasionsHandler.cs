@@ -1,9 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Products.Commands.UpdateOccasions;
+﻿namespace Catalog.Application.Products.Commands.UpdateOccasions;
 
 public record UpdateOccasionsCommand(Guid Id, List<Guid> OccasionIds) : ICommand<UpdateOccasionsResult>;
 public record UpdateOccasionsResult(bool IsSuccess);

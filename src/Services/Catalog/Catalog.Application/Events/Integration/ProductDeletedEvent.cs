@@ -1,6 +1,4 @@
-﻿using BuildingBlocks.Messaging.Events;
-
-namespace Catalog.Application.Events.Integration;
+﻿namespace Catalog.Application.Events.Integration;
 public record ProductDeletedEvent : IntegrationEvent
 {
     public Guid ProductId { get; set; } 

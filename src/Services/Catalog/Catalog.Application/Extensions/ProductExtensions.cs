@@ -1,7 +1,4 @@
-﻿using Catalog.Application.Dtos;
-using Catalog.Domain.ValueObjects;
-
-namespace Catalog.Application.Extensions;
+﻿namespace Catalog.Application.Extensions;
 
 public static class ProductExtensions
 {

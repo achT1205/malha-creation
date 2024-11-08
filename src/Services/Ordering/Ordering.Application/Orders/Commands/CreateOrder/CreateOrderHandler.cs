@@ -1,10 +1,24 @@
-﻿using BuildingBlocks.Enums;
-using Ordering.Application.Abstractions.Models;
-using Ordering.Application.Abstractions.Services;
-using Ordering.Application.Orders.Helpers;
-using Ordering.Application.Orders.IntegrationEvents;
+﻿namespace Ordering.Application.Orders.Commands.CreateOrder;
+public record CreateOrderCommand : ICommand<CreateOrderResult>
+{
+    public required Guid CustomerId { get; set; }
+    public required AddressDto ShippingAddress { get; set; }
+    public required AddressDto BillingAddress { get; set; }
+    public required PaymentDto Payment { get; set; }
+    public required List<OrderItemDto> OrderItems { get; set; }
+}
 
-namespace Ordering.Application.Orders.Commands.CreateOrder;
+public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
+{
+    public CreateOrderCommandValidator()
+    {
+        RuleFor(x => x.CustomerId).NotNull().WithMessage("CustomerId is required");
+        RuleFor(x => x.OrderItems).NotEmpty().WithMessage("OrderItems should not be empty");
+        RuleFor(x => x.BillingAddress).NotEmpty().WithMessage("BillingAddress is required");
+        RuleFor(x => x.ShippingAddress).NotEmpty().WithMessage("ShippingAddress is required");
+        RuleFor(x => x.Payment).NotEmpty().WithMessage("Payment is required");
+    }
+}
 
 public class CreateOrderCommandHandler(
     ILogger<AutoCreateOrderCommandHandler> _logger,
@@ -59,7 +73,7 @@ public class CreateOrderCommandHandler(
             }
             decimal price = 0;
             ColorVariant variant = new();
-            if (product?.ProductType == ProductTypeEnum.Clothing.ToString())
+            if (product?.ProductType == ProductType.Clothing.ToString())
             {
                 variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
                 var size = variant?.SizeVariants?.FirstOrDefault(x => x.Size == orderItemDto.Size);

@@ -1,5 +1,4 @@
-﻿using Catalog.Application.Dtos;
-using Catalog.Application.Materials.Commands.CreateMaterial;
+﻿using Catalog.Application.Materials.Commands.CreateMaterial;
 using Catalog.Application.Materials.Queries;
 
 namespace Catalog.API.Endpoints;

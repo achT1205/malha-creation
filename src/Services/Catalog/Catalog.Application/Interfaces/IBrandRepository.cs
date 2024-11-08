@@ -1,5 +1,4 @@
-﻿using Catalog.Domain.ValueObjects;
-
+﻿
 namespace Catalog.Application.Interfaces;
 
 public interface IBrandRepository

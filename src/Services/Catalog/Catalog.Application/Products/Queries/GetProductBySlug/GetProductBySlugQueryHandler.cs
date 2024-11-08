@@ -1,9 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Dtos;
-using Catalog.Application.Extensions;
-using Catalog.Application.Interfaces;
-
-namespace Catalog.Application.Products.Queries.GetProductBySlug;
+﻿namespace Catalog.Application.Products.Queries.GetProductBySlug;
 
 public record GetProductBySlugQuery(string Slug) : IQuery<GetProductByIdQueryResult>;
 public record GetProductByIdQueryResult(ProductDto Product);

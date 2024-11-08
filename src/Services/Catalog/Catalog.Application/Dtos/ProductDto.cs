@@ -1,6 +1,4 @@
-﻿using Catalog.Domain.Enums;
-
-namespace Catalog.Application.Dtos;
+﻿namespace Catalog.Application.Dtos;
 
 public record ProductDto
 (

@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.Messaging.Events;
-using Ordering.Application.Orders.Models;
-
-namespace Ordering.Application.Orders.Events;
+﻿namespace Ordering.Application.Orders.Events;
 
 public record CartCheckoutEvent : IntegrationEvent
 {

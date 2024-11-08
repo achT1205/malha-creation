@@ -1,6 +1,4 @@
-﻿using BuildingBlocks.Messaging.Events;
-
-namespace Ordering.Application.Orders.IntegrationEvents;
+﻿namespace Ordering.Application.Orders.IntegrationEvents;
 
 public record OrderStartedEvent : IntegrationEvent
 {

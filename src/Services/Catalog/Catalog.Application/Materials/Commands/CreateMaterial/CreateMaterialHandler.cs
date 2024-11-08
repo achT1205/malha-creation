@@ -1,8 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using FluentValidation;
-
-namespace Catalog.Application.Materials.Commands.CreateMaterial;
+﻿namespace Catalog.Application.Materials.Commands.CreateMaterial;
 
 
 public record CreateMaterialCommand(string Name) : ICommand<CreateMaterialResult>;

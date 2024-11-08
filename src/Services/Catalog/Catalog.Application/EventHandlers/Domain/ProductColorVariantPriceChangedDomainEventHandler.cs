@@ -1,9 +1,4 @@
-﻿using Catalog.Application.Events.Integration;
-using Catalog.Domain.Events;
-using Mapster;
-using MassTransit;
-using MediatR;
-using Microsoft.Extensions.Logging;
+﻿
 
 namespace Catalog.Application.EventHandlers.Domain;
 

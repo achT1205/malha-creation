@@ -1,6 +1,4 @@
-﻿using Catalog.Domain.ValueObjects;
-
-namespace Catalog.Application.Interfaces;
+﻿namespace Catalog.Application.Interfaces;
 public interface ICollectionRepository
 {
     Task<Collection> GetByIdAsync(CollectionId id);

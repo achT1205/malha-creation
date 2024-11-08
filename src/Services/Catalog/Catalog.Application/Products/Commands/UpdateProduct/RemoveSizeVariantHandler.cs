@@ -1,10 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Products.Commands.RemoveSizeVariant;
+﻿namespace Catalog.Application.Products.Commands.RemoveSizeVariant;
 
 public record RemoveSizeVariantCommand(Guid Id, Guid ColorVariantId, Guid SizeVariantId) : ICommand<RemoveSizeVariantResult>;
 public record RemoveSizeVariantResult(bool IsSuccess);

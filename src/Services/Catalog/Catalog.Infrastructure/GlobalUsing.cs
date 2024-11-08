@@ -6,3 +6,4 @@ global using Catalog.Domain.Models;
 global using Catalog.Application.Data;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Catalog.Domain.ValueObjects;
+global using BuildingBlocks.Messaging.Events;

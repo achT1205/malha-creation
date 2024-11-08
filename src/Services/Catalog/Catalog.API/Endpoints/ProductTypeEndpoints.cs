@@ -1,6 +1,4 @@
-﻿using Catalog.Application.Dtos;
-using Catalog.Application.Products.Queries.GetProducts;
-using Catalog.Application.ProductTypes.Commands.CreateProductType;
+﻿using Catalog.Application.ProductTypes.Commands.CreateProductType;
 using Catalog.Application.ProductTypes.Queries;
 
 namespace Catalog.API.Endpoints;

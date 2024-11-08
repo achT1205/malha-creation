@@ -1,11 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions;
-using Catalog.Application.Dtos;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Products.Commands.AddColorVariant;
+﻿namespace Catalog.Application.Products.Commands.AddColorVariant;
 
 public record AddColorVariantCommand(
     Guid Id,

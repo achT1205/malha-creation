@@ -1,8 +1,6 @@
-﻿using BuildingBlocks.Messaging.Events;
+﻿namespace Catalog.Application.Events.Integration;
 
-namespace Catalog.Application.Events.Integration;
-
-public record ProductCreatedEvent : IntegrationEvent
+public record ProductCreatedEventIntegrationEvent : IntegrationEvent
 {
     public Guid Id { get; set; } 
     public string ProductType { get; set; } = default!;

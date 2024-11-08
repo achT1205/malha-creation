@@ -1,11 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Occasions.Commands.CreateOccasion;
-
-
+﻿namespace Catalog.Application.Occasions.Commands.CreateOccasion;
 public record CreateOccasionCommand(
     string Name
     )

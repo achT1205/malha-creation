@@ -1,5 +1,4 @@
-﻿using Catalog.Application.Dtos;
-using Catalog.Application.Products.Commands.AddColorVariant;
+﻿using Catalog.Application.Products.Commands.AddColorVariant;
 using Catalog.Application.Products.Commands.AddColorVariantStock;
 using Catalog.Application.Products.Commands.AddSizeVariant;
 using Catalog.Application.Products.Commands.AddSizeVariantStock;

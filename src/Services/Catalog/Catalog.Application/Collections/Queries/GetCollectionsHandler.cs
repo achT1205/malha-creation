@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-
-namespace Catalog.Application.Collections.Queries;
+﻿namespace Catalog.Application.Collections.Queries;
 
 public record GetCollectionsQuery : IQuery<GetCollectionsResult>;
 public record GetCollectionsResult(IEnumerable<CollectionDto> Collections);

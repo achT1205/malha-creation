@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-
-namespace Catalog.Application.Occasions.Queries;
+﻿namespace Catalog.Application.Occasions.Queries;
 
 public record GetOccasionsQuery : IQuery<GetOccasionsResult>;
 public record GetOccasionsResult(IEnumerable<OccasionDto> Occasions);

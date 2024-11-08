@@ -1,9 +1,4 @@
-﻿using Catalog.Application.Events.Integration;
-using Catalog.Application.Products.Queries.GetProductForStockValidationById;
-using Catalog.Application.Services;
-using MassTransit;
-using MediatR;
-using Microsoft.Extensions.Logging;
+﻿using Catalog.Application.Products.Queries.GetProductForStockValidationById;
 
 namespace Catalog.Application.EventHandlers.Integration;
 

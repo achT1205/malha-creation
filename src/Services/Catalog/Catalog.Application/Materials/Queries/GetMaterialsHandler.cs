@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-
-namespace Catalog.Application.Materials.Queries;
+﻿namespace Catalog.Application.Materials.Queries;
 
 public record GetMaterialsQuery : IQuery<GetMaterialsResult>;
 public record GetMaterialsResult(IEnumerable<MaterialDto> Materials);

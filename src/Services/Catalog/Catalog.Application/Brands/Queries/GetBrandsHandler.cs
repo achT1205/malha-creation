@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-
-namespace Catalog.Application.Brands.Queries;
+﻿namespace Catalog.Application.Brands.Queries;
 
 public record GetBrandsQuery : IQuery<GetBrandsResult>;
 public record GetBrandsResult(IEnumerable<BrandDto> Brands);

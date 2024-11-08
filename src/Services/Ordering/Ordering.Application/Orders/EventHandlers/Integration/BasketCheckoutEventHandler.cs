@@ -1,6 +1,4 @@
 ﻿using Ordering.Application.Orders.Commands.CreateOrder;
-using Ordering.Application.Orders.Events;
-
 namespace Ordering.Application.Orders.EventHandlers.Integration;
 public class BasketCheckoutEventHandler
     (ISender sender, ILogger<BasketCheckoutEventHandler> logger)

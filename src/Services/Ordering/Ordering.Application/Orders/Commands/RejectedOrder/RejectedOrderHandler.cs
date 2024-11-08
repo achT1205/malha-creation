@@ -1,6 +1,4 @@
 ﻿namespace Ordering.Application.Orders.Commands.RejectedOrder;
-
-
 public record RejectOrderCommand(Guid Id) : ICommand<RejectOrderResult>;
 public record RejectOrderResult(bool IsSuccess);
 public class RejectOrderCommandHandler(IApplicationDbContext dbContext) : ICommandHandler<RejectOrderCommand, RejectOrderResult>

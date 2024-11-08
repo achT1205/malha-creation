@@ -1,16 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions;
-using Catalog.Application.Dtos;
-using Catalog.Application.Events.Integration;
-using Catalog.Application.Extensions;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.Enums;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-using Mapster;
-using MassTransit;
-
-namespace Catalog.Application.Products.Commands.CreateProduct;
+﻿namespace Catalog.Application.Products.Commands.CreateProduct;
 
 public record CreateProductCommand(
     string Name,
@@ -68,15 +56,12 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
 {
 
     private readonly IProductRepository _productRepository;
-    private readonly IPublishEndpoint _publishEndpoint;
 
     public CreateProductCommandHandler(
-        IProductRepository productRepository,
-        IPublishEndpoint publishEndpoint
+        IProductRepository productRepository
         )
     {
         _productRepository = productRepository;
-        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
@@ -87,12 +72,6 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
 
             await _productRepository.AddAsync(product);
             await _productRepository.SaveChangesAsync();
-
-
-            var dto = product.ToProductDto(null, null, null, null, null);
-            var eventMessage = dto.Adapt<ProductCreatedEvent>();
-            await _publishEndpoint.Publish(eventMessage, cancellationToken);
-
         }
         catch (Exception ex)
         {

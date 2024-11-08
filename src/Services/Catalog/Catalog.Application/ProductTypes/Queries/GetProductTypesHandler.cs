@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-
-namespace Catalog.Application.ProductTypes.Queries;
+﻿namespace Catalog.Application.ProductTypes.Queries;
 
 public record GetProductTypesQuery : IQuery<GetProductTypesResult>;
 public record GetProductTypesResult(IEnumerable<ProductTypeDto> ProductTypes);

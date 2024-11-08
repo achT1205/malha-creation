@@ -1,10 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Products.Commands.AddSizeVariant;
+﻿namespace Catalog.Application.Products.Commands.AddSizeVariant;
 
 public record AddSizeVariantCommand(
     Guid Id,
@@ -45,7 +39,7 @@ public class AddSizeVariantCommandHandler : ICommandHandler<AddSizeVariantComman
             {
                 throw new NotFoundException($"The product {command.Id} was not found");
             }
-            if(product.ProductType != Domain.Enums.ProductTypeEnum.Clothing)
+            if(product.ProductType != ProductTypeEnum.Clothing)
             {
                 throw new NotFoundException($"This product can not have size variants");
             }

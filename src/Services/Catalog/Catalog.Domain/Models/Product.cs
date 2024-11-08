@@ -84,7 +84,7 @@ public class Product : Aggregate<ProductId>
              averageRating
          );
 
-        product.AddDomainEvent(new ProductCreatedEvent(product));
+        product.AddDomainEvent(new ProductCreatedEventDomainEvent(product));
         return product;
     }
 

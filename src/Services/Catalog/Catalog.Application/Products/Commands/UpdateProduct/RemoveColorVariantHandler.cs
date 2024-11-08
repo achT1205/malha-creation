@@ -1,10 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-
-namespace Catalog.Application.Products.Commands.RemoveColorVariant;
+﻿namespace Catalog.Application.Products.Commands.RemoveColorVariant;
 
 public record RemoveColorVariantCommand(Guid Id, Guid ColorVariantId) : ICommand<RemoveColorVariantResult>;
 public record RemoveColorVariantResult(bool IsSuccess);

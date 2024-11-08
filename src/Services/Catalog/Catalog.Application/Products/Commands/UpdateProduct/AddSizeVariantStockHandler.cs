@@ -1,11 +1,4 @@
-﻿using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-
-namespace Catalog.Application.Products.Commands.AddSizeVariantStock;
+﻿namespace Catalog.Application.Products.Commands.AddSizeVariantStock;
 
 public record AddSizeVariantStockCommand(Guid Id, Guid ColorVariantId, Guid SizeVariantId, int Quantity) : ICommand<AddSizeVariantStockResult>;
 public record AddSizeVariantStockResult(bool IsSuccess);

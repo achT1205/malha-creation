@@ -1,5 +1,4 @@
 ﻿using Ordering.Application.Orders.Commands.RejectedOrder;
-using Ordering.Application.Orders.Events;
 
 namespace Ordering.Application.Orders.EventHandlers.Integration;
 
