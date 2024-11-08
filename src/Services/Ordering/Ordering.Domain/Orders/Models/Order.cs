@@ -90,7 +90,7 @@ public class Order : Aggregate<OrderId>
         TransitionToStatus(OrderStatus.GracePeriodConfirmed);
     }
 
-    // GracePeriodConfirmed -> Validated
+    // GracePeriodConfirmed -> Validated --- implement validatios(paymet methode ....)
     public void ValidateOrder()
     {
         if (Status != OrderStatus.GracePeriodConfirmed)

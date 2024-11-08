@@ -1,7 +1,7 @@
 ﻿using BuildingBlocks.CQRS;
 using BuildingBlocks.Exceptions;
 using Catalog.Application.Dtos;
-using Catalog.Application.Events.IntegrationEvents;
+using Catalog.Application.Events.Integration;
 using Catalog.Application.Extensions;
 using Catalog.Application.Interfaces;
 using Catalog.Domain.Enums;

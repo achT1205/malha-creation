@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Events.IntegrationEvents;
+﻿using Catalog.Application.Events.Integration;
 using Catalog.Domain.Events;
 using Mapster;
 using MassTransit;

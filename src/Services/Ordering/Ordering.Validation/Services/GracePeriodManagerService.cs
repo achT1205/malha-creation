@@ -3,29 +3,26 @@ using MediatR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Ordering.Application.Orders.Commands.ConfirmGracePeriod;
-using Ordering.Application.Orders.Queries.GetGraceTimeOrders;
-using Ordering.Processor.Events.Domain;
-using Ordering.Processor.Models;
+using Ordering.Application.Orders.Commands.ValidationOrder;
+using Ordering.Application.Orders.Queries.GetGraceTimeConfirmedOrders;
+using Ordering.Validation.Events.IntegrationEvents;
 
-namespace Ordering.Processor.Services;
+namespace Ordering.Validation.Services;
 
-public class GracePeriodManagerService : BackgroundService
+public class OrderValidationManagerService : BackgroundService
 {
-    private readonly BackgroundTaskOptions _options;
+    //private readonly BackgroundTaskOptions _options;
     private readonly ILogger _logger;
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ISender _sender;
 
 
-    public GracePeriodManagerService(
+    public OrderValidationManagerService(
         ISender sender,
-        IOptions<BackgroundTaskOptions> options,
-        ILogger<GracePeriodManagerService> logger,
+        ILogger<OrderValidationManagerService> logger,
         IPublishEndpoint publishEndpoint)
     {
         _logger = logger;
-        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
         _sender = sender;
 
@@ -34,7 +31,7 @@ public class GracePeriodManagerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var delayTime = TimeSpan.FromSeconds(_options.CheckUpdateTime);
+        var delayTime = TimeSpan.FromSeconds(30);
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -68,19 +65,19 @@ public class GracePeriodManagerService : BackgroundService
             _logger.LogDebug("Checking confirmed grace period orders");
         }
 
-        var result = await _sender.Send(new GetGraceTimeOrdersQuery());
+        var result = await _sender.Send(new GetGraceTimeConfirmedOrdersQuery());
 
         foreach (var o in result.orders)
         {
-            var commad = new ConfirmGracePeriodCommand(o.Id);
+            var commad = new ValidationOrderCommand(o.Id);
 
             await _sender.Send(commad);
 
-            var confirmGracePeriodEvent = new GracePeriodConfirmedDomainEvent(o.Id);
+            var evt = new OrdarValidateEventIntegration(o.Id);
 
             _logger.LogInformation("Publishing integration event: {IntegrationEventId} - ({@IntegrationEvent})", confirmGracePeriodEvent.OrderId, confirmGracePeriodEvent);
 
-            await _publishEndpoint.Publish(confirmGracePeriodEvent);
+            await _publishEndpoint.Publish(evt);
         }
     }
 }

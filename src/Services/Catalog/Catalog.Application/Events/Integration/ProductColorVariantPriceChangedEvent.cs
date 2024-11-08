@@ -1,5 +1,5 @@
 ﻿using BuildingBlocks.Messaging.Events;
 
-namespace Catalog.Application.Events.IntegrationEvents;
+namespace Catalog.Application.Events.Integration;
 
 public record ProductColorVariantPriceChangedEvent(Guid Id, Guid ColorVariantId) : IntegrationEvent;
