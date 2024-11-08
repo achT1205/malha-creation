@@ -1,4 +1,5 @@
 ﻿using Catalog.Application.Dtos;
+using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Extensions;
 
@@ -28,8 +29,22 @@ public static class ProductExtensions
             );
     }
 
+    public static ProductStockDto ProductStockDtoFromProduct(this Product product)
+    {
+        return new ProductStockDto(
+            Id: product.Id.Value,
+            ProductType: product.ProductType,
+            ColorVariants: product.ColorVariants.Select(cv => new StockColorVariantDto(
+                Id: cv.Id.Value,
+                Color: cv.Color.Value,
+                Quantity: cv.Quantity.Value,
+                SizeVariants: cv.SizeVariants.Select(
+                    sv => new StockSizeVariantDto(Id: sv.Id.Value, sv.Size.Value, sv.Quantity.Value)).ToList()
+                )).ToList());
+    }
+
     private static ProductDto DtoFromProduct(
-        Product product,
+         Product product,
         string? material,
         string? collection,
         string? productType,

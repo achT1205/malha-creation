@@ -22,7 +22,7 @@ if (app.Environment.IsDevelopment())
 {
     await app.InitialiseDatabaseAsync();
 }
-app.UseMiddleware<RetrictAccessMiddleware>();
+//app.UseMiddleware<RetrictAccessMiddleware>();
 
 app.MapProductEndpoints();
 app.MapCategoryEndpoints();

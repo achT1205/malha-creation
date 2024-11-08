@@ -2,4 +2,4 @@
 
 namespace Ordering.Processor.Events.Intetration;
 
-public record OrdarValidateEventIntegration(Guid OrderId) : IntegrationEvent;
+public record OrdarValidationSucceededIntegrationEvent(Guid OrderId) : IntegrationEvent;

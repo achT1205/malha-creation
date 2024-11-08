@@ -1,9 +1,13 @@
 ﻿using BuildingBlocks.CQRS;
+using Catalog.Application.Dtos;
 using Catalog.Application.Extensions;
 using Catalog.Application.Interfaces;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Products.Queries.GetProductById;
+
+public record GetProductByIdQuery(Guid Id) : IQuery<GetProductByIdQueryResult>;
+public record GetProductByIdQueryResult(ProductDto Product);
 
 public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, GetProductByIdQueryResult>
 {

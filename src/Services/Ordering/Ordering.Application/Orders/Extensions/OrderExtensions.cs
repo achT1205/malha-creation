@@ -22,6 +22,11 @@ public static class OrderExtensions
         return DtoFromOrder(order);
     }
 
+    public static OrderStockDto ToOrderStockDto(this Order order)
+    {
+        return OrderStockDtoFromOrder(order);
+    }
+
     private static OrderDto DtoFromOrder(Order order)
     {
         return new OrderDto(
@@ -35,5 +40,14 @@ public static class OrderExtensions
                     TotalPrice: order.TotalPrice,
                     OrderItems: order.OrderItems.Select(oi => new OrderItemDto(oi.ProductId.Value, oi.Quantity, oi.Color, oi.Size, oi.Price)).ToList()
                 );
+    }
+
+
+    private static OrderStockDto OrderStockDtoFromOrder(Order order)
+    {
+        return new OrderStockDto(
+            Id: order.Id.Value,
+            OrderItems: order.OrderItems.Select(oi => new OrderItemStockDto(oi.ProductId.Value, oi.Quantity, oi.Color, oi.Size)).ToList()
+            );
     }
 }

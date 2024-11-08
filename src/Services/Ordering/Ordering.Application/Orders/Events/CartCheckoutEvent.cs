@@ -1,8 +1,9 @@
-﻿using Ordering.Application.Orders.Models;
+﻿using BuildingBlocks.Messaging.Events;
+using Ordering.Application.Orders.Models;
 
-namespace Ordering.Application.Orders.IntegrationEvents;
+namespace Ordering.Application.Orders.Events;
 
-public record CartCheckoutEvent : BuildingBlocks.Messaging.Events.IntegrationEvent
+public record CartCheckoutEvent : IntegrationEvent
 {
     public Guid UserId { get; set; } = default!;
     public Basket Cart { get; set; } = default!;

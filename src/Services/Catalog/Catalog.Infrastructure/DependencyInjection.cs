@@ -1,7 +1,9 @@
 ﻿using Catalog.Application.Interfaces;
+using Catalog.Application.Services;
 using Catalog.Infrastructure.Data;
 using Catalog.Infrastructure.Interceptors;
 using Catalog.Infrastructure.Repositories;
+using Catalog.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Catalog.Infrastructure;
@@ -28,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IOccasionRepository, OccasionRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
+        services.AddScoped<IOrderingService, OrderingService>();
 
         return services;
     }

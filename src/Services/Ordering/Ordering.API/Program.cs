@@ -29,7 +29,7 @@ internal class Program
             app.InitialiseDatabase();
         }
 
-        app.UseMiddleware<RetrictAccessMiddleware>();
+        //app.UseMiddleware<RetrictAccessMiddleware>();
 
         app.MapOrderEndpoints();
 

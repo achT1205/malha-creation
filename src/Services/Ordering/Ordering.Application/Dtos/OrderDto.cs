@@ -12,3 +12,12 @@ public record OrderDto(
     OrderStatus Status,
     List<OrderItemDto> OrderItems,
     decimal? TotalPrice);
+
+
+public record OrderStockDto(
+    Guid Id,
+    List<OrderItemStockDto> OrderItems);
+
+
+public record OrderItemStockDto(Guid ProductId, int Quantity, string Color, string Size);
+

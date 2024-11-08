@@ -8,3 +8,11 @@ public record SizeVariantDto
     int Quantity,
     int RestockThreshold
     );
+
+
+public record StockSizeVariantDto
+    (
+    Guid Id,
+    string Size,
+    int Quantity
+    );

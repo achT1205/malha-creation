@@ -1,8 +1,12 @@
 ﻿using BuildingBlocks.CQRS;
+using Catalog.Application.Dtos;
 using Catalog.Application.Extensions;
 using Catalog.Application.Interfaces;
 
 namespace Catalog.Application.Products.Queries.GetProducts;
+
+public record GetProductsQuery : IQuery<GetProductsQueryResult>;
+public record GetProductsQueryResult(IEnumerable<ProductDto> Products);
 
 public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, GetProductsQueryResult>
 {

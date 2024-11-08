@@ -3,24 +3,23 @@ using MassTransit;
 using PaymentProcessor.Events.IntegrationEvents;
 
 namespace PaymentProcessor.EventHandling.IntegrationEvents;
-public class OrderStatusChangedEventHandler
-    (ILogger<OrderStatusChangedEventHandler> logger, IPublishEndpoint publishEndpoint)
-    : IConsumer<OrderStatusChangedToStockConfirmedEvent>
+public class OrderStockConfirmedIntegrationEventHandler
+    (ILogger<OrderStockConfirmedIntegrationEventHandler> logger, IPublishEndpoint publishEndpoint)
+    : IConsumer<OrderStockConfirmedIntegrationEvent>
 {
-    public async Task Consume(ConsumeContext<OrderStatusChangedToStockConfirmedEvent> context)
+    public async Task Consume(ConsumeContext<OrderStockConfirmedIntegrationEvent> context)
     {
         // TODO: Create new order and start order fullfillment process
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
         IntegrationEvent orderPaymentIntegrationEvent;
-        var status = context.Message.status;
 
         if (true)
         {
-            orderPaymentIntegrationEvent = new OrderPaymentSucceeded(context.Message.OrderId);
+            orderPaymentIntegrationEvent = new OrderPaymentSucceededIntegrationEvent(context.Message.OrderId);
         }
         else
         {
-            orderPaymentIntegrationEvent = new OrderPaymentFailed(context.Message.OrderId);
+            orderPaymentIntegrationEvent = new OrderPaymentFailedIntegrationEvent(context.Message.OrderId);
         }
 
         await publishEndpoint.Publish(orderPaymentIntegrationEvent);

@@ -1,9 +1,12 @@
-﻿using MassTransit;
+﻿using BuildingBlocks.Messaging.Events;
+using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
+using Ordering.Application.Orders.Commands.RejectedOrder;
+using Ordering.Application.Orders.Commands.ValidationOrder;
 using Ordering.Application.Orders.Queries.GetOrdersById;
-using Ordering.Processor.Events.Domain;
+using Ordering.Domain.Orders.Events;
 using Ordering.Processor.Events.Intetration;
 
 namespace Ordering.Processor.EventHandlers.Domain;
@@ -24,9 +27,22 @@ public class GracePeriodConfirmedDomainEventHandler
 
             // implemete the validation here  result.Order
 
-            var evt = new OrdarValidateEventIntegration(orderId);
 
-            await publishEndpoint.Publish(evt, cancellationToken);
+            IntegrationEvent evt = null;
+            if (true)
+            {
+                var command = new ValidationOrderCommand(orderId);
+                await sender.Send(command);
+
+                await publishEndpoint.Publish (new OrdarValidationSucceededIntegrationEvent(orderId)); 
+            }
+            else
+            {
+                var command = new RejectOrderCommand(orderId);
+                await sender.Send(command);
+
+                await publishEndpoint.Publish(new OrdarValidationFailedIntegrationEvent(orderId));
+            }
         }
     }
 }

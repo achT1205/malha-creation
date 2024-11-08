@@ -20,11 +20,10 @@ public record OutputColorVariantDto(
         List<SizeVariantDto> SizeVariants
     );
 
-//public record UpdateColorVariantDto(
-//        Guid ? Id,
-//        string Color,
-//        List<ImageDto> Images,
-//        PriceDto ? Price,
-//        int? Quantity,
-//        List<SizeVariantDto> SizeVariants
-//    );
+
+public record StockColorVariantDto(
+        Guid Id,
+        string Color,
+        int? Quantity,
+        List<StockSizeVariantDto> SizeVariants
+    );

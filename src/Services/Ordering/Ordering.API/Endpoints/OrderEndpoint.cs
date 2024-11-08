@@ -10,6 +10,7 @@ using Ordering.Application.Orders.Commands.UpdateShippingAddress;
 using Ordering.Application.Orders.Queries.GetOrders;
 using Ordering.Application.Orders.Queries.GetOrdersByCustomer;
 using Ordering.Application.Orders.Queries.GetOrdersByOrderCode;
+using Ordering.Application.Orders.Queries.GetOrdersForStockValidation;
 
 namespace Ordering.API.Endpoints;
 
@@ -37,6 +38,7 @@ public static class OrderEndpoints
     public record GetOrdersResponse(PaginatedResult<OrderDto> Orders);
     public record GetOrdersByCustomerResponse(IEnumerable<OrderDto> Orders);
     public record GetOrdersByCodeResponse(IEnumerable<OrderDto> Orders);
+    public record GetOrderForStockValidationResponse(OrderStockDto Order);
     public static void MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/orders", async (CreateOrderRequest request, ISender sender) =>
@@ -157,6 +159,22 @@ public static class OrderEndpoints
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithSummary("Get Orders By Code")
         .WithDescription("Get Orders By Code");
+
+        app.MapGet("/api/get-stock-order/{id}", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new GetOrderForStockValidationQuery(id));
+
+            var response = result.Adapt<GetOrderForStockValidationResponse>();
+
+            return Results.Ok(response);
+        })
+        .WithName("GetOrderForStockValidation")
+        .Produces<GetOrderForStockValidationResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Get Order For Stock Validation.")
+        .WithDescription("Get Order For Stock Validation.");
+
 
         app.MapGet("/api/orders", async ([AsParameters] PaginationRequest request, ISender sender) =>
         {

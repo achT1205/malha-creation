@@ -2,12 +2,15 @@
 using Catalog.Application.Dtos;
 using Catalog.Application.Extensions;
 using Catalog.Application.Interfaces;
+using Catalog.Domain.ValueObjects;
 
-namespace Catalog.Application.Products.Queries.GetProductBySlug;
+namespace Catalog.Application.Products.Queries.GetProductForStockValidationById;
 
-public record GetProductBySlugQuery(string Slug) : IQuery<GetProductByIdQueryResult>;
-public record GetProductByIdQueryResult(ProductDto Product);
-public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery, GetProductByIdQueryResult>
+public record GetProductForStockValidationByIdQuery(Guid Id) : IQuery<GetProductForStockValidationByIdQueryResult>;
+
+public record GetProductForStockValidationByIdQueryResult(ProductStockDto Product);
+
+public class GetProductForStockValidationByIdQueryHandler : IQueryHandler<GetProductForStockValidationByIdQuery, GetProductForStockValidationByIdQueryResult>
 {
     private readonly IProductRepository _productRepository;
     private readonly IProductTypeRepository _productTypeRepository;
@@ -15,7 +18,7 @@ public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery,
     private readonly ICollectionRepository _collectionRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IOccasionRepository _occasionRepository;
-    public GetProductBySlugQueryHandler(
+    public GetProductForStockValidationByIdQueryHandler(
         IProductRepository productRepository,
         IProductTypeRepository productTypeRepository,
         IMaterialRepository materialRepository,
@@ -31,13 +34,13 @@ public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery,
         _occasionRepository = occasionRepository;
     }
 
-    public async Task<GetProductByIdQueryResult> Handle(GetProductBySlugQuery query, CancellationToken cancellationToken)
+    public async Task<GetProductForStockValidationByIdQueryResult> Handle(GetProductForStockValidationByIdQuery query, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetBySlugAsync(query.Slug);
+        var product = await _productRepository.GetByIdAsync(ProductId.Of(query.Id));
 
         if (product == null)
         {
-            throw new KeyNotFoundException($"Product with slug '{query.Slug}' not found.");
+            throw new KeyNotFoundException($"Product with Id '{query.Id}' not found.");
         }
         var productType = await _productTypeRepository.GetByIdAsync(product.ProductTypeId);
         var material = await _materialRepository.GetByIdAsync(product.MaterialId);
@@ -45,13 +48,8 @@ public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery,
         var categories = await _categoryRepository.GetByIdsAsync(product.CategoryIds.ToList());
         var occasions = await _occasionRepository.GetByIdsAsync(product.OccasionIds.ToList());
 
-        var productDto = product.ToProductDto(
-            material.Name,
-            collection.Name,
-            productType.Name,
-            occasions.Select(o => o.Name.Value).ToList(),
-            categories.Select(c => c.Name.Value).ToList());
+        var productDto = product.ProductStockDtoFromProduct();
 
-        return new GetProductByIdQueryResult(productDto);
+        return new GetProductForStockValidationByIdQueryResult(productDto);
     }
 }

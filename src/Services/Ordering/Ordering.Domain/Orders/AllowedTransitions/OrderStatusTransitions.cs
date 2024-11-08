@@ -9,8 +9,8 @@ public static class OrderStatusTransitions
         { OrderStatus.Draft, new List<OrderStatus> { OrderStatus.Pending, OrderStatus.Cancelled, OrderStatus.Deleted } },
         { OrderStatus.Pending, new List<OrderStatus> { OrderStatus.GracePeriodConfirmed, OrderStatus.Cancelled, OrderStatus.Deleted } },
         { OrderStatus.GracePeriodConfirmed, new List<OrderStatus> { OrderStatus.Validated, OrderStatus.Rejected } },
-        { OrderStatus.Validated, new List<OrderStatus> { OrderStatus.StockConfirmed } },
-        { OrderStatus.StockConfirmed, new List<OrderStatus> { OrderStatus.Paid } },
+        { OrderStatus.Validated, new List<OrderStatus> { OrderStatus.StockConfirmed, OrderStatus.Rejected } },
+        { OrderStatus.StockConfirmed, new List<OrderStatus> { OrderStatus.Paid, OrderStatus.Rejected } },
         { OrderStatus.Paid, new List<OrderStatus> { OrderStatus.Shipped } },
         { OrderStatus.Shipped, new List<OrderStatus> { OrderStatus.Completed } },
         { OrderStatus.Completed, new List<OrderStatus> { } }, // End state, no transitions out

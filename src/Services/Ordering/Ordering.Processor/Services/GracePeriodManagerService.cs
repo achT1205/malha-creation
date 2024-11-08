@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ordering.Application.Orders.Commands.ConfirmGracePeriod;
 using Ordering.Application.Orders.Queries.GetGraceTimeOrders;
-using Ordering.Processor.Events.Domain;
+using Ordering.Domain.Orders.Events;
 using Ordering.Processor.Models;
 
 namespace Ordering.Processor.Services;
@@ -30,7 +30,6 @@ public class GracePeriodManagerService : BackgroundService
         _sender = sender;
 
     }
-    //private readonly BackgroundTaskOptions _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

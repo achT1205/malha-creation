@@ -1,4 +1,6 @@
-﻿namespace Catalog.Application.Dtos;
+﻿using Catalog.Domain.Enums;
+
+namespace Catalog.Application.Dtos;
 
 public record ProductDto
 (
@@ -19,4 +21,12 @@ public record ProductDto
     string? Collection,
     List<string>?  Occasions,
     List<string>? Categories
+);
+
+
+public record ProductStockDto
+(
+    Guid Id,
+    ProductTypeEnum ProductType, 
+    List<StockColorVariantDto> ColorVariants
 );
