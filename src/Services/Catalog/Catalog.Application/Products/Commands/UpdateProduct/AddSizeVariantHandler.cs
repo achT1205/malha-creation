@@ -47,7 +47,7 @@ public class AddSizeVariantCommandHandler : ICommandHandler<AddSizeVariantComman
                ColorVariantId.Of(command.ColorVariantId),
                SizeVariantId.Of(Guid.NewGuid()),
                Size.Of(command.Size),
-               Price.Of("$", command.Price),
+               Price.Of("USD", command.Price),
                Quantity.Of(command.Quantity),
                Quantity.Of(command.RestockThreshold));
             product.AddSizeVariant(ColorVariantId.Of(command.ColorVariantId), sizeVariant);

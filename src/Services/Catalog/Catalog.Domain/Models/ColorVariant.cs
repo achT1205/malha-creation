@@ -1,4 +1,5 @@
 ﻿using Catalog.Domain.Events;
+using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Domain.Models;
 
@@ -115,4 +116,14 @@ public class ColorVariant : Entity<ColorVariantId>
         }
     }
 
+    internal void UpdateSizeVariantPrice(SizeVariantId sizeVariantId, Price price)
+    {
+        var sv = _sizeVariants.FirstOrDefault(_ => _.Id == sizeVariantId);
+        if (sv == null)
+        {
+            throw new CatalogDomainException($"The SizeVariant {sizeVariantId} was not found");
+        }
+        var oldPrice = sv.Price;
+        sv.UpdatePrice(price);
+    }
 }

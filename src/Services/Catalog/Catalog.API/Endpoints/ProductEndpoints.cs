@@ -9,6 +9,7 @@ using Catalog.Application.Products.Commands.UpdateCategories;
 using Catalog.Application.Products.Commands.UpdateColorVariantPrice;
 using Catalog.Application.Products.Commands.UpdateOccasions;
 using Catalog.Application.Products.Commands.UpdateProductInfos;
+using Catalog.Application.Products.Commands.UpdateSizeVariantPrice;
 using Catalog.Application.Products.Queries.GetProductById;
 using Catalog.Application.Products.Queries.GetProductBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
@@ -49,6 +50,7 @@ public static class ProductEndpoints
     public record UpdateOccasionsRequest(Guid Id, List<Guid> OccasionIds);
     public record UpdateCategoriesRequest(Guid Id, List<Guid> CategoryIds);
     public record UpdateColorVariantPriceRequest(Guid Id, Guid ColorVariantId, decimal Price);
+    public record UpdateSizeVariantPriceRequest(Guid Id, Guid ColorVariantId, Guid SizeVariantId, decimal Price);
     public record AddSizeVariantStockRequest(Guid Id, Guid ColorVariantId, Guid SizeVariantId, int Quantity);
     public record AddColorVariantStockRequest(Guid Id, Guid ColorVariantId, int Quantity);
     public record AddColorVariantRequest(
@@ -57,7 +59,7 @@ public static class ProductEndpoints
     List<ImageDto> Images,
     decimal? Price,
     int? Quantity,
-    List<SizeVariantDto>? sizeVariants,
+    List<SizeVariantDto>? SizeVariants,
     int? RestockThreshold
     );
     public record AddSizeVariantRequest(
@@ -65,7 +67,6 @@ public static class ProductEndpoints
     Guid ColorVariantId,
     string Size,
     decimal Price,
-    string Currency,
     int Quantity,
     int RestockThreshold);
     public record UpdateProductResponse(bool IsSuccess);
@@ -177,6 +178,22 @@ public static class ProductEndpoints
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product: Update ColorVariant Price.")
         .WithDescription("Update Product: Update ColorVariant Price.");
+
+
+        app.MapPut("/api/products/{id}/color-variants/{colorVariantId}/size-variants/{sizeVariantId}/update-price", async (Guid id, Guid colorVariantId, Guid sizeVariantId, UpdateSizeVariantPriceRequest requst, ISender sender) =>
+        {
+            var command = requst.Adapt<UpdateSizeVariantPriceCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("Update Product size variant price")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Update Size variant Price.")
+        .WithDescription("Update Product: Update Size variant Price.");
+
+        //
 
         app.MapDelete("/api/products/{id}/color-variants/{colorVariantId}", async (Guid id, Guid colorVariantId, ISender sender) =>
         {

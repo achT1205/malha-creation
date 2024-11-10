@@ -6,7 +6,7 @@ public record AddColorVariantCommand(
     List<ImageDto> Images,
     decimal? Price,
     int? Quantity,
-    List<SizeVariantDto>? sizeVariants,
+    List<SizeVariantDto>? SizeVariants,
     int? RestockThreshold
 ) : ICommand<AddColorVariantResult>;
 public record AddColorVariantResult(bool IsSuccess);
@@ -53,7 +53,7 @@ public class AddColorVariantCommandHandler : ICommandHandler<AddColorVariantComm
                     product.Id,
                     Color.Of(command.Color),
                     Slug.Of(product.UrlFriendlyName.Value, command.Color),
-                    ColorVariantPrice.Of(command.Price.HasValue ? "USD" : null, command.Price),
+                    ColorVariantPrice.Of("USD" , command.Price),
                     ColorVariantQuantity.Of(command.Quantity),
                     ColorVariantQuantity.Of(command.RestockThreshold));
 
@@ -62,9 +62,9 @@ public class AddColorVariantCommandHandler : ICommandHandler<AddColorVariantComm
                 var newImage = Image.Of(image.ImageSrc, image.AltText);
                 newColorVariant.AddImage(newImage);
             }
-            if (product.ProductType == Domain.Enums.ProductTypeEnum.Clothing && command.sizeVariants.Any())
+            if (product.ProductType == Domain.Enums.ProductTypeEnum.Clothing && command.SizeVariants.Any())
             {
-                foreach (var sizeVariant in command.sizeVariants)
+                foreach (var sizeVariant in command.SizeVariants)
                 {
                     var newSizeVariant = SizeVariant.Create(
                         newColorVariant.Id,
