@@ -162,11 +162,11 @@ public class Product : Aggregate<ProductId>
 
     public void AddColorVariant(ColorVariant colorVariant)
     {
-        if (!_colorVariants.Any(cv => cv.Color.Value.ToLower() == colorVariant.Color.Value.ToLower()))
-        {
-            _colorVariants.Add(colorVariant);
-            AddDomainEvent(new ProductNewColorVariantAddedDomainEvent(colorVariant));
-        }
+        if (_colorVariants.Any(cv => cv.Color.Value.ToLower() == colorVariant.Color.Value.ToLower()))
+            throw new InvalidOperationException($"A Color Variant with the same Name \"{colorVariant.Color.Value}\" already exists.");
+
+        _colorVariants.Add(colorVariant);
+        AddDomainEvent(new ProductNewColorVariantAddedDomainEvent(colorVariant));
     }
     public void RemoveColorVariant(ColorVariantId colorVariantId)
     {
@@ -184,7 +184,7 @@ public class Product : Aggregate<ProductId>
 
     public void AddColorVariantStock(ColorVariantId colorVariantId, ColorVariantQuantity quantity)
     {
-        var cv = ColorVariants.FirstOrDefault(_ => _.Equals(colorVariantId));
+        var cv = ColorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
         if (cv == null)
         {
             throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
@@ -200,7 +200,7 @@ public class Product : Aggregate<ProductId>
 
     public void AddSizeVariantStock(ColorVariantId colorVariantId, SizeVariantId sizeVariantId, Quantity quantity)
     {
-        var cv = ColorVariants.FirstOrDefault(_ => _.Equals(colorVariantId));
+        var cv = ColorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
         if (cv == null)
         {
             throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
@@ -271,7 +271,7 @@ public class Product : Aggregate<ProductId>
 
     public void AddSizeVariant(ColorVariantId colorVariantId, SizeVariant sizeVariant)
     {
-        var cv = ColorVariants.FirstOrDefault(_ => _.Equals(colorVariantId));
+        var cv = ColorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
         if (cv == null)
         {
             throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
@@ -281,7 +281,7 @@ public class Product : Aggregate<ProductId>
 
     public void RemoveSizeVariant(ColorVariantId colorVariantId, SizeVariantId sizeVariantId)
     {
-        var cv = ColorVariants.FirstOrDefault(_ => _.Equals(colorVariantId));
+        var cv = ColorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
         if (cv == null)
         {
             throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
@@ -295,7 +295,7 @@ public class Product : Aggregate<ProductId>
         {
             throw new CatalogDomainException($"Only Size varaiant price can be changed for this product.");
         }
-        var cv = ColorVariants.FirstOrDefault(_ => _.Equals(colorVariantId));
+        var cv = ColorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
         if (cv == null)
         {
             throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");

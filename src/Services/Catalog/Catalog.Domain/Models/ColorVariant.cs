@@ -1,4 +1,6 @@
-﻿namespace Catalog.Domain.Models;
+﻿using Catalog.Domain.Events;
+
+namespace Catalog.Domain.Models;
 
 public class ColorVariant : Entity<ColorVariantId>
 {
@@ -38,7 +40,7 @@ public class ColorVariant : Entity<ColorVariantId>
     {
         return new ColorVariant(productId, color, slug, price, quantity, restockThreshold);
     }
-    public void UpdatePrice( ColorVariantPrice newPrice)
+    public void UpdatePrice(ColorVariantPrice newPrice)
     {
         if (!Price.Equals(newPrice))
         {
@@ -57,7 +59,7 @@ public class ColorVariant : Entity<ColorVariantId>
 
         if (newQuantity <= 0)
         {
-            throw new CatalogDomainException($"Item units desired should be greater than zero");
+            throw new CatalogDomainException($"Item quantity should be greater than zero");
         }
         Quantity = Quantity.Increase(newQuantity);
     }
@@ -81,14 +83,8 @@ public class ColorVariant : Entity<ColorVariantId>
             throw new ArgumentNullException(nameof(sizeVariant));
         }
 
-        // Vérification pour éviter les doublons
-        var existingVariant = SizeVariants.FirstOrDefault(sv => sv.Size.Equals(sizeVariant));
-
-        if (existingVariant != null)
-        {
-            throw new InvalidOperationException("A size variant with the same ID already exists.");
-        }
-
+        if (_sizeVariants.Any(cv => cv.Size.Value.ToLower() == sizeVariant.Size.Value.ToLower()))
+            throw new InvalidOperationException($"A Size Variant with the same Name \"{sizeVariant.Size.Value}\"  already exists.");
         _sizeVariants.Add(sizeVariant);
     }
     public void RemoveSizeVariant(SizeVariantId sizeVariantId)

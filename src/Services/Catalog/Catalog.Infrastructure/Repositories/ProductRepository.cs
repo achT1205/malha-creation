@@ -63,6 +63,8 @@ public class ProductRepository : IProductRepository
         {
             throw new ArgumentNullException(nameof(product));
         }
+        _context.Entry(product).Property("Name_Value").CurrentValue = product.Name.Value;
+        _context.Entry(product).Property("UrlFriendlyName_Value").CurrentValue = product.UrlFriendlyName.Value;
         _context.Products.Update(product);
     }
 

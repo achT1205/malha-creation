@@ -4,16 +4,17 @@ public static class ProductExtensions
 {
     public static IEnumerable<ProductDto> ToProductDtoList(this IEnumerable<Product> products)
     {
-        return products.Select(product => DtoFromProduct(product, null, null, null, null, null)).ToList();
+        return products.Select(product => DtoFromProduct(product)).ToList();
     }
 
     public static ProductDto ToProductDto(
         this Product product,
-        string material,
-        string collection,
-        string productType,
-        List<string>? occasions,
-        List<string>? categories
+        Material material,
+        Collection collection,
+        ProductType productType,
+        Brand brand,
+        List<Occasion>? occasions,
+        List<Category>? categories
         )
     {
         return DtoFromProduct(
@@ -21,6 +22,7 @@ public static class ProductExtensions
             material,
             collection,
             productType,
+            brand,
             occasions,
             categories
             );
@@ -42,11 +44,12 @@ public static class ProductExtensions
 
     private static ProductDto DtoFromProduct(
          Product product,
-        string? material,
-        string? collection,
-        string? productType,
-        List<string>? occasions,
-        List<string>? categories
+        Material material,
+        Collection collection,
+        ProductType productType,
+        Brand brand,
+        List<Occasion>? occasions,
+        List<Category>? categories
         )
     {
         return new ProductDto(
@@ -56,26 +59,54 @@ public static class ProductExtensions
             Description: product.Description.Value,
             IsHandmade: product.IsHandmade,
             CoverImage: new ImageDto(product.CoverImage.ImageSrc, product.CoverImage.AltText),
-            ProductTypeId: product.ProductTypeId.Value,
-            MaterialId: product.MaterialId.Value,
-            CollectionId: product.CollectionId.Value,
-            OccasionIds: product.OccasionIds.Select(i => i.Value).ToList(),
-            CategoryIds: product.CategoryIds.Select(i => i.Value).ToList(),
+            ProductType: new ProductTypeDto(productType.Id.Value, productType.Name),
+            Material: new MaterialDto(material.Id.Value, material.Name),
+            Collection: new CollectionDto(collection.Id.Value, collection.Name, collection.Image.ImageSrc, collection.Image.AltText),
+            Brand: new BrandDto(brand.Id.Value, brand.Name.Value),
+            Occasions: occasions?.Select(i => new OccasionDto(i.Id.Value, i.Name.Value)).ToList(),
+            Categories: categories?.Select(i => new CategoryDto(i.Id.Value, i.Name.Value)).ToList(),
             ColorVariants: product.ColorVariants.Select(cv => new OutputColorVariantDto(
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,
                 Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
                 Price: new PriceDto(cv.Price.Currency, cv.Price.Amount),
                 Quantity: cv.Quantity.Value,
+                RestockThreshold: cv.RestockThreshold.Value,
                 Slug: cv.Slug.Value,
                 SizeVariants: cv.SizeVariants.Select(
-                    sv => new SizeVariantDto(sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value, sv.RestockThreshold.Value)).ToList()
-                )).ToList(),
-            ProductType: productType,
-            Material: material,
-            Collection: collection,
-            Occasions: occasions,
-            Categories: categories
+                    sv => new SizeVariantDto(sv.Id.Value, sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value, sv.RestockThreshold.Value)).ToList()
+                )).ToList()
+        );
+    }
+
+    private static ProductDto DtoFromProduct(
+     Product product
+    )
+    {
+        return new ProductDto(
+            Id: product.Id.Value,
+            Name: product.Name.Value,
+            UrlFriendlyName: product.UrlFriendlyName.Value,
+            Description: product.Description.Value,
+            IsHandmade: product.IsHandmade,
+            CoverImage: new ImageDto(product.CoverImage.ImageSrc, product.CoverImage.AltText),
+            ProductType: new ProductTypeDto(product.ProductTypeId.Value, ""),
+            Material: new MaterialDto(product.MaterialId.Value, ""),
+            Collection: new CollectionDto(product.CollectionId.Value,"","", ""),
+            Brand: new BrandDto(product.BrandId.Value, ""),
+            Occasions: product.OccasionIds?.Select(i => new OccasionDto(i.Value, "")).ToList(),
+            Categories: product.CategoryIds?.Select(i => new CategoryDto(i.Value,"")).ToList(),
+            ColorVariants: product.ColorVariants.Select(cv => new OutputColorVariantDto(
+                Id: cv.Id.Value,
+                Color: cv.Color.Value,
+                Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
+                Price: new PriceDto(cv.Price.Currency, cv.Price.Amount),
+                Quantity: cv.Quantity.Value,
+                RestockThreshold: cv.RestockThreshold.Value,
+                Slug: cv.Slug.Value,
+                SizeVariants: cv.SizeVariants.Select(
+                    sv => new SizeVariantDto(sv.Id.Value, sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value, sv.RestockThreshold.Value)).ToList()
+                )).ToList()
         );
     }
 }

@@ -9,7 +9,7 @@ public class ProductColorVariantPriceChangedDomainEventHandler
     public async Task Handle(ProductColorVariantPriceChangedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
-        var evt = domainEvent.Adapt<ProductColorVariantPriceChangedEvent>();
+        var evt = new ProductColorVariantPriceChangedEvent(domainEvent.ProductId, domainEvent.ColorVariantId, domainEvent.Price, domainEvent.OldPrice, domainEvent.Currency);
         await publishEndpoint.Publish(evt, cancellationToken);
     }
 }

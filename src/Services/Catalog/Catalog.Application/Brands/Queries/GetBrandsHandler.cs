@@ -3,8 +3,6 @@
 public record GetBrandsQuery : IQuery<GetBrandsResult>;
 public record GetBrandsResult(IEnumerable<BrandDto> Brands);
 
-public record BrandDto(Guid Id, string Name);
-
 public class GetBrandsQueryHandler : IQueryHandler<GetBrandsQuery, GetBrandsResult>
 {
     private readonly IBrandRepository _BrandRepository;

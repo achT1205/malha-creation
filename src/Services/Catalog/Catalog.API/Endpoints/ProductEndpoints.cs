@@ -12,6 +12,7 @@ using Catalog.Application.Products.Commands.UpdateProductInfos;
 using Catalog.Application.Products.Queries.GetProductById;
 using Catalog.Application.Products.Queries.GetProductBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
+using Catalog.Domain.Enums;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.API.Endpoints;
@@ -26,6 +27,7 @@ public static class ProductEndpoints
     bool OnReorder,
     ImageDto CoverImage,
     Guid ProductTypeId,
+    ProductTypeEnum ProductType,
     Guid MaterialId,
     Guid BrandId,
     Guid CollectionId,
@@ -92,7 +94,7 @@ public static class ProductEndpoints
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Update Product Infos")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product infos.")
@@ -106,7 +108,7 @@ public static class ProductEndpoints
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Update Product Ocations")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product occasions.")
@@ -119,7 +121,7 @@ public static class ProductEndpoints
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Update Product Categories")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product categories.")
@@ -137,7 +139,7 @@ public static class ProductEndpoints
                     var response = result.Adapt<UpdateProductResponse>();
                     return Results.Ok(response);
                 })
-        .WithName("UpdateProduct")
+        .WithName("add Color variant stock")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product: Add ColorVariant Stock.")
@@ -156,7 +158,7 @@ public static class ProductEndpoints
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Add SizeVariant Stock")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product: Add SizeVariant Stock.")
@@ -170,7 +172,7 @@ public static class ProductEndpoints
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Update Product color variant price")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product: Update ColorVariant Price.")
@@ -183,7 +185,7 @@ public static class ProductEndpoints
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Delete Product Color variant")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product: Remove colorVariant.")
@@ -196,37 +198,37 @@ public static class ProductEndpoints
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Delete Product size variant")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update Product: Remove SizeVariant.")
         .WithDescription("Update Product: Remove SizeVariant.");
 
-        app.MapPost("/api/products/{id}/color-variants/{colorVariantId}/size-variants/", async (Guid id, Guid colorVariantId, AddColorVariantRequest request, ISender sender) =>
-        {
-            var command = request.Adapt<AddColorVariantCommand>();
-            var result = await sender.Send(command);
-            var response = result.Adapt<UpdateProductResponse>();
-            return Results.Ok(response);
-        })
-        .WithName("UpdateProduct")
-        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Update Product: Add ColorVariant.")
-        .WithDescription("Update Product: Add ColorVariant.");
-
-        app.MapPost("/api/products/{id}/color-variants", async (Guid id, AddSizeVariantRequest request, ISender sender) =>
+        app.MapPost("/api/products/{id}/color-variants/{colorVariantId}/size-variants/", async (Guid id, Guid colorVariantId, AddSizeVariantRequest request, ISender sender) =>
         {
             var command = request.Adapt<AddSizeVariantCommand>();
             var result = await sender.Send(command);
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Add Product size variant")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Update Product: Add ColorVariant.")
-        .WithDescription("Update Product: Add ColorVariant.");
+        .WithSummary("Update Product: Add Product size variant.")
+        .WithDescription("Update Product: Add Product size variant.");
+
+        app.MapPost("/api/products/{id}/color-variants", async (Guid id, AddColorVariantRequest request, ISender sender) =>
+        {
+            var command = request.Adapt<AddColorVariantCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("Add Product color variant")
+        .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update Product: Add Product color variant.")
+        .WithDescription("Update Product: Add Product color variant.");
 
 
         app.MapGet("/api/products/by-slug/{slug:regex(^[a-zA-Z0-9_-]+$)}", async (string slug, ISender sender) =>

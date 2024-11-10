@@ -3,13 +3,6 @@
 public record GetCollectionsQuery : IQuery<GetCollectionsResult>;
 public record GetCollectionsResult(IEnumerable<CollectionDto> Collections);
 
-public record CollectionDto(
-    Guid Id,
-    string Name,
-    string ImageSrc,
-    string AltText
-    );
-
 public class GetCollectionsQueryHandler : IQueryHandler<GetCollectionsQuery, GetCollectionsResult>
 {
     private readonly ICollectionRepository _CollectionRepository;

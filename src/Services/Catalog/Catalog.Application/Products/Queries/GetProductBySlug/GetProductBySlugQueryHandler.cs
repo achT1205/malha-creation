@@ -10,13 +10,15 @@ public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery,
     private readonly ICollectionRepository _collectionRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IOccasionRepository _occasionRepository;
+    private readonly IBrandRepository _brandRepository;
     public GetProductBySlugQueryHandler(
         IProductRepository productRepository,
         IProductTypeRepository productTypeRepository,
         IMaterialRepository materialRepository,
         ICollectionRepository collectionRepository,
         ICategoryRepository categoryRepository,
-        IOccasionRepository occasionRepository)
+        IOccasionRepository occasionRepository,
+        IBrandRepository brandRepository)
     {
         _productRepository = productRepository;
         _productTypeRepository = productTypeRepository;
@@ -24,6 +26,7 @@ public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery,
         _collectionRepository = collectionRepository;
         _categoryRepository = categoryRepository;
         _occasionRepository = occasionRepository;
+        _brandRepository = brandRepository;
     }
 
     public async Task<GetProductByIdQueryResult> Handle(GetProductBySlugQuery query, CancellationToken cancellationToken)
@@ -36,16 +39,18 @@ public class GetProductBySlugQueryHandler : IQueryHandler<GetProductBySlugQuery,
         }
         var productType = await _productTypeRepository.GetByIdAsync(product.ProductTypeId);
         var material = await _materialRepository.GetByIdAsync(product.MaterialId);
+        var brand = await _brandRepository.GetByIdAsync(product.BrandId);
         var collection = await _collectionRepository.GetByIdAsync(product.CollectionId);
         var categories = await _categoryRepository.GetByIdsAsync(product.CategoryIds.ToList());
         var occasions = await _occasionRepository.GetByIdsAsync(product.OccasionIds.ToList());
 
         var productDto = product.ToProductDto(
-            material.Name,
-            collection.Name,
-            productType.Name,
-            occasions.Select(o => o.Name.Value).ToList(),
-            categories.Select(c => c.Name.Value).ToList());
+            material,
+            collection,
+            productType,
+            brand,
+            occasions,
+            categories);
 
         return new GetProductByIdQueryResult(productDto);
     }

@@ -1,5 +1,6 @@
 ﻿using Catalog.Application.Categories.Commands.CreateCategory;
 using Catalog.Application.Categories.Queries;
+using Catalog.Application.Categories.Commands.DeleteCategory;
 
 
 namespace Catalog.API.Endpoints;
@@ -13,20 +14,15 @@ public static class CategoryEndpoints
         );
     public record CreateCategoryResponse(Guid Id);
 
+    public record  DeleteCategoryResponse(bool IsSuccess);
+
     public static void MapCategoryEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/categories", async (CreateCategoryRequest request, ISender sender) =>
         {
-            // Adapter la requête en commande
             var command = request.Adapt<CreateCategoryCommand>();
-
-            // Envoyer la commande via MediatR
             var result = await sender.Send(command);
-
-            // Adapter le résultat en réponse
             var response = result.Adapt<CreateCategoryResponse>();
-
-            // Retourner la réponse avec un statut 201 Created
             return Results.Created($"/api/categories/{result.Id}", response);
         })
         .WithName("CreateCategory")
@@ -46,6 +42,21 @@ public static class CategoryEndpoints
        .ProducesProblem(StatusCodes.Status400BadRequest)
        .WithSummary("Get categories")
        .WithDescription("Retrieve a list of all available categories.");
+
+
+        app.MapDelete("/api/categories/{id}", async (Guid id, ISender sender) =>
+        {
+            var query = new DeleteCategoryCommand(id);
+            var result = await sender.Send(query);
+            var response = result.Adapt<DeleteCategoryResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("DeleteCategoryResponse")
+        .Produces<DeleteCategoryResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Delete Category")
+        .WithDescription("Delete Category.");
+
     }
 
 }

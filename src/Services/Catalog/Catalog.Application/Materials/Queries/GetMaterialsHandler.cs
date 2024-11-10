@@ -3,8 +3,6 @@
 public record GetMaterialsQuery : IQuery<GetMaterialsResult>;
 public record GetMaterialsResult(IEnumerable<MaterialDto> Materials);
 
-public record MaterialDto(Guid Id, string Name);
-
 public class GetMaterialsQueryHandler : IQueryHandler<GetMaterialsQuery, GetMaterialsResult>
 {
     private readonly IMaterialRepository _materialRepository;

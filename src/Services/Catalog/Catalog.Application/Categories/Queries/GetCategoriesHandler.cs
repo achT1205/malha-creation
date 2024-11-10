@@ -3,11 +3,6 @@
 public record GetCategoriesQuery : IQuery<GetCategoriesResult>;
 public record GetCategoriesResult(IEnumerable<CategoryDto> Categories);
 
-public record CategoryDto(
-    Guid Id,
-    string Name
-    );
-
 public class GetCategoriesQueryHandler : IQueryHandler<GetCategoriesQuery, GetCategoriesResult>
 {
     private readonly ICategoryRepository _CategoryRepository;

@@ -2,12 +2,6 @@
 
 public record GetOccasionsQuery : IQuery<GetOccasionsResult>;
 public record GetOccasionsResult(IEnumerable<OccasionDto> Occasions);
-
-public record OccasionDto(
-    Guid Id,
-    string Name
-    );
-
 public class GetOccasionsQueryHandler : IQueryHandler<GetOccasionsQuery, GetOccasionsResult>
 {
     private readonly IOccasionRepository _OccasionRepository;

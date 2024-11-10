@@ -271,6 +271,16 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         // Set the unique constraint on the shadow property
         builder.HasIndex("UrlFriendlyName_Value").IsUnique();
 
+        // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
+        builder.Property<string>("Name_Value")
+              .HasColumnName("Name")
+              .HasMaxLength(100)
+              .IsRequired();
+
+        // Set the unique constraint on the shadow property
+        builder.HasIndex("Name_Value").IsUnique();
+
+
 
         builder.ComplexProperty(
             p => p.UrlFriendlyName, unb =>

@@ -1,4 +1,5 @@
-﻿using Catalog.Application.ProductTypes.Commands.CreateProductType;
+﻿using Catalog.Application.ProductTypes.Commands.DeleteProductType;
+using Catalog.Application.ProductTypes.Commands.CreateProductType;
 using Catalog.Application.ProductTypes.Queries;
 
 namespace Catalog.API.Endpoints;
@@ -10,20 +11,15 @@ public static class ProductTypeEndpoints
     public record CreateProductTypeRequest(string Name);
     public record CreateProductTypeResponse(Guid Id);
 
+    public record DeleteProductTypeResponse(bool IsSuccess);
+
     public static void MapProductTypeEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/product-types", async (CreateProductTypeRequest request, ISender sender) =>
         {
-            // Adapter la requête en commande
             var command = request.Adapt<CreateProductTypeCommand>();
-
-            // Envoyer la commande via MediatR
             var result = await sender.Send(command);
-
-            // Adapter le résultat en réponse
             var response = result.Adapt<CreateProductTypeResponse>();
-
-            // Retourner la réponse avec un statut 201 Created
             return Results.Created($"/api/product-types/{result.Id}", response);
         })
         .WithName("CreateProductType")
@@ -43,6 +39,19 @@ public static class ProductTypeEndpoints
        .ProducesProblem(StatusCodes.Status400BadRequest)
        .WithSummary("Get Product Types")
        .WithDescription("Retrieve a list of all available Product Types.");
+
+        app.MapDelete("/api/product-types/{id}", async (Guid id, ISender sender) =>
+        {
+            var query = new DeleteProductTypeCommand(id);
+            var result = await sender.Send(query);
+            var response = result.Adapt<DeleteProductTypeResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("DeleteProductTypeResponse")
+        .Produces<DeleteProductTypeResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Delete ProductType")
+        .WithDescription("Delete ProductType.");
     }
 
 }

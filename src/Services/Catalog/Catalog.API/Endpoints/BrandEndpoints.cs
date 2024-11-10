@@ -1,6 +1,6 @@
 ﻿using Catalog.Application.Brands.Commands.CreateBrand;
 using Catalog.Application.Brands.Queries;
-
+using Catalog.Application.Brands.Commands.DeleteBrand;
 
 namespace Catalog.API.Endpoints;
 
@@ -12,6 +12,7 @@ public static class BrandEndpoints
     string Name
         );
     public record CreateBrandResponse(Guid Id);
+    public record DeleteBrandResponse(bool IsSuccess);
 
     public static void MapBrandEndpoints(this IEndpointRouteBuilder app)
     {
@@ -39,6 +40,19 @@ public static class BrandEndpoints
        .ProducesProblem(StatusCodes.Status400BadRequest)
        .WithSummary("Get brands")
        .WithDescription("Retrieve a list of all available brands.");
+
+        app.MapDelete("/api/brands/{id}", async (Guid id, ISender sender) =>
+        {
+            var query = new DeleteBrandCommand(id);
+            var result = await sender.Send(query);
+            var response = result.Adapt<DeleteBrandResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("DeleteBrandResponse")
+        .Produces<DeleteBrandResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Delete Brand")
+        .WithDescription("Delete Brand.");
     }
 
 }
