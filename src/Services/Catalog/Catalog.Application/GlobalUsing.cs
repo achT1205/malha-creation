@@ -1,8 +1,6 @@
-﻿global using Catalog.Domain.Models;  
+﻿global using Catalog.Domain.Models;
 global using Microsoft.EntityFrameworkCore;
-global using Catalog.Application.Events.Integration;
 global using Catalog.Domain.Events;
-global using Mapster;
 global using MassTransit;
 global using MediatR;
 global using Microsoft.Extensions.Logging;

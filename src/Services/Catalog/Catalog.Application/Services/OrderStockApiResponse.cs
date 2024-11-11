@@ -1,3 +1,3 @@
 ﻿namespace Catalog.Application.Services;
 
-public record OrderStockApiResponse(OrderStockDto OrderStock);
+public record OrderStockApiResponse(OrderStockDto Order);

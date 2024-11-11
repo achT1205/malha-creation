@@ -12,7 +12,9 @@ public class GetOrderForStockValidationQueryHandler(IApplicationDbContext dbCont
         var totalCount = await dbContext.Orders.LongCountAsync(cancellationToken);
 
         var order = await dbContext.Orders
-                       .FirstOrDefaultAsync(_=> _.Id == OrderId.Of(query.Id));
+            .Include(o => o.OrderItems)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(_=> _.Id == OrderId.Of(query.Id));
 
         return new GetOrderForStockValidationResult(order.ToOrderStockDto());
     }

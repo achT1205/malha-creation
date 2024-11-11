@@ -6,11 +6,33 @@ public class OrderUpdatedEventHandler(IPublishEndpoint publishEndpoint, ILogger<
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
 
-        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.StockConfirmed)
+        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.GracePeriodConfirmed)
         {
-            var evt = new OrderStatusChangedToStockConfirmedEvent(domainEvent.order.Id.Value, domainEvent.status.ToString());
+
+        }
+
+        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.Validated)
+        {
+            var evt = new OrderValidationSucceededEvent(domainEvent.order.Id.Value);
 
             await publishEndpoint.Publish(evt, cancellationToken);
+        }
+
+        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.StockConfirmed)
+        {
+            var evt = new StartOrderPaymentEvent(domainEvent.order.Id.Value);
+
+            await publishEndpoint.Publish(evt, cancellationToken);
+        }
+
+        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.Rejected)
+        {
+
+        }
+
+        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.Paid)
+        {
+
         }
     }
 }

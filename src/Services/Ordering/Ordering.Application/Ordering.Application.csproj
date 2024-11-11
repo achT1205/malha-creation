@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Orders\Events\" />
+  </ItemGroup>
+
 </Project>

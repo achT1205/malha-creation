@@ -31,7 +31,7 @@ public class OrderingService : IOrderingService
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
 
-                return resp?.OrderStock;
+                return resp?.Order;
             }
 
             throw new InternalServerException(response.Content.ToString());

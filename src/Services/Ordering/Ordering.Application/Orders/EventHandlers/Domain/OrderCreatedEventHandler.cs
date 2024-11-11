@@ -9,8 +9,8 @@ public class OrderCreatedEventHandler
 
         if (await featureManager.IsEnabledAsync("OrderFullfilment"))
         {
-            var orderCreatedIntegrationEvent = domainEvent.order;
-            await publishEndpoint.Publish(orderCreatedIntegrationEvent, cancellationToken);
+            var ent = new OrderStartedEvent() { UserId = domainEvent.order.CustomerId.Value };
+            await publishEndpoint.Publish(ent, cancellationToken);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Ordering.Domain.Orders.AllowedTransitions;
 using Ordering.Domain.Orders.Enums;
-using Ordering.Domain.Orders.Events;
 
 namespace Ordering.Domain.Orders.Models;
 
@@ -33,8 +32,8 @@ public class Order : Aggregate<OrderId>
             BillingAddress = billingAddress,
             Payment = payment,
             Status = OrderStatus.Draft,
-            CreatedAt = DateTime.UtcNow,
-            GracePeriodEnd = DateTime.UtcNow.AddMinutes(10)
+            CreatedAt = DateTime.Now,
+            GracePeriodEnd = DateTime.Now.AddMinutes(2)
         };
         order.AddDomainEvent(new OrderCreatedEvent(order));
         return order;
@@ -49,7 +48,7 @@ public class Order : Aggregate<OrderId>
         }
 
         Status = newStatus;
-        LastModified = DateTime.UtcNow;
+        LastModified = DateTime.Now;
 
         AddDomainEvent(new OrderStatusChangedEvent(this, newStatus));
     }
@@ -171,7 +170,7 @@ public class Order : Aggregate<OrderId>
         }
 
         ShippingAddress = newShippingAddress;
-        LastModified = DateTime.UtcNow;
+        LastModified = DateTime.Now;
         AddDomainEvent(new ShippingAddressUpdatedEvent(this));
     }
 
@@ -183,7 +182,7 @@ public class Order : Aggregate<OrderId>
         }
 
         BillingAddress = newBillingAddress;
-        LastModified = DateTime.UtcNow;
+        LastModified = DateTime.Now;
         AddDomainEvent(new BillingAddressUpdatedEvent(this));
     }
 
@@ -195,7 +194,7 @@ public class Order : Aggregate<OrderId>
         }
 
         Payment = newPayment;
-        LastModified = DateTime.UtcNow;
+        LastModified = DateTime.Now;
         AddDomainEvent(new PaymentUpdatedEvent(this));
     }
 }

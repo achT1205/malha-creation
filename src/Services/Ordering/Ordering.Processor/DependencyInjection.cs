@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Ordering.Processor.Models;
-using Ordering.Processor.Services;
+﻿using Ordering.Processor.Services;
 
 namespace Ordering.Processor;
 
@@ -15,6 +13,7 @@ public static class DependencyInjection
             .BindConfiguration(nameof(BackgroundTaskOptions));
 
         services.AddHostedService<GracePeriodManagerService>();
+        services.AddHostedService<OrderValidationManagerService>();
 
         return services;
     }

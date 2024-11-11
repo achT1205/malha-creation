@@ -9,6 +9,7 @@ using Ordering.Application.Orders.Commands.UpdatePayment;
 using Ordering.Application.Orders.Commands.UpdateShippingAddress;
 using Ordering.Application.Orders.Queries.GetOrders;
 using Ordering.Application.Orders.Queries.GetOrdersByCustomer;
+using Ordering.Application.Orders.Queries.GetOrdersById;
 using Ordering.Application.Orders.Queries.GetOrdersByOrderCode;
 using Ordering.Application.Orders.Queries.GetOrdersForStockValidation;
 
@@ -39,6 +40,7 @@ public static class OrderEndpoints
     public record GetOrdersByCustomerResponse(IEnumerable<OrderDto> Orders);
     public record GetOrdersByCodeResponse(IEnumerable<OrderDto> Orders);
     public record GetOrderForStockValidationResponse(OrderStockDto Order);
+    public record GetOrderByIdResponse(OrderDto Order);
     public static void MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/orders", async (CreateOrderRequest request, ISender sender) =>
@@ -145,9 +147,9 @@ public static class OrderEndpoints
         .WithSummary("Confirmed Stock For the Order")
         .WithDescription("Confirmed Stock For the Order");
 
-        app.MapGet("/api/orders/{code}", async (string code, ISender sender) =>
+        app.MapGet("/api/order-by-code/{code}", async (string code, ISender sender) =>
         {
-            var result = await sender.Send(new GetOrdersByOrderCodeQuery(code));
+            var result = await sender.Send(new GetOrderByOrderCodeQuery(code));
 
             var response = result.Adapt<GetOrdersByCodeResponse>();
 
@@ -191,6 +193,8 @@ public static class OrderEndpoints
         .WithSummary("Get Orders")
         .WithDescription("Get Orders");
 
+
+
         app.MapGet("/api/orders/customer/{customerId}", async (Guid customerId, ISender sender) =>
         {
             var result = await sender.Send(new GetOrdersByCustomerQuery(customerId));
@@ -205,5 +209,22 @@ public static class OrderEndpoints
        .ProducesProblem(StatusCodes.Status404NotFound)
        .WithSummary("Get Orders By Customer")
        .WithDescription("Get Orders By Customer");
+
+        app.MapGet("/api/orders/{id}", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new GetOrdersByIdQuery(id));
+
+            var response = result.Adapt<GetOrderByIdResponse>();
+
+            return Results.Ok(response);
+        })
+        .WithName("Get Order By Id")
+        .Produces<GetOrderByIdResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Get Order By Id")
+        .WithDescription("Get Order By Id");
+
+        
     }
 }

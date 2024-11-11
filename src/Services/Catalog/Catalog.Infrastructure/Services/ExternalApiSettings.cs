@@ -2,6 +2,6 @@
 {
     public class ExternalApiSettings
     {
-        public string OrderApiUrl = default!;
+        public string OrderApiUrl { set; get; } = default!;
     }
 }

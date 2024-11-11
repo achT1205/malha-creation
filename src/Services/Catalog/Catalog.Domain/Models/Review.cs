@@ -23,7 +23,7 @@ public class Review : Entity<ReviewId>
         ReviewerId = reviewerId ?? throw new ArgumentNullException(nameof(reviewerId));
         Rating = rating ?? throw new ArgumentNullException(nameof(rating));
         Comment = comment;
-        DatePosted = DateTime.UtcNow;
+        DatePosted = DateTime.Now;
         _helpfulVotes = 0;
     }
 

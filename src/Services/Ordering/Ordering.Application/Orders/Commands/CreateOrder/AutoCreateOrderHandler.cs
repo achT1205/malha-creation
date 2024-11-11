@@ -32,8 +32,8 @@ public class AutoCreateOrderCommandHandler(
     public async Task<CreateOrderResult> Handle(AutoCreateOrderCommand command, CancellationToken cancellationToken)
     {
         // Add Integration event to clean the basket
-        var orderStartedEvent = new OrderStartedEvent() { UserId = command.CustomerId };
-        await publishEndpoint.Publish(orderStartedEvent, cancellationToken);
+        //var orderStartedEvent = new OrderStartedEvent() { UserId = command.CustomerId };
+        //await publishEndpoint.Publish(orderStartedEvent, cancellationToken);
 
         var order =  CreateNewOrder(command);
         order.SubmitForProcessing();

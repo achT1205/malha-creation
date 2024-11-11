@@ -4,9 +4,9 @@ namespace Ordering.Application.Orders.EventHandlers.Integration;
 
 public class OrderPaymentSucceededIntegrationEventHandler
     (ISender sender, ILogger<OrderPaymentSucceededIntegrationEventHandler> logger)
-    : IConsumer<OrderPaymentSucceededIntegrationEvent>
+    : IConsumer<OrderPaymentSucceededEvent>
 {
-    public async Task Consume(ConsumeContext<OrderPaymentSucceededIntegrationEvent> context)
+    public async Task Consume(ConsumeContext<OrderPaymentSucceededEvent> context)
     {
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
 

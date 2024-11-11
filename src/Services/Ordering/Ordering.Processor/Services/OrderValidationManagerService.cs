@@ -1,6 +1,9 @@
-﻿namespace Ordering.Processor.Services;
+﻿using Ordering.Application.Orders.Commands.ValidateRoder;
+using Ordering.Application.Orders.Queries.GetGraceTimeConfirmedOrders;
 
-public class GracePeriodManagerService : BackgroundService
+namespace Ordering.Processor.Services;
+
+public class OrderValidationManagerService : BackgroundService
 {
     private readonly BackgroundTaskOptions _options;
     private readonly ILogger _logger;
@@ -8,7 +11,7 @@ public class GracePeriodManagerService : BackgroundService
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
-    public GracePeriodManagerService(
+    public OrderValidationManagerService(
         IOptions<BackgroundTaskOptions> options,
         ILogger<GracePeriodManagerService> logger,
         IServiceProvider serviceProvider,
@@ -41,11 +44,13 @@ public class GracePeriodManagerService : BackgroundService
             {
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-               var result = await mediator.Send(new GetGraceTimeOrdersQuery(), cancellationToken);
+               var result = await mediator.Send(new GetGraceTimeConfirmedOrdersQuery(), cancellationToken);
                 if (result != null && result.orders.Any()) {
                     foreach (var o in result.orders)
                     {
-                        var commad = new ConfirmGracePeriodCommand(o.Id);
+                        // implement all valivation here 
+
+                        var commad = new ValidateRoderCommand(o.Id);
 
                         await mediator.Send(commad);
                     }
