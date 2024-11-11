@@ -1,4 +1,7 @@
-﻿namespace Ordering.Application.Orders.EventHandlers.Domain;
+﻿using Ordering.Domain.Orders.Enums;
+using System.ComponentModel.DataAnnotations;
+
+namespace Ordering.Application.Orders.EventHandlers.Domain;
 public class OrderUpdatedEventHandler(IPublishEndpoint publishEndpoint, ILogger<OrderUpdatedEventHandler> logger)
     : INotificationHandler<OrderStatusChangedEvent>
 {
@@ -6,31 +9,56 @@ public class OrderUpdatedEventHandler(IPublishEndpoint publishEndpoint, ILogger<
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
 
-        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.GracePeriodConfirmed)
+        if (domainEvent.status == OrderStatus.Pending)
         {
 
         }
 
-        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.Validated)
+        if (domainEvent.status == OrderStatus.GracePeriodConfirmed)
+        {
+
+        }
+
+        if (domainEvent.status == OrderStatus.Validated)
         {
             var evt = new OrderValidationSucceededEvent(domainEvent.order.Id.Value);
 
             await publishEndpoint.Publish(evt, cancellationToken);
         }
 
-        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.StockConfirmed)
+        if (domainEvent.status == OrderStatus.StockConfirmed)
         {
             var evt = new StartOrderPaymentEvent(domainEvent.order.Id.Value);
 
             await publishEndpoint.Publish(evt, cancellationToken);
         }
 
-        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.Rejected)
+        if (domainEvent.status == OrderStatus.Rejected)
         {
 
         }
 
-        if (domainEvent.status == Ordering.Domain.Orders.Enums.OrderStatus.Paid)
+        if (domainEvent.status == OrderStatus.Paid)
+        {
+
+        }
+
+        if (domainEvent.status == OrderStatus.Shipped)
+        {
+
+        }
+
+        if (domainEvent.status == OrderStatus.Shipped)
+        {
+
+        }
+
+        if (domainEvent.status == OrderStatus.Completed)
+        {
+
+        }
+
+        if (domainEvent.status == OrderStatus.Deleted)
         {
 
         }
