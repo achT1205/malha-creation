@@ -12,7 +12,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddOptions<BackgroundTaskOptions>()
-     .BindConfiguration(nameof(BackgroundTaskOptions));
+            .BindConfiguration(nameof(BackgroundTaskOptions));
 
         services.AddHostedService<GracePeriodManagerService>();
 

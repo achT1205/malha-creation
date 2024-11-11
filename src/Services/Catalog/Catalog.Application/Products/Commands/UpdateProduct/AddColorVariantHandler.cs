@@ -38,7 +38,7 @@ public class AddColorVariantCommandHandler : ICommandHandler<AddColorVariantComm
             {
                 throw new NotFoundException($"The product {command.Id} was not found");
             }
-            if (product.ProductType != Domain.Enums.ProductTypeEnum.Clothing)
+            if (product.ProductType != ProductType.Clothing)
             {
                 if (!command.Price.HasValue || command.Price.Value <= 0)
                     throw new ArgumentException("Price must greater than 0.", nameof(Price));
@@ -52,7 +52,7 @@ public class AddColorVariantCommandHandler : ICommandHandler<AddColorVariantComm
             var newColorVariant = ColorVariant.Create(
                     product.Id,
                     Color.Of(command.Color),
-                    Slug.Of(product.UrlFriendlyName.Value, command.Color),
+                    Slug.Of(product.UrlFriendlyName, Color.Of(command.Color)),
                     ColorVariantPrice.Of("USD" , command.Price),
                     ColorVariantQuantity.Of(command.Quantity),
                     ColorVariantQuantity.Of(command.RestockThreshold));
@@ -62,13 +62,12 @@ public class AddColorVariantCommandHandler : ICommandHandler<AddColorVariantComm
                 var newImage = Image.Of(image.ImageSrc, image.AltText);
                 newColorVariant.AddImage(newImage);
             }
-            if (product.ProductType == Domain.Enums.ProductTypeEnum.Clothing && command.SizeVariants.Any())
+            if (product.ProductType == ProductType.Clothing && command.SizeVariants.Any())
             {
                 foreach (var sizeVariant in command.SizeVariants)
                 {
                     var newSizeVariant = SizeVariant.Create(
                         newColorVariant.Id,
-                        SizeVariantId.Of(Guid.NewGuid()),
                         Size.Of(sizeVariant.Size),
                         Price.Of("USD", sizeVariant.Price),
                         Quantity.Of(sizeVariant.Quantity),

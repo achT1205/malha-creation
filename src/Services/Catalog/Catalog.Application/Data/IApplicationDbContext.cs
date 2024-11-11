@@ -7,7 +7,7 @@ public interface IApplicationDbContext
     DbSet<Material> Materials { get; set; }
     DbSet<Occasion> Occasions { get; set; }
     DbSet<Product> Products { get; set; }
-    DbSet<ProductType> ProductTypes { get; set; }
+    //DbSet<ProductType> ProductTypes { get; set; }
     DbSet<Brand> Brands { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 

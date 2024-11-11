@@ -11,7 +11,7 @@ public class UpdateBillingAddressCommandHandler(IApplicationDbContext dbContext)
         {
             throw new OrderNotFoundException(command.Id);
         }
-        var billingAddress = Address.Of(command.Address.FirstName, command.Address.LastName, command.Address.EmailAddress, command.Address.AddressLine, command.Address.Country, command.Address.State, command.Address.ZipCode);
+        var billingAddress = Address.Of(command.Address.FirstName, command.Address.LastName, command.Address.EmailAddress, command.Address.AddressLine, command.Address.Country, command.Address.City, command.Address.ZipCode);
         
         order.UpdateBillingAddress(billingAddress);
         

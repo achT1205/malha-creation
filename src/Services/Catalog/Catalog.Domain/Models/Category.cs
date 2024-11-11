@@ -15,9 +15,9 @@ public class Category : Entity<CategoryId>
         Name = name;
     }
 
-    public static Category Create( CategoryName name)
+    public static Category Create(CategoryId categoryId, CategoryName name)
     {
 
-        return new Category(CategoryId.Of(Guid.NewGuid()), name);
+        return new Category(categoryId, name);
     }
 }

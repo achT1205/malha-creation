@@ -15,19 +15,19 @@ public class SizeVariant : Entity<SizeVariantId>
     {
 
     }
-    private SizeVariant(ColorVariantId colorVariantId, SizeVariantId sizeVariantId, Size size, Price price, Quantity quantity, Quantity restockThreshold)
+    private SizeVariant(ColorVariantId colorVariantId, Size size, Price price, Quantity quantity, Quantity restockThreshold)
     {
         ColorVariantId = colorVariantId ?? throw new ArgumentNullException(nameof(colorVariantId)); ;
-        Id = sizeVariantId ?? throw new ArgumentNullException(nameof(sizeVariantId)); ;
+        Id = SizeVariantId.Of(Guid.NewGuid());
         Size = size ?? throw new ArgumentNullException(nameof(size));
         Price = price ?? throw new ArgumentNullException(nameof(price));
         Quantity = quantity ?? throw new ArgumentNullException(nameof(quantity));
         RestockThreshold = restockThreshold ?? throw new ArgumentNullException(nameof(restockThreshold));
     }
 
-    public static SizeVariant Create(ColorVariantId colorVariantId, SizeVariantId sizeVariantId, Size size, Price price, Quantity quantity, Quantity restockThreshold)
+    public static SizeVariant Create(ColorVariantId colorVariantId, Size size, Price price, Quantity quantity, Quantity restockThreshold)
     {
-        return new SizeVariant(colorVariantId, sizeVariantId, size, price, quantity, restockThreshold);
+        return new SizeVariant(colorVariantId, size, price, quantity, restockThreshold);
     }
 
     public void UpdatePrice(Price newPrice)

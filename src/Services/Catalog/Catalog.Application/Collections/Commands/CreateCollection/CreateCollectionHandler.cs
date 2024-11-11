@@ -28,7 +28,7 @@ public class CreateCollectionCommandHandler : ICommandHandler<CreateCollectionCo
     public async Task<CreateCollectionResult> Handle(CreateCollectionCommand command, CancellationToken cancellationToken)
     {
         var image = Image.Of(command.ImageSrc, command.AltText);
-        var collection = Collection.Create(command.Name, image);
+        var collection = Collection.Create(CollectionId.Of(Guid.NewGuid()), command.Name, image);
         await _CollectionRepository.AddAsync(collection);
         await _CollectionRepository.SaveChangesAsync();
         return new CreateCollectionResult(collection.Id.Value);

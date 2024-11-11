@@ -13,7 +13,7 @@ using Ordering.Infrastructure.Data;
 namespace Ordering.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241108183312_Create_Database")]
+    [Migration("20241111153734_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -59,6 +59,11 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasMaxLength(180)
                                 .HasColumnType("nvarchar(180)");
 
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
                             b1.Property<string>("Country")
                                 .IsRequired()
                                 .HasMaxLength(50)
@@ -75,11 +80,6 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("LastName")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.Property<string>("State")
                                 .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
@@ -118,7 +118,7 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasMaxLength(3)
                                 .HasColumnType("nvarchar(3)");
 
-                            b1.Property<string>("CardName")
+                            b1.Property<string>("CardHolderName")
                                 .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
@@ -146,6 +146,11 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasMaxLength(180)
                                 .HasColumnType("nvarchar(180)");
 
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
                             b1.Property<string>("Country")
                                 .IsRequired()
                                 .HasMaxLength(50)
@@ -162,11 +167,6 @@ namespace Ordering.Infrastructure.Data.Migrations
                                 .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("LastName")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.Property<string>("State")
                                 .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
@@ -215,7 +215,6 @@ namespace Ordering.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Size")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Slug")

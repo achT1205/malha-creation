@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Products.Commands.AddColorVariant;
+﻿using BuildingBlocks.Pagination;
+using Catalog.Application.Products.Commands.AddColorVariant;
 using Catalog.Application.Products.Commands.AddColorVariantStock;
 using Catalog.Application.Products.Commands.AddSizeVariant;
 using Catalog.Application.Products.Commands.AddSizeVariantStock;
@@ -28,7 +29,7 @@ public static class ProductEndpoints
     bool OnReorder,
     ImageDto CoverImage,
     Guid ProductTypeId,
-    ProductTypeEnum ProductType,
+    ProductType ProductType,
     Guid MaterialId,
     Guid BrandId,
     Guid CollectionId,
@@ -290,9 +291,9 @@ public static class ProductEndpoints
         .WithDescription("Delete Product.");
 
 
-        app.MapGet("/api/products", async (ISender sender) =>
+        app.MapGet("/api/products", async ([AsParameters] PaginationRequest request, ISender sender) =>
         {
-            var query = new GetProductsQuery();
+            var query = new GetProductsQuery(request);
             var result = await sender.Send(query);
             return Results.Ok(result);
         })

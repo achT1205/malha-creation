@@ -2,7 +2,7 @@
 
 public class OrderItem : Entity<OrderItemId>
 {
-    internal OrderItem(OrderId orderId, ProductId productId, int quantity, decimal price, string color, string size, string productName, string slug)
+    internal OrderItem(OrderId orderId, ProductId productId, int quantity, decimal price, string color, string? size, string productName, string slug)
     {
         Id = OrderItemId.Of(Guid.NewGuid());
         OrderId = orderId;
@@ -19,7 +19,7 @@ public class OrderItem : Entity<OrderItemId>
     public int Quantity { get; private set; } = default!;
     public decimal Price { get; private set; } = default!;
     public string Color { get; set; } = default!;
-    public string Size { get; set; } = default!;
+    public string? Size { get; set; } = default!;
     public string ProductName { get; private set; } = default!;
     public string Slug { get; private set; } = default!;
 }

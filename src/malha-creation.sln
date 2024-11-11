@@ -25,7 +25,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ordering.Application", "Ser
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{4A710381-B6B4-45B5-AD03-B4BFB2B5E255}"
 	ProjectSection(SolutionItems) = preProject
+		AccessoryProduct.json = AccessoryProduct.json
+		ClothingProducts.json = ClothingProducts.json
 		Note = Note
+		products.json = products.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ordering.API", "Services\Ordering\Ordering.API\Ordering.API.csproj", "{25E5F97E-B7E7-4216-8EC9-A87B755F3CD4}"
@@ -52,11 +55,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auth", "Auth", "{912EB845-4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.API", "Services\Auth\Auth.API\Auth.API.csproj", "{AABF8950-CAFD-429F-9D58-E33F7B1F1B4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ordering.Processor", "Services\Ordering\Ordering.Processor\Ordering.Processor.csproj", "{1FE9F460-EAA4-4D1D-B386-A5EFF13BB854}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ordering.Processor", "Services\Ordering\Ordering.Processor\Ordering.Processor.csproj", "{1FE9F460-EAA4-4D1D-B386-A5EFF13BB854}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Payment", "Payment", "{7F4271E7-29C0-4C26-99FE-7C5FCD62930E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentProcessor", "Services\Payment\PaymentProcessor\PaymentProcessor.csproj", "{E8CBAAFE-B2D9-4D9C-8DF4-5262C679B218}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaymentProcessor", "Services\Payment\PaymentProcessor\PaymentProcessor.csproj", "{E8CBAAFE-B2D9-4D9C-8DF4-5262C679B218}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

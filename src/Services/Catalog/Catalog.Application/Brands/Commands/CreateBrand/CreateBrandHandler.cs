@@ -22,7 +22,7 @@ public class CreateBrandCommandHandler : ICommandHandler<CreateBrandCommand, Cre
     }
     public async Task<CreateBrandResult> Handle(CreateBrandCommand command, CancellationToken cancellationToken)
     {
-        var brand = Brand.Create(BrandName.Of(command.Name));
+        var brand = Brand.Create(BrandId.Of(Guid.NewGuid()), BrandName.Of(command.Name));
 
         await _brandRepository.AddAsync(brand);
         await _brandRepository.SaveChangesAsync();

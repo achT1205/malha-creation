@@ -39,13 +39,12 @@ public class AddSizeVariantCommandHandler : ICommandHandler<AddSizeVariantComman
             {
                 throw new NotFoundException($"The product {command.Id} was not found");
             }
-            if(product.ProductType != ProductTypeEnum.Clothing)
+            if(product.ProductType != ProductType.Clothing)
             {
                 throw new NotFoundException($"This product can not have size variants");
             }
             var sizeVariant = SizeVariant.Create(
                ColorVariantId.Of(command.ColorVariantId),
-               SizeVariantId.Of(Guid.NewGuid()),
                Size.Of(command.Size),
                Price.Of("USD", command.Price),
                Quantity.Of(command.Quantity),

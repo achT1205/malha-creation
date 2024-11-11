@@ -1,11 +1,4 @@
-﻿using Catalog.Application.Brands.Queries;
-using Catalog.Application.Categories.Queries;
-using Catalog.Application.Collections.Queries;
-using Catalog.Application.Materials.Queries;
-using Catalog.Application.Occasions.Queries;
-using Catalog.Application.ProductTypes.Queries;
-
-namespace Catalog.Application.Dtos;
+﻿namespace Catalog.Application.Dtos;
 
 public record ProductDto
 (
@@ -14,8 +7,8 @@ public record ProductDto
     string UrlFriendlyName,
     string Description,
     bool IsHandmade,
+    ProductType ProductType,
     ImageDto CoverImage,
-    ProductTypeDto ProductType,
     MaterialDto Material,
     CollectionDto Collection,
     BrandDto Brand,
@@ -28,7 +21,7 @@ public record ProductDto
 public record ProductStockDto
 (
     Guid Id,
-    ProductTypeEnum ProductType, 
+    ProductType ProductType, 
     List<StockColorVariantDto> ColorVariants
 );
 

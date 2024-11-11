@@ -1,6 +1,6 @@
-﻿using Cart.API.Cart.Commands.DeleteCart;
+﻿using BuildingBlocks.Messaging.Events;
+using Cart.API.Cart.Commands.DeleteCart;
 using MassTransit;
-using ShoppingCart.API.Events.IntegrationEvent;
 
 namespace ShoppingCart.API.EventHandlers.IntegrationEvents;
 

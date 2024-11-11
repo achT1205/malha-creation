@@ -1,7 +1,4 @@
-﻿using Catalog.Domain.Events;
-using Catalog.Domain.ValueObjects;
-
-namespace Catalog.Domain.Models;
+﻿namespace Catalog.Domain.Models;
 
 public class ColorVariant : Entity<ColorVariantId>
 {

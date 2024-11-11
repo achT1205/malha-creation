@@ -22,9 +22,10 @@ public static class DatabaseExtentions
         await SeedCategoryAsync(context);
         await SeedOccasionAsync(context);
         await SeedMaterialAsync(context);
-        await SeedProductTypeAsync(context);
+        //await SeedProductTypeAsync(context);
         await SeedCollectionAsync(context);
         await SeedBrandsAsync(context);
+        //await SeedProductsAsync(context);
     }
 
 
@@ -55,14 +56,14 @@ public static class DatabaseExtentions
         }
     }
 
-    private static async Task SeedProductTypeAsync(ApplicationDbContext context)
-    {
-        if (!await context.ProductTypes.AnyAsync())
-        {
-            await context.ProductTypes.AddRangeAsync(InitialData.ProductTypes);
-            await context.SaveChangesAsync();
-        }
-    }
+    //private static async Task SeedProductTypeAsync(ApplicationDbContext context)
+    //{
+    //    if (!await context.ProductTypes.AnyAsync())
+    //    {
+    //        await context.ProductTypes.AddRangeAsync(InitialData.ProductTypes);
+    //        await context.SaveChangesAsync();
+    //    }
+    //}
 
     private static async Task SeedCollectionAsync(ApplicationDbContext context)
     {
@@ -78,6 +79,15 @@ public static class DatabaseExtentions
         if (!await context.Brands.AnyAsync())
         {
             await context.Brands.AddRangeAsync(InitialData.Brands);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedProductsAsync(ApplicationDbContext context)
+    {
+        if (!await context.Products.AnyAsync())
+        {
+            await context.Products.AddRangeAsync(InitialData.Products);
             await context.SaveChangesAsync();
         }
     }

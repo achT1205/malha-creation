@@ -30,7 +30,7 @@ public class CreateOrderCommandHandler(
     public async Task<CreateOrderResult> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
         // Add Integration event to clean the basket
-        var orderStartedEvent = new OrderStartedEvent(command.CustomerId);
+        var orderStartedEvent = new OrderStartedEvent() { UserId = command.CustomerId };
         await publishEndpoint.Publish(orderStartedEvent);
 
         var order = await CreateNewOrder(command);
@@ -51,8 +51,8 @@ public class CreateOrderCommandHandler(
 
     private async Task<Order> CreateNewOrder(CreateOrderCommand orderDto)
     {
-        var shippingAddress = Address.Of(orderDto.ShippingAddress.FirstName, orderDto.ShippingAddress.LastName, orderDto.ShippingAddress.EmailAddress, orderDto.ShippingAddress.AddressLine, orderDto.ShippingAddress.Country, orderDto.ShippingAddress.State, orderDto.ShippingAddress.ZipCode);
-        var billingAddress = Address.Of(orderDto.BillingAddress.FirstName, orderDto.BillingAddress.LastName, orderDto.BillingAddress.EmailAddress, orderDto.BillingAddress.AddressLine, orderDto.BillingAddress.Country, orderDto.BillingAddress.State, orderDto.BillingAddress.ZipCode);
+        var shippingAddress = Address.Of(orderDto.ShippingAddress.FirstName, orderDto.ShippingAddress.LastName, orderDto.ShippingAddress.EmailAddress, orderDto.ShippingAddress.AddressLine, orderDto.ShippingAddress.Country, orderDto.ShippingAddress.City, orderDto.ShippingAddress.ZipCode);
+        var billingAddress = Address.Of(orderDto.BillingAddress.FirstName, orderDto.BillingAddress.LastName, orderDto.BillingAddress.EmailAddress, orderDto.BillingAddress.AddressLine, orderDto.BillingAddress.Country, orderDto.BillingAddress.City, orderDto.BillingAddress.ZipCode);
         var orderId = Guid.NewGuid();
         var newOrder = Order.Create(
                 id: OrderId.Of(orderId),
@@ -60,7 +60,7 @@ public class CreateOrderCommandHandler(
                 OrderCode: OrderCode.Of(OrderCodeGenerator.GenerateOrderCode(orderDto.CustomerId)),
                 shippingAddress: shippingAddress,
                 billingAddress: billingAddress,
-                payment: Payment.Of(orderDto.Payment.CardName, orderDto.Payment.CardNumber, orderDto.Payment.Expiration, orderDto.Payment.Cvv, orderDto.Payment.PaymentMethod)
+                payment: Payment.Of(orderDto.Payment.CardHolderName, orderDto.Payment.CardNumber, orderDto.Payment.Expiration, orderDto.Payment.Cvv, orderDto.Payment.PaymentMethod)
                 );
 
         foreach (var orderItemDto in orderDto.OrderItems)
@@ -73,7 +73,7 @@ public class CreateOrderCommandHandler(
             }
             decimal price = 0;
             ColorVariant variant = new();
-            if (product?.ProductType == ProductType.Clothing.ToString())
+            if (product?.ProductType == ProductType.Clothing)
             {
                 variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
                 var size = variant?.SizeVariants?.FirstOrDefault(x => x.Size == orderItemDto.Size);
@@ -82,7 +82,7 @@ public class CreateOrderCommandHandler(
             else
             {
                 variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
-                if (variant != null) price = variant.Price.Amount;
+                if (variant != null) price = variant.Price.Amount.Value;
             }
             newOrder.Add(OrderId.Of(orderId), ProductId.Of(orderItemDto.ProductId), orderItemDto.Quantity, price, orderItemDto.Color, orderItemDto.Size, product.Name, variant.Slug);
         }

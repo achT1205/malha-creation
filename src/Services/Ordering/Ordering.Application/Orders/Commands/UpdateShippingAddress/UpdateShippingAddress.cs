@@ -11,7 +11,7 @@ public class UpdateShippingAddressCommandHandler(IApplicationDbContext dbContext
         {
             throw new OrderNotFoundException(command.Id);
         }
-        var address = Address.Of(command.Address.FirstName, command.Address.LastName, command.Address.EmailAddress, command.Address.AddressLine, command.Address.Country, command.Address.State, command.Address.ZipCode);
+        var address = Address.Of(command.Address.FirstName, command.Address.LastName, command.Address.EmailAddress, command.Address.AddressLine, command.Address.Country, command.Address.City, command.Address.ZipCode);
         
         order.UpdateShippingAddress(address);
         

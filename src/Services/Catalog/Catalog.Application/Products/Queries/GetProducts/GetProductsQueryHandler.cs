@@ -1,7 +1,9 @@
-﻿namespace Catalog.Application.Products.Queries.GetProducts;
+﻿using BuildingBlocks.Pagination;
 
-public record GetProductsQuery : IQuery<GetProductsQueryResult>;
-public record GetProductsQueryResult(IEnumerable<ProductDto> Products);
+namespace Catalog.Application.Products.Queries.GetProducts;
+
+public record GetProductsQuery(PaginationRequest PaginationRequest) : IQuery<GetProductsQueryResult>;
+public record GetProductsQueryResult(PaginatedResult<ProductDto> Products);
 
 public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, GetProductsQueryResult>
 {
@@ -15,9 +17,17 @@ public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, GetProduc
     }
     public async Task<GetProductsQueryResult> Handle(GetProductsQuery query, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetAllAsync();
-        
+        var (products, totalCount) = await _productRepository.GetAllAsync();
 
-        return new GetProductsQueryResult(products.ToProductDtoList());
+        var pageIndex = query.PaginationRequest.PageIndex;
+        var pageSize = query.PaginationRequest.PageSize;
+
+        return new GetProductsQueryResult(
+            new PaginatedResult<ProductDto>(
+            pageIndex,
+            pageSize,
+            totalCount,
+            products.ToProductDtoList())
+            );
     }
 }

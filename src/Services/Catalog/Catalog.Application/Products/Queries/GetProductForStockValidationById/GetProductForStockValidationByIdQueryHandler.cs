@@ -7,21 +7,18 @@ public record GetProductForStockValidationByIdQueryResult(ProductStockDto Produc
 public class GetProductForStockValidationByIdQueryHandler : IQueryHandler<GetProductForStockValidationByIdQuery, GetProductForStockValidationByIdQueryResult>
 {
     private readonly IProductRepository _productRepository;
-    private readonly IProductTypeRepository _productTypeRepository;
     private readonly IMaterialRepository _materialRepository;
     private readonly ICollectionRepository _collectionRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IOccasionRepository _occasionRepository;
     public GetProductForStockValidationByIdQueryHandler(
         IProductRepository productRepository,
-        IProductTypeRepository productTypeRepository,
         IMaterialRepository materialRepository,
         ICollectionRepository collectionRepository,
         ICategoryRepository categoryRepository,
         IOccasionRepository occasionRepository)
     {
         _productRepository = productRepository;
-        _productTypeRepository = productTypeRepository;
         _materialRepository = materialRepository;
         _collectionRepository = collectionRepository;
         _categoryRepository = categoryRepository;
@@ -36,7 +33,6 @@ public class GetProductForStockValidationByIdQueryHandler : IQueryHandler<GetPro
         {
             throw new KeyNotFoundException($"Product with Id '{query.Id}' not found.");
         }
-        var productType = await _productTypeRepository.GetByIdAsync(product.ProductTypeId);
         var material = await _materialRepository.GetByIdAsync(product.MaterialId);
         var collection = await _collectionRepository.GetByIdAsync(product.CollectionId);
         var categories = await _categoryRepository.GetByIdsAsync(product.CategoryIds.ToList());

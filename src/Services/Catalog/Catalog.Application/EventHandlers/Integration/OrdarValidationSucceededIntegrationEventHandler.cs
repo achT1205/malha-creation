@@ -25,7 +25,7 @@ public class OrdarValidationSucceededIntegrationEventHandler
                 var cv = product.ColorVariants.FirstOrDefault(_ => _.Color == orderItem.Color.ToLower());
                 var sv = cv.SizeVariants.FirstOrDefault(_ => _.Size.ToLower() == orderItem.Size.ToLower());
                 var productCurrentStock = cv.Quantity.Value;
-                if (product.ProductType == Catalog.Domain.Enums.ProductTypeEnum.Clothing)
+                if (product.ProductType == ProductType.Clothing)
                 {
                     productCurrentStock = sv.Quantity;
                 }

@@ -21,7 +21,7 @@ public class CreateMaterialCommandHandler : ICommandHandler<CreateMaterialComman
     }
     public async Task<CreateMaterialResult> Handle(CreateMaterialCommand command, CancellationToken cancellationToken)
     {
-        var type = Material.Create(command.Name);
+        var type = Material.Create(MaterialId.Of(Guid.NewGuid()), command.Name);
         await _materialRepository.AddAsync(type);
         await _materialRepository.SaveChangesAsync();
         return new CreateMaterialResult(type.Id.Value);

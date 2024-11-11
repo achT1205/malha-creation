@@ -1,6 +1,5 @@
 ﻿using Catalog.Application.Interfaces;
 using Catalog.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Repositories;
 
@@ -37,14 +36,18 @@ public class ProductRepository : IProductRepository
     }
 
     // Récupérer tous les produits
-    public async Task<List<Product>> GetAllAsync()
+    public async Task<(List<Product>, long)> GetAllAsync()
     {
-        return await _context.Products
+        var totalCount = await _context.Products.LongCountAsync();
+
+        var products = await _context.Products
             .Include(p => p.ColorVariants)
                 .ThenInclude(cv => cv.Images)
             .Include(p => p.ColorVariants)
                 .ThenInclude(cv => (cv).SizeVariants)
             .ToListAsync();
+
+        return (products, totalCount);
     }
     // Ajouter un nouveau produit
     public async Task AddAsync(Product product)

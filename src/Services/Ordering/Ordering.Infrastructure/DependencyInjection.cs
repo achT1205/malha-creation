@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-using Ordering.Application.Abstractions.Services;
-using Ordering.Infrastructure.Configs;
 using Ordering.Infrastructure.Data;
 using Ordering.Infrastructure.Interceptors;
 using Ordering.Infrastructure.Services;
@@ -32,6 +30,8 @@ public static class DependencyInjection
 
         // Register the external API service
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<ICartService, CartService>();
+
 
         return services;
     }

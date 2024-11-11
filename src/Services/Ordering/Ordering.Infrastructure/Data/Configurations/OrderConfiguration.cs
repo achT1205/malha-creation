@@ -55,7 +55,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
            addressBuilder.Property(a => a.Country)
                .HasMaxLength(50);
 
-           addressBuilder.Property(a => a.State)
+           addressBuilder.Property(a => a.City)
                .HasMaxLength(50);
 
            addressBuilder.Property(a => a.ZipCode)
@@ -84,7 +84,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
               addressBuilder.Property(a => a.Country)
                   .HasMaxLength(50);
 
-              addressBuilder.Property(a => a.State)
+              addressBuilder.Property(a => a.City)
                   .HasMaxLength(50);
 
               addressBuilder.Property(a => a.ZipCode)
@@ -95,7 +95,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.ComplexProperty(
                o => o.Payment, paymentBuilder =>
                {
-                   paymentBuilder.Property(p => p.CardName)
+                   paymentBuilder.Property(p => p.CardHolderName)
                        .HasMaxLength(50);
 
                    paymentBuilder.Property(p => p.CardNumber)

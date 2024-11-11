@@ -6,7 +6,6 @@ public record GetProductByIdQueryResult(ProductDto Product);
 public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, GetProductByIdQueryResult>
 {
     private readonly IProductRepository _productRepository;
-    private readonly IProductTypeRepository _productTypeRepository;
     private readonly IMaterialRepository _materialRepository;
     private readonly ICollectionRepository _collectionRepository;
     private readonly ICategoryRepository _categoryRepository;
@@ -14,7 +13,6 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Get
     private readonly IBrandRepository  _brandRepository;
     public GetProductByIdQueryHandler(
         IProductRepository productRepository,
-        IProductTypeRepository productTypeRepository,
         IMaterialRepository materialRepository,
         ICollectionRepository collectionRepository,
         ICategoryRepository categoryRepository,
@@ -22,7 +20,6 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Get
         IBrandRepository brandRepository)
     {
         _productRepository = productRepository;
-        _productTypeRepository = productTypeRepository;
         _materialRepository = materialRepository;
         _collectionRepository = collectionRepository;
         _categoryRepository = categoryRepository;
@@ -38,7 +35,6 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Get
         {
             throw new KeyNotFoundException($"Product with Id '{query.Id}' not found.");
         }
-        var productType = await _productTypeRepository.GetByIdAsync(product.ProductTypeId);
         var material = await _materialRepository.GetByIdAsync(product.MaterialId);
         var brand = await _brandRepository.GetByIdAsync(product.BrandId);
         var collection = await _collectionRepository.GetByIdAsync(product.CollectionId);
@@ -48,7 +44,6 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Get
         var productDto = product.ToProductDto(
             material,
             collection,
-            productType,
             brand,
             occasions,
             categories);

@@ -12,22 +12,9 @@ public record Slug
     {
         Value = value;
     }
-
-    // Méthode pour créer le slug avec validation
-    public static Slug Of(string urlFriendlyName, string color)
+    public static Slug Of(UrlFriendlyName urlFriendlyName, Color color)
     {
-        if (string.IsNullOrWhiteSpace(urlFriendlyName))
-        {
-            throw new ArgumentException("UrlFriendlyName cannot be null or empty.", nameof(urlFriendlyName));
-        }
-
-        if (string.IsNullOrWhiteSpace(color))
-        {
-            throw new ArgumentException("Color cannot be null or empty.", nameof(color));
-        }
-
-        // Génération du slug
-        string slug = GenerateSlug(urlFriendlyName, color);
+        string slug = GenerateSlug(urlFriendlyName.Value, color.Value);
 
         return new Slug(slug);
     }
@@ -55,7 +42,6 @@ public record Slug
         return slugInput;
     }
 
-    // Optional: Remove diacritics (accents on letters like é, à, etc.)
     private static string RemoveDiacritics(string text)
     {
         var normalizedString = text.Normalize(System.Text.NormalizationForm.FormD);
@@ -72,7 +58,6 @@ public record Slug
 
         return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
     }
-
     public override string ToString() => Value;
 }
 

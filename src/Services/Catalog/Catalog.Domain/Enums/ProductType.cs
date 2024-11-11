@@ -1,6 +1,6 @@
 ﻿namespace Catalog.Domain.Enums;
 
-public enum ProductTypeEnum
+public enum ProductType
 {
     Clothing,
     Accessory,

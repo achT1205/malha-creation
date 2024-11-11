@@ -22,7 +22,7 @@ public class CreateOccasionCommandHandler : ICommandHandler<CreateOccasionComman
     }
     public async Task<CreateOccasionResult> Handle(CreateOccasionCommand command, CancellationToken cancellationToken)
     {
-        var occasion = Occasion.Create(OccasionName.Of(command.Name));
+        var occasion = Occasion.Create(OccasionId.Of(Guid.NewGuid()), OccasionName.Of(command.Name));
         await _OccasionRepository.AddAsync(occasion);
         await _OccasionRepository.SaveChangesAsync();
         return new CreateOccasionResult(occasion.Id.Value);

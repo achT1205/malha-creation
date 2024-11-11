@@ -11,7 +11,7 @@ public class UpdatePaymentCommandHandler(IApplicationDbContext dbContext) : ICom
         {
             throw new OrderNotFoundException(command.Id);
         }
-        var payment = Payment.Of(command.Payment.CardName, command.Payment.CardNumber, command.Payment.Expiration, command.Payment.Cvv, command.Payment.PaymentMethod);
+        var payment = Payment.Of(command.Payment.CardHolderName, command.Payment.CardNumber, command.Payment.Expiration, command.Payment.Cvv, command.Payment.PaymentMethod);
         order.UpdatePayment(payment);
         await dbContext.SaveChangesAsync(cancellationToken);
         return new UpdatePaymentResult(true);

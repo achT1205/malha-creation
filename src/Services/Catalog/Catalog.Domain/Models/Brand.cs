@@ -13,9 +13,9 @@ public class Brand : Entity<BrandId>
         Name = name;
     }
 
-    public static Brand Create(BrandName name)
+    public static Brand Create(BrandId brandId, BrandName name)
     {
 
-        return new Brand(BrandId.Of(Guid.NewGuid()), name);
+        return new Brand(brandId, name);
     }
 }

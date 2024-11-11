@@ -17,9 +17,9 @@ public class Collection : Entity<CollectionId>
     }
 
     // Méthode statique de création pour encapsuler la logique de création
-    public static Collection Create(string name, Image image)
+    public static Collection Create(CollectionId collectionId, string name, Image image)
     {
-        return new Collection(CollectionId.Of(Guid.NewGuid()), name, image);
+        return new Collection(collectionId, name, image);
     }
 
     // Méthode privée pour valider et définir le nom

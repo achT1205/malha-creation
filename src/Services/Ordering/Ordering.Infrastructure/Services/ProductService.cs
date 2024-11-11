@@ -1,12 +1,4 @@
-﻿using BuildingBlocks.Exceptions;
-using Microsoft.Extensions.Options;
-using Ordering.Application.Abstractions.Models;
-using Ordering.Application.Abstractions.Services;
-using Ordering.Infrastructure.Configs;
-using System.Text.Json;
-
-namespace Ordering.Infrastructure.Services;
-
+﻿namespace Ordering.Infrastructure.Services;
 public class ProductService : IProductService
 {
     private readonly HttpClient _httpClient;

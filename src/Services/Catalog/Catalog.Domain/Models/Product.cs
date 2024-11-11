@@ -15,8 +15,7 @@ public class Product : Aggregate<ProductId>
     public Image CoverImage { get; private set; } = default!;
     public bool IsHandmade { get; private set; } = default!;
     public bool OnReorder { get; private set; } = default!;
-    public ProductTypeId ProductTypeId { get; private set; } = default!;
-    public ProductTypeEnum ProductType { get; private set; } = default!;
+    public ProductType ProductType { get; private set; } = default!;
     public MaterialId MaterialId { get; private set; } = default!;
     public BrandId BrandId { get; private set; } = default!;
     public CollectionId CollectionId { get; private set; } = default!;
@@ -27,61 +26,51 @@ public class Product : Aggregate<ProductId>
 
     private Product() { }
     private Product(
-        ProductId id,
         ProductName name,
         UrlFriendlyName urlFriendlyName,
         ProductDescription description,
         bool isHandmade,
         Image coverImage,
-        ProductTypeId productTypeId,
-        ProductTypeEnum productType,
+        ProductType productType,
         MaterialId materialId,
         BrandId brandId,
-        CollectionId collectionId,
-        AverageRating averageRating
+        CollectionId collectionId
         )
     {
-        Id = id;
+        Id = ProductId.Of(Guid.NewGuid());
         Name = name ?? throw new ArgumentNullException(nameof(name));
         UrlFriendlyName = urlFriendlyName ?? throw new ArgumentNullException(nameof(urlFriendlyName));
         Description = description ?? throw new ArgumentNullException(nameof(description));
         IsHandmade = isHandmade;
         CoverImage = coverImage ?? throw new ArgumentNullException(nameof(coverImage));
-        ProductTypeId = productTypeId ?? throw new ArgumentNullException(nameof(productTypeId));
         MaterialId = materialId ?? throw new ArgumentNullException(nameof(materialId));
         BrandId = brandId ?? throw new ArgumentNullException(nameof(brandId));
         CollectionId = collectionId ?? throw new ArgumentNullException(nameof(collectionId));
-        AverageRating = averageRating ?? AverageRating.Of(0, 0);
+        AverageRating = AverageRating.Of(0, 0);
         ProductType = productType;
     }
     public static Product Create(
-        ProductId id,
         ProductName name,
         UrlFriendlyName urlFriendlyName,
         ProductDescription description,
         bool isHandmade,
         Image coverImage,
-        ProductTypeId productTypeId,
-        ProductTypeEnum productType,
+        ProductType productType,
         MaterialId materialId,
         BrandId brandId,
-        CollectionId collectionId,
-        AverageRating averageRating
+        CollectionId collectionId
         )
     {
         var product = new Product(
-             id,
              name,
              urlFriendlyName,
              description,
              isHandmade,
              coverImage,
-             productTypeId,
              productType,
              materialId,
              brandId,
-             collectionId,
-             averageRating
+             collectionId
          );
 
         product.AddDomainEvent(new ProductCreatedEventDomainEvent(product));
@@ -189,7 +178,7 @@ public class Product : Aggregate<ProductId>
         {
             throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
         }
-        if (ProductType == ProductTypeEnum.Clothing)
+        if (ProductType == ProductType.Clothing)
         {
             throw new CatalogDomainException($"Can add stock only to size variant");
         }
@@ -291,7 +280,7 @@ public class Product : Aggregate<ProductId>
 
     public void UpdateColorVariantPrice(ColorVariantId colorVariantId, ColorVariantPrice price)
     {
-        if (ProductType == ProductTypeEnum.Clothing)
+        if (ProductType == ProductType.Clothing)
         {
             throw new CatalogDomainException($"Only Size varaiant price can be changed for this product.");
         }
@@ -312,7 +301,7 @@ public class Product : Aggregate<ProductId>
 
     public void UpdateSizeVariantPrice(ColorVariantId colorVariantId, SizeVariantId sizeVariantId, Price price)
     {
-        if (ProductType != ProductTypeEnum.Clothing)
+        if (ProductType != ProductType.Clothing)
         {
             throw new CatalogDomainException($"Not Clothing product.");
         }

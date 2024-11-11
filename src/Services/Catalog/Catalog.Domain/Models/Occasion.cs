@@ -15,8 +15,8 @@ public class Occasion : Entity<OccasionId>
 
     }
 
-    public static Occasion Create( OccasionName name)
+    public static Occasion Create(OccasionId occasionId, OccasionName name)
     {
-        return new Occasion(OccasionId.Of(Guid.NewGuid()), name);
+        return new Occasion(occasionId, name);
     }
 }

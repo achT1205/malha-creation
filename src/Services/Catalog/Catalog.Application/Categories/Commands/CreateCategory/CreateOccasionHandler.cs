@@ -24,7 +24,7 @@ public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryComman
     }
     public async Task<CreateCategoryResult> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
     {
-        var category = Category.Create(CategoryName.Of(command.Name));
+        var category = Category.Create(CategoryId.Of(Guid.NewGuid()), CategoryName.Of(command.Name));
         await _CategoryRepository.AddAsync(category);
         await _CategoryRepository.SaveChangesAsync();
         return new CreateCategoryResult(category.Id.Value);

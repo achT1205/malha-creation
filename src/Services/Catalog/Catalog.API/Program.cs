@@ -29,7 +29,7 @@ app.MapCategoryEndpoints();
 app.MapCollectionEndpoints();
 app.MapMaterialEndpoints();
 app.MapOccasionEndpoints();
-app.MapProductTypeEndpoints();
+//app.MapProductTypeEndpoints();
 app.MapBrandEndpoints();
 
 app.Run();

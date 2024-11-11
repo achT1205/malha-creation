@@ -11,7 +11,6 @@ public static class ProductExtensions
         this Product product,
         Material material,
         Collection collection,
-        ProductType productType,
         Brand brand,
         List<Occasion>? occasions,
         List<Category>? categories
@@ -21,7 +20,6 @@ public static class ProductExtensions
             product,
             material,
             collection,
-            productType,
             brand,
             occasions,
             categories
@@ -46,7 +44,6 @@ public static class ProductExtensions
          Product product,
         Material material,
         Collection collection,
-        ProductType productType,
         Brand brand,
         List<Occasion>? occasions,
         List<Category>? categories
@@ -58,8 +55,8 @@ public static class ProductExtensions
             UrlFriendlyName: product.UrlFriendlyName.Value,
             Description: product.Description.Value,
             IsHandmade: product.IsHandmade,
+            ProductType: product.ProductType,
             CoverImage: new ImageDto(product.CoverImage.ImageSrc, product.CoverImage.AltText),
-            ProductType: new ProductTypeDto(productType.Id.Value, productType.Name),
             Material: new MaterialDto(material.Id.Value, material.Name),
             Collection: new CollectionDto(collection.Id.Value, collection.Name, collection.Image.ImageSrc, collection.Image.AltText),
             Brand: new BrandDto(brand.Id.Value, brand.Name.Value),
@@ -69,8 +66,12 @@ public static class ProductExtensions
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,
                 Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
-                Price: new PriceDto(cv.Price.Currency, cv.Price.Amount),
-                Quantity: cv.Quantity.Value,
+                Price: 
+                product.ProductType == ProductType.Clothing ? null 
+                : new PriceDto(cv.Price.Currency, cv.Price.Amount),
+                Quantity:
+                product.ProductType == ProductType.Clothing ? null 
+                : cv.Quantity.Value,
                 RestockThreshold: cv.RestockThreshold.Value,
                 Slug: cv.Slug.Value,
                 SizeVariants: cv.SizeVariants.Select(
@@ -89,8 +90,8 @@ public static class ProductExtensions
             UrlFriendlyName: product.UrlFriendlyName.Value,
             Description: product.Description.Value,
             IsHandmade: product.IsHandmade,
+            ProductType: product.ProductType,
             CoverImage: new ImageDto(product.CoverImage.ImageSrc, product.CoverImage.AltText),
-            ProductType: new ProductTypeDto(product.ProductTypeId.Value, ""),
             Material: new MaterialDto(product.MaterialId.Value, ""),
             Collection: new CollectionDto(product.CollectionId.Value,"","", ""),
             Brand: new BrandDto(product.BrandId.Value, ""),
@@ -100,8 +101,12 @@ public static class ProductExtensions
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,
                 Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
-                Price: new PriceDto(cv.Price.Currency, cv.Price.Amount),
-                Quantity: cv.Quantity.Value,
+                Price:
+                product.ProductType == ProductType.Clothing ? null
+                : new PriceDto(cv.Price.Currency, cv.Price.Amount),
+                Quantity:
+                product.ProductType == ProductType.Clothing ? null
+                : cv.Quantity.Value,
                 RestockThreshold: cv.RestockThreshold.Value,
                 Slug: cv.Slug.Value,
                 SizeVariants: cv.SizeVariants.Select(

@@ -326,15 +326,10 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.ProductType)
         .HasConversion(
             s => s.ToString(),
-            dbStatus => (ProductTypeEnum)Enum.Parse(typeof(ProductTypeEnum), dbStatus));
+            dbStatus => (ProductType)Enum.Parse(typeof(ProductType), dbStatus));
 
         builder.Property(p => p.IsHandmade);
         builder.Property(p => p.OnReorder);
-
-        builder.Property(p => p.ProductTypeId)
-            .ValueGeneratedNever().HasConversion(
-            id => id.Value,
-            dbId => ProductTypeId.Of(dbId));
 
         builder.Property(p => p.MaterialId)
             .ValueGeneratedNever().HasConversion(
@@ -359,11 +354,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasOne<Brand>()
             .WithMany()
             .HasForeignKey(p => p.BrandId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne<ProductType>()
-            .WithMany()
-            .HasForeignKey(p => p.ProductTypeId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne<Material>()

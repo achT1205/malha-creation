@@ -7,7 +7,7 @@ public record CreateProductCommand(
     bool IsHandmade,
     ImageDto CoverImage,
     Guid ProductTypeId,
-    ProductTypeEnum ProductType,
+    ProductType ProductType,
     Guid MaterialId,
     Guid BrandId,
     Guid CollectionId,
@@ -30,7 +30,7 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
         RuleFor(x => x.BrandId).NotEmpty().WithMessage("Product Brand  is required");
         RuleFor(x => x.CollectionId).NotEmpty().WithMessage("Product Collection is required");
         RuleFor(x => x.ProductType).IsInEnum().WithMessage("The ProductType is required.");
-        RuleFor(x => x.ProductType == ProductTypeEnum.Clothing || x.ProductType == ProductTypeEnum.Accessory).NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
+        RuleFor(x => x.ProductType == ProductType.Clothing || x.ProductType == ProductType.Accessory).NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
         RuleFor(x => x.UrlFriendlyName)
             .Matches(@"^[a-zA-Z0-9 \-]*$")
             .WithMessage("The field must not contain special characters.");
@@ -40,13 +40,13 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
         RuleFor(x => x.ColorVariants.Count()).GreaterThan(0).WithMessage("ColorVariants is required.");
         RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
         RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0."));
-        When(x => x.ProductType == ProductTypeEnum.Clothing, () =>
+        When(x => x.ProductType == ProductType.Clothing, () =>
         {
             RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.sizeVariants).NotNull().WithMessage("The Sizes can not be null."));
             RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleForEach(x => x.sizeVariants).ChildRules(size => size.RuleFor(x => x.Size).NotEmpty().WithMessage("Size is required for clothing products.")));
             RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleForEach(x => x.sizeVariants).ChildRules(size => size.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero.")));
         });
-        When(x => x.ProductType == ProductTypeEnum.Accessory, () =>
+        When(x => x.ProductType == ProductType.Accessory, () =>
         {
             RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero."));
         });
@@ -85,18 +85,15 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
     {
         var coverImage = Image.Of(command.CoverImage.ImageSrc, command.CoverImage.AltText);
         var product = Product.Create(
-            ProductId.Of(Guid.NewGuid()),
             ProductName.Of(command.Name),
             UrlFriendlyName.Of(command.UrlFriendlyName),
             ProductDescription.Of(command.Description),
             command.IsHandmade,
             coverImage,
-            ProductTypeId.Of(command.ProductTypeId),
             command.ProductType,
             MaterialId.Of(command.MaterialId),
             BrandId.Of(command.BrandId),
-            CollectionId.Of(command.CollectionId),
-            AverageRating.Of(0m, 0)
+            CollectionId.Of(command.CollectionId)
         );
 
         foreach (var id in command.CategoryIds)
@@ -110,7 +107,7 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
         }
         foreach (var colorVariant in command.ColorVariants)
         {
-            if (product.ProductType != Domain.Enums.ProductTypeEnum.Clothing)
+            if (product.ProductType != ProductType.Clothing)
             {
                 if (!colorVariant.Price.HasValue || colorVariant.Price.Value <= 0)
                     throw new ArgumentException("Price must greater than 0.", nameof(Price));
@@ -123,8 +120,10 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
             var newColorVariant = ColorVariant.Create(
                     product.Id,
                     Color.Of(colorVariant.Color),
-                    Slug.Of(command.UrlFriendlyName, colorVariant.Color),
-                    ColorVariantPrice.Of("USD", colorVariant.Price),
+                    Slug.Of(UrlFriendlyName.Of(command.UrlFriendlyName), Color.Of(colorVariant.Color)),
+                    ColorVariantPrice.Of(
+                        product.ProductType == ProductType.Clothing ? null : "USD",
+                        colorVariant.Price),
                     ColorVariantQuantity.Of(colorVariant.Quantity),
                     ColorVariantQuantity.Of(colorVariant.RestockThreshold));
 
@@ -134,15 +133,14 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                 newColorVariant.AddImage(newImage);
             }
 
-            if (product.ProductType == Domain.Enums.ProductTypeEnum.Clothing)
-            {
+            if (product.ProductType == ProductType.Clothing)
+            { 
                 if (!colorVariant.sizeVariants.Any())
                     throw new ArgumentException("sizeVariants are required for Clothing product.", nameof(Quantity));
                 foreach (var sizeVariant in colorVariant.sizeVariants)
                 {
                     var newSizeVariant = SizeVariant.Create(
                         newColorVariant.Id,
-                        SizeVariantId.Of(Guid.NewGuid()),
                         Size.Of(sizeVariant.Size),
                         Price.Of("USD", sizeVariant.Price),
                         Quantity.Of(sizeVariant.Quantity),

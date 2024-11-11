@@ -21,4 +21,3 @@ global using Ordering.Domain.Enums;
 global using Ordering.Domain.Orders.Events;
 global using Ordering.Application.Orders.Events;
 global using BuildingBlocks.Messaging.Events;
-global using Ordering.Application.Orders.Models;

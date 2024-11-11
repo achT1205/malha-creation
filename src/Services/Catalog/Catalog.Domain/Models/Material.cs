@@ -14,7 +14,7 @@ public class Material : Entity<MaterialId>
     {
         
     }
-    public static Material Create(string name)
+    public static Material Create(MaterialId materialId, string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -26,6 +26,6 @@ public class Material : Entity<MaterialId>
             throw new ArgumentException("Material name cannot exceed 100 characters.", nameof(name));
         }
 
-        return new Material(MaterialId.Of(Guid.NewGuid()), name);
+        return new Material(materialId, name);
     }
 }
