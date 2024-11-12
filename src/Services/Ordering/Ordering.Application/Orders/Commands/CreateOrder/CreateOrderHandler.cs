@@ -23,18 +23,12 @@ public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
 public class CreateOrderCommandHandler(
     ILogger<AutoCreateOrderCommandHandler> _logger,
     IApplicationDbContext _context, 
-    IProductService productService,
-    IPublishEndpoint publishEndpoint)
+    IProductService productService)
     : ICommandHandler<CreateOrderCommand, CreateOrderResult>
 {
     public async Task<CreateOrderResult> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        // Add Integration event to clean the basket
-        var orderStartedEvent = new OrderStartedEvent() { UserId = command.CustomerId };
-        await publishEndpoint.Publish(orderStartedEvent);
-
         var order = await CreateNewOrder(command);
-        order.SubmitForProcessing();
         try
         {
             _logger.LogInformation("Creating Order - Order: {@Order}", order);

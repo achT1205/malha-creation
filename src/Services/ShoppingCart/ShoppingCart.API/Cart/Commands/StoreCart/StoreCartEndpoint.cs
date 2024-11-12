@@ -1,4 +1,6 @@
-﻿namespace Cart.API.Cart.Commands.StoreCart;
+﻿using ShoppingCart.API.Dtos;
+
+namespace Cart.API.Cart.Commands.StoreCart;
 public record StoreCartRequest
 {
     public Guid UserId { get; set; } = default!;

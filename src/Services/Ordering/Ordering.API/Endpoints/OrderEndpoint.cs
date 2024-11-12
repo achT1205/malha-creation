@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Pagination;
+﻿using BuildingBlocks.Messaging.Events;
+using BuildingBlocks.Pagination;
 using Ordering.Application.Orders.Commands.CancelOrder;
 using Ordering.Application.Orders.Commands.ConfirmOrder;
 using Ordering.Application.Orders.Commands.CreateOrder;

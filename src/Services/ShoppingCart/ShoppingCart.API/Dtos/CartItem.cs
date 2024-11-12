@@ -1,4 +1,4 @@
-﻿namespace Cart.API.Models;
+﻿namespace ShoppingCart.API.Dtos;
 
 public class CartItem
 {

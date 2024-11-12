@@ -3,45 +3,52 @@ namespace Ordering.Application.Orders.EventHandlers.Integration;
 public class BasketCheckoutEventHandler
     (
     ISender sender,
-    ILogger<BasketCheckoutEventHandler> logger,
-    ICartService cartService)
+    ILogger<BasketCheckoutEventHandler> logger)
     : IConsumer<CartCheckoutEvent>
 {
     public async Task Consume(ConsumeContext<CartCheckoutEvent> context)
     {
+
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
-        var command = await MapToCreateOrderCommand(context.Message);
+        var order = CreateNewOrder(context.Message);
+        var command = new AutoCreateOrderCommand(order);
         await sender.Send(command);
-
-
     }
 
-    private async Task<AutoCreateOrderCommand> MapToCreateOrderCommand(CartCheckoutEvent message)
+
+    private Order CreateNewOrder(CartCheckoutEvent message)
     {
-        // Create full order with incoming event data
-        var address = new AddressDto(message.FirstName, message.LastName, message.EmailAddress, message.AddressLine, message.Country, message.City, message.ZipCode);
-        var payment = new PaymentDto(message.CardHolderName, message.CardNumber, message.Expiration, message.CVV, message.PaymentMethod);
 
-        var cart = await cartService.GetCartByUserIdAsync(message.UserId);
-
-        var orderItems = cart?.Items.Select(cartItem => new OrderItemDto(
-            cartItem.ProductId,
-            cartItem.ProductName,
-            cartItem.Quantity,
-            cartItem.Color,
-            cartItem.Size,
-            cartItem.Price,
-            cartItem.Slug
-        )).ToList();
+        var shippingAddress = message.ShippingAddress;
+        var billingAddress = message.BillingAddress;
+        var payment = message.Payment;
+        var basket = message.Basket;
 
 
-        return new AutoCreateOrderCommand()
+        var sAdd = Ordering.Domain.ValueObjects.Address.Of(shippingAddress.FirstName, shippingAddress.LastName, shippingAddress.EmailAddress, shippingAddress.AddressLine, shippingAddress.Country, shippingAddress.City, shippingAddress.ZipCode);
+        var bAdd = Ordering.Domain.ValueObjects.Address.Of(billingAddress.FirstName, billingAddress.LastName, billingAddress.EmailAddress, billingAddress.AddressLine, billingAddress.Country, billingAddress.City, billingAddress.ZipCode);
+        var orderId = Guid.NewGuid();
+        var newOrder = Order.Create(
+                id: OrderId.Of(orderId),
+                customerId: CustomerId.Of(basket.UserId),
+                OrderCode: OrderCode.Of(OrderCodeGenerator.GenerateOrderCode(basket.UserId)),
+                shippingAddress: sAdd,
+                billingAddress: bAdd,
+                payment: Ordering.Domain.ValueObjects.Payment.Of(payment.CardHolderName, payment.CardNumber, payment.Expiration, payment.Cvv, payment.PaymentMethod)
+                );
+
+        foreach (var orderItemDto in basket.Items)
         {
-            CustomerId = message.UserId,
-            BillingAddress = address,
-            ShippingAddress = address,
-            Payment = payment,
-            OrderItems = orderItems
-        };
+            newOrder.Add(
+                OrderId.Of(orderId),
+                ProductId.Of(orderItemDto.ProductId),
+                orderItemDto.Quantity,
+                orderItemDto.Price,
+                orderItemDto.Color,
+                orderItemDto.Size,
+                orderItemDto.ProductName,
+                orderItemDto.Slug);
+        }
+        return newOrder;
     }
 }

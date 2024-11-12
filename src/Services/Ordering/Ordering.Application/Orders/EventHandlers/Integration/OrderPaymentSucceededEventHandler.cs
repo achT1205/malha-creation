@@ -2,8 +2,8 @@
 
 namespace Ordering.Application.Orders.EventHandlers.Integration;
 
-public class OrderPaymentSucceededIntegrationEventHandler
-    (ISender sender, ILogger<OrderPaymentSucceededIntegrationEventHandler> logger)
+public class OrderPaymentSucceededEventHandler
+    (ISender sender, ILogger<OrderPaymentSucceededEventHandler> logger)
     : IConsumer<OrderPaymentSucceededEvent>
 {
     public async Task Consume(ConsumeContext<OrderPaymentSucceededEvent> context)

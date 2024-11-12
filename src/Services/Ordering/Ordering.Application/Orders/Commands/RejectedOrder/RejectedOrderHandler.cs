@@ -13,7 +13,7 @@ public class RejectOrderCommandHandler(IApplicationDbContext dbContext) : IComma
             throw new OrderNotFoundException(command.Id);
         }
 
-        order.RejectOrder();
+        order.FailOrder();
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

@@ -459,7 +459,6 @@ namespace Catalog.Infrastructure.Data.Migrations
                                         .HasColumnName("Price");
 
                                     b2.Property<string>("Currency")
-                                        .IsRequired()
                                         .HasColumnType("nvarchar(max)")
                                         .HasColumnName("Currency");
 

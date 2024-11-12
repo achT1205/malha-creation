@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Exceptions;
 using Cart.API.Services.Interfaces;
 using Discount.Grpc;
+using ShoppingCart.API.Dtos;
 using ShoppingCart.API.Enums;
 
 namespace Cart.API.Cart.Commands.StoreCart;

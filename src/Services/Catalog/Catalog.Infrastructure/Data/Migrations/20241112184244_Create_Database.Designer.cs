@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241110192925_Create_Database")]
+    [Migration("20241112184244_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -462,7 +462,6 @@ namespace Catalog.Infrastructure.Data.Migrations
                                         .HasColumnName("Price");
 
                                     b2.Property<string>("Currency")
-                                        .IsRequired()
                                         .HasColumnType("nvarchar(max)")
                                         .HasColumnName("Currency");
 

@@ -53,6 +53,7 @@ public class Order : Aggregate<OrderId>
         AddDomainEvent(new OrderStatusChangedEvent(this, newStatus));
     }
 
+    
     // Draft -> Pending
     public void SubmitForProcessing()
     {
@@ -62,85 +63,157 @@ public class Order : Aggregate<OrderId>
         TransitionToStatus(OrderStatus.Pending);
     }
 
-    // Draft or Pending -> Cancelled
-    public void CancelOrder()
-    {
-        if (Status != OrderStatus.Draft && Status != OrderStatus.Pending)
-            throw new InvalidOperationException("Order can only be cancelled in Draft or Pending.");
-
-        TransitionToStatus(OrderStatus.Cancelled);
-    }
-
-    // Draft or Pending -> Deleted
-    public void DeleteOrder()
-    {
-        if (Status != OrderStatus.Draft && Status != OrderStatus.Pending)
-            throw new InvalidOperationException("Order can only be deleted in Draft or Pending.");
-
-        TransitionToStatus(OrderStatus.Deleted);
-    }
-
-    // Pending -> ConfirmGracePeriod
-    public void ConfirmGracePeriod()
+    // Pending -> Confirmed
+    public void ConfirmOrder()
     {
         if (Status != OrderStatus.Pending)
-            throw new InvalidOperationException("Order must be in Pending to confirm grace period.");
+            throw new InvalidOperationException("Order must be in Pending to confirm.");
+
+        TransitionToStatus(OrderStatus.Confirmed);
+    }
+
+    // Confirmed -> GracePeriodConfirmed
+    public void ConfirmGracePeriod()
+    {
+        if (Status != OrderStatus.Confirmed)
+            throw new InvalidOperationException("Order must be Confirmed to enter Grace Period.");
 
         TransitionToStatus(OrderStatus.GracePeriodConfirmed);
     }
 
-    // GracePeriodConfirmed -> Validated --- implement validatios(paymet methode ....)
+    // GracePeriodConfirmed -> Validated
     public void ValidateOrder()
     {
         if (Status != OrderStatus.GracePeriodConfirmed)
-            throw new InvalidOperationException("Order must be in GracePeriodConfirmed to be validated.");
+            throw new InvalidOperationException("Order must be in GracePeriodConfirmed to validate.");
 
         TransitionToStatus(OrderStatus.Validated);
     }
 
-    // GracePeriodConfirmed -> Rejected
-    public void RejectOrder()
-    {
-        if (Status != OrderStatus.GracePeriodConfirmed)
-            throw new InvalidOperationException("Order must be in GracePeriodConfirmed to be rejected.");
-
-        TransitionToStatus(OrderStatus.Rejected);
-    }
-
-    // Validated -> StockConfirmed
-    public void ConfirmStock()
-    {
-        if (Status != OrderStatus.Validated)
-            throw new InvalidOperationException("Order must be Validated before stock confirmation.");
-
-        TransitionToStatus(OrderStatus.StockConfirmed);
-    }
-
-    // StockConfirmed -> Paid
+    // Validated -> Paid
     public void MarkAsPaid()
     {
-        if (Status != OrderStatus.StockConfirmed)
-            throw new InvalidOperationException("Order must be StockConfirmed to be marked as paid.");
+        if (Status != OrderStatus.Validated)
+            throw new InvalidOperationException("Order must be Validated to mark as Paid.");
 
         TransitionToStatus(OrderStatus.Paid);
     }
 
-    // Paid -> Shipped
-    public void ShipOrder()
+    // Paid -> Processing
+    public void StartProcessing()
     {
         if (Status != OrderStatus.Paid)
-            throw new InvalidOperationException("Order must be Paid to be shipped.");
+            throw new InvalidOperationException("Order must be Paid to start Processing.");
+
+        TransitionToStatus(OrderStatus.Processing);
+    }
+
+    // Processing -> StockConfirmed
+    public void ConfirmStock()
+    {
+        if (Status != OrderStatus.Processing)
+            throw new InvalidOperationException("Order must be in Processing to confirm stock.");
+
+        TransitionToStatus(OrderStatus.StockConfirmed);
+    }
+
+    // StockConfirmed -> Packing
+    public void StartPacking()
+    {
+        if (Status != OrderStatus.StockConfirmed)
+            throw new InvalidOperationException("Order must be StockConfirmed to start Packing.");
+
+        TransitionToStatus(OrderStatus.Packing);
+    }
+
+    // Packing -> Shipped
+    public void ShipOrder()
+    {
+        if (Status != OrderStatus.Packing)
+            throw new InvalidOperationException("Order must be in Packing to ship.");
 
         TransitionToStatus(OrderStatus.Shipped);
     }
 
-    // Shipped -> Completed
-    public void CompleteOrder()
+    // Shipped -> OutForDelivery
+    public void MarkOutForDelivery()
     {
         if (Status != OrderStatus.Shipped)
-            throw new InvalidOperationException("Order must be Shipped to be completed.");
+            throw new InvalidOperationException("Order must be Shipped to be Out For Delivery.");
+
+        TransitionToStatus(OrderStatus.OutForDelivery);
+    }
+
+    // OutForDelivery -> Delivered
+    public void Deliver()
+    {
+        if (Status != OrderStatus.OutForDelivery)
+            throw new InvalidOperationException("Order must be Out For Delivery to mark as Delivered.");
+
+        TransitionToStatus(OrderStatus.Delivered);
+    }
+
+    // Delivered -> Completed
+    public void CompleteOrder()
+    {
+        if (Status != OrderStatus.Delivered)
+            throw new InvalidOperationException("Order must be Delivered to mark as Completed.");
 
         TransitionToStatus(OrderStatus.Completed);
+    }
+
+    // Various statuses -> Cancelled
+    public void CancelOrder()
+    {
+        if (Status == OrderStatus.Completed || Status == OrderStatus.Cancelled || Status == OrderStatus.Deleted)
+            throw new InvalidOperationException("Order cannot be cancelled from the current status.");
+
+        TransitionToStatus(OrderStatus.Cancelled);
+    }
+
+    // Transition to Failed from specific statuses
+    public void FailOrder()
+    {
+        if (Status != OrderStatus.Validated && Status != OrderStatus.Pending)
+            throw new InvalidOperationException("Order can only fail if it is in Pending or Validated status.");
+
+        TransitionToStatus(OrderStatus.Failed);
+    }
+
+    // Various statuses -> Deleted
+    public void DeleteOrder()
+    {
+        if (Status == OrderStatus.Completed || Status == OrderStatus.Deleted)
+            throw new InvalidOperationException("Order cannot be deleted from the current status.");
+
+        TransitionToStatus(OrderStatus.Deleted);
+    }
+
+    // Delivered -> RefundRequested
+    public void RequestRefund()
+    {
+        if (Status != OrderStatus.Delivered)
+            throw new InvalidOperationException("Order must be Delivered to request a refund.");
+
+        TransitionToStatus(OrderStatus.RefundRequested);
+    }
+
+    // RefundRequested -> Refunded
+    public void ProcessRefund()
+    {
+        if (Status != OrderStatus.RefundRequested)
+            throw new InvalidOperationException("Order must be in RefundRequested to process refund.");
+
+        TransitionToStatus(OrderStatus.Refunded);
+    }
+
+    // Shipped or Delivered -> Returned
+    public void MarkAsReturned()
+    {
+        if (Status != OrderStatus.Shipped && Status != OrderStatus.Delivered)
+            throw new InvalidOperationException("Order must be Shipped or Delivered to be marked as Returned.");
+
+        TransitionToStatus(OrderStatus.Returned);
     }
 
 

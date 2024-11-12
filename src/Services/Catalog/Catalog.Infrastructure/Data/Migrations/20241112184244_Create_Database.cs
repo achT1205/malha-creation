@@ -149,7 +149,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                     Slug = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     OnOrdering = table.Column<bool>(type: "bit", nullable: false),
                     RestockThreshold = table.Column<int>(type: "int", nullable: true),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
