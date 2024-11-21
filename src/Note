@@ -4,6 +4,8 @@ Add-Migration Create_Database -OutputDir Data/Migrations -Project Auth.API -Star
 
 Add-Migration Create_Database -OutputDir Data/Migrations -Project Catalog.Infrastructure -StartupProject Catalog.API
 
+Add-Migration Create_Database -OutputDir Data/Migrations -Project Discount.Infrastructure -StartupProject Discount.Grpc
+
 update-database
 
 

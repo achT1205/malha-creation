@@ -11,4 +11,6 @@ public class OrderBasketItem
     public Guid? SizeVariantId { get; set; } = default!;
     public string ProductName { get; set; } = default!;
     public string Slug { get; set; } = default!;
+    public string CoverImage { get; set; } = default!;
+    public CouponModel Coupon { get; set; } = null!;
 }

@@ -75,6 +75,7 @@ public class StoreCartCommandHandler(
             }
             BasketItem.Color = cv.Color;
             BasketItem.Slug = cv.Slug;
+            BasketItem.CoverImage = cv.Images[0].ImageSrc;
             if (product.ProductType == ProductType.Clothing)
             {
                 var sv = cv.SizeVariants.Find(x => x.Id == item.SizeVariantId);
@@ -91,6 +92,7 @@ public class StoreCartCommandHandler(
             }
             var coupon = await discountProto.GetDiscountAsync(new GetDiscountRequest { ProductId = item.ProductId.ToString() }, cancellationToken: cancellationToken);
             BasketItem.Price -= coupon.Amount;
+            BasketItem.Coupon = coupon;
 
             BasketItems.Add(BasketItem);
         }

@@ -100,6 +100,16 @@ services:
     ports:
       - "1434:1433"
 
+
+  mc-discountdb:
+    container_name: mc-discountdb
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SwN12345678
+    restart: always
+    ports:
+      - "1435:1433"
+
   mc-identitydb:
     container_name: mc-identitydb
     environment:

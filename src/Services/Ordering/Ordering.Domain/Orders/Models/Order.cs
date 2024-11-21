@@ -14,6 +14,8 @@ public class Order : Aggregate<OrderId>
     public Payment Payment { get; private set; } = default!;
     public OrderStatus Status { get; private set; } = OrderStatus.Pending;
     public DateTime GracePeriodEnd { get; private set; }
+    public string? PaymentIntentId { get; private set; }
+    public string? StripeSessionId { get; private set; }
 
     public decimal TotalPrice
     {
@@ -53,7 +55,7 @@ public class Order : Aggregate<OrderId>
         AddDomainEvent(new OrderStatusChangedEvent(this, newStatus));
     }
 
-    
+
     // Draft -> Pending
     public void SubmitForProcessing()
     {
@@ -217,12 +219,12 @@ public class Order : Aggregate<OrderId>
     }
 
 
-    public void Add(OrderId id, ProductId productId, int quantity, decimal price, string color, string size, string productName, string slug)
+    public void Add(OrderId id, ProductId productId, int quantity, decimal price, string color, string size, string productName, string slug, int? discount, string? description)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
 
-        var orderItem = new OrderItem(id, productId, quantity, price, color, size, productName, slug);
+        var orderItem = new OrderItem(id, productId, quantity, price, color, size, productName, slug, discount, description);
         _orderItems.Add(orderItem);
     }
 
@@ -269,5 +271,18 @@ public class Order : Aggregate<OrderId>
         Payment = newPayment;
         LastModified = DateTime.Now;
         AddDomainEvent(new PaymentUpdatedEvent(this));
+    }
+
+    public void SetStripeSessionId(string stripeSessionId)
+    {
+        //if (Status != OrderStatus.Pending) { 
+
+        //}
+        StripeSessionId = stripeSessionId;
+    }
+
+    public void SetPaymentIntentId()
+    {
+        PaymentIntentId = PaymentIntentId;
     }
 }

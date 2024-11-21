@@ -47,7 +47,10 @@ public class BasketCheckoutEventHandler
                 orderItemDto.Color,
                 orderItemDto.Size,
                 orderItemDto.ProductName,
-                orderItemDto.Slug);
+                orderItemDto.Slug,
+                orderItemDto.Coupon?.Amount,
+                orderItemDto.Coupon?.Description
+                );
         }
         return newOrder;
     }

@@ -15,6 +15,11 @@
     networks:
       - mc-network
 
+  mc-discountdb:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    networks:
+      - mc-network
+
   mc-messagebroker:
     image: rabbitmq:management
     networks:

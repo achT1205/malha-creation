@@ -2,7 +2,7 @@
 
 public class OrderItem : Entity<OrderItemId>
 {
-    internal OrderItem(OrderId orderId, ProductId productId, int quantity, decimal price, string color, string? size, string productName, string slug)
+    internal OrderItem(OrderId orderId, ProductId productId, int quantity, decimal price, string color, string? size, string productName, string slug, int? discount, string? descrition)
     {
         Id = OrderItemId.Of(Guid.NewGuid());
         OrderId = orderId;
@@ -13,6 +13,8 @@ public class OrderItem : Entity<OrderItemId>
         Size = size;
         ProductName = productName;
         Slug = slug;
+        Discount = discount;
+        CouponDescrition = descrition;
     }
     public OrderId OrderId { get; private set; } = default!;
     public ProductId ProductId { get; private set; } = default!;
@@ -22,4 +24,6 @@ public class OrderItem : Entity<OrderItemId>
     public string? Size { get; set; } = default!;
     public string ProductName { get; private set; } = default!;
     public string Slug { get; private set; } = default!;
+    public string? CouponDescrition { get; private set; } = default!;
+    public int? Discount { get; private set; } = default!;
 }

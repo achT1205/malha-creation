@@ -8,7 +8,6 @@ public record CheckoutCartCommand
     : ICommand<CheckoutCartResult>
 {
     public Guid UserId { get; set; } = default!;
-
     public AddressDto ShippingAddress { get; set; } = default!;
     public AddressDto BillingAddress { get; set; } = default!;
     public PaymentDto Payment { get; set; } = default!;

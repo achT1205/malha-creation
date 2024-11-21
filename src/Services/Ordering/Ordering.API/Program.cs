@@ -28,6 +28,7 @@ internal class Program
         {
             app.InitialiseDatabase();
         }
+        Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 
         //app.UseMiddleware<RetrictAccessMiddleware>();
 

@@ -78,7 +78,7 @@ public class CreateOrderCommandHandler(
                 variant = product.ColorVariants.FirstOrDefault(x => x.Color == orderItemDto.Color);
                 if (variant != null) price = variant.Price.Amount.Value;
             }
-            newOrder.Add(OrderId.Of(orderId), ProductId.Of(orderItemDto.ProductId), orderItemDto.Quantity, price, orderItemDto.Color, orderItemDto.Size, product.Name, variant.Slug);
+            newOrder.Add(OrderId.Of(orderId), ProductId.Of(orderItemDto.ProductId), orderItemDto.Quantity, price, orderItemDto.Color, orderItemDto.Size, product.Name, variant.Slug, 0, "");
         }
         return newOrder;
     }
