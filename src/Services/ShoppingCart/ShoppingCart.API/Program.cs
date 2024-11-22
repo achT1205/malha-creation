@@ -5,7 +5,6 @@ using BuildingBlocks.Messaging.MassTransit;
 using BuildingBlocks.Behaviors;
 using BuildingBlocks.Exceptions.Handler;
 using Discount.Grpc;
-using CartDiscount.Grpc;
 using Cart.API.Configs;
 using Cart.API.Services.Interfaces;
 using Cart.API.Services;
@@ -41,20 +40,6 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 //Grpc Services
 builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
-{
-    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
-})
-.ConfigurePrimaryHttpMessageHandler(() =>
-{
-    var handler = new HttpClientHandler
-    {
-        ServerCertificateCustomValidationCallback =
-       HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-    };
-    return handler;
-});
-
-builder.Services.AddGrpcClient<CartDiscountProtoService.CartDiscountProtoServiceClient>(options =>
 {
     options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
 })

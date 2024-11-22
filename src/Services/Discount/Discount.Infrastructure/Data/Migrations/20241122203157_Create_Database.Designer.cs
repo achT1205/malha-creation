@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Discount.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241120235918_Create_Database")]
+    [Migration("20241122203157_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -97,8 +97,8 @@ namespace Discount.Infrastructure.Data.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<int?>("FlatAmount")
-                                .HasColumnType("int")
+                            b1.Property<decimal?>("FlatAmount")
+                                .HasColumnType("decimal(18,2)")
                                 .HasColumnName("FlatAmount");
 
                             b1.Property<int?>("Percentage")

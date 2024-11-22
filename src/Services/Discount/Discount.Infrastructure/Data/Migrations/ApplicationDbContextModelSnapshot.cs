@@ -94,8 +94,8 @@ namespace Discount.Infrastructure.Data.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<int?>("FlatAmount")
-                                .HasColumnType("int")
+                            b1.Property<decimal?>("FlatAmount")
+                                .HasColumnType("decimal(18,2)")
                                 .HasColumnName("FlatAmount");
 
                             b1.Property<int?>("Percentage")

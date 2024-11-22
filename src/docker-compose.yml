@@ -40,53 +40,53 @@
     networks:
       - mc-network
 
-  mc-discount.grpc:
-    image: ${DOCKER_REGISTRY-}discountgrpc
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: Services/Discount/Discount.Grpc/Dockerfile
+  # mc-discount.grpc:
+  #   image: ${DOCKER_REGISTRY-}discountgrpc
+  #   networks:
+  #     - mc-network
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
-  mc-catalog.api:
-    image: ${DOCKER_REGISTRY-}catalogapi
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+  # mc-catalog.api:
+  #   image: ${DOCKER_REGISTRY-}catalogapi
+  #   networks:
+  #     - mc-network
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Catalog/Catalog.API/Dockerfile
 
-  mc-shoppingcart.api:
-    image: ${DOCKER_REGISTRY-}shoppingcartapi
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: Services/ShoppingCart/ShoppingCart.API/Dockerfile
+  # mc-shoppingcart.api:
+  #   image: ${DOCKER_REGISTRY-}shoppingcartapi
+  #   networks:
+  #     - mc-network
+  #   build:
+  #     context: .
+  #     dockerfile: Services/ShoppingCart/ShoppingCart.API/Dockerfile
 
-  mc-ordering.api:
-    image: ${DOCKER_REGISTRY-}orderingapi
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+  # mc-ordering.api:
+  #   image: ${DOCKER_REGISTRY-}orderingapi
+  #   networks:
+  #     - mc-network
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Ordering/Ordering.API/Dockerfile
 
-  mc-ocelotapigateway:
-    image: ${DOCKER_REGISTRY-}ocelotapigateway
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
+  # mc-ocelotapigateway:
+  #   image: ${DOCKER_REGISTRY-}ocelotapigateway
+  #   networks:
+  #     - mc-network
+  #   build:
+  #     context: .
+  #     dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
 
-  mc-auth.api:
-    image: ${DOCKER_REGISTRY-}authapi
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: Services/Auth/Auth.API/Dockerfile
+  # mc-auth.api:
+  #   image: ${DOCKER_REGISTRY-}authapi
+  #   networks:
+  #     - mc-network
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Auth/Auth.API/Dockerfile
 
  networks:
   mc-network:

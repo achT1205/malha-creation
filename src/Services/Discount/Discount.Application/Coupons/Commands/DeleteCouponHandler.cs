@@ -12,7 +12,7 @@ public class DeleteCouponCommandHandler(IApplicationDbContext dbContext) : IComm
     public async Task<DeleteCouponResult> Handle(DeleteCouponCommand command, CancellationToken cancellationToken)
     {
         var coupon = await dbContext.Coupons
-        .FirstOrDefaultAsync(c => c.Id.Value == command.CouponId, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == CouponId.Of(command.CouponId), cancellationToken);
 
         if (coupon == null)
             throw new NotFoundException($"Coupon with ID {command.CouponId} not found.");

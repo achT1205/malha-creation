@@ -90,9 +90,9 @@ public class StoreCartCommandHandler(
             {
                 BasketItem.Price = cv.Price.Amount.Value;
             }
-            var coupon = await discountProto.GetDiscountAsync(new GetDiscountRequest { ProductId = item.ProductId.ToString() }, cancellationToken: cancellationToken);
-            BasketItem.Price -= coupon.Amount;
-            BasketItem.Coupon = coupon;
+            //var coupon = await discountProto.GetDiscountAsync(new GetDiscountRequest { ProductId = item.ProductId.ToString() }, cancellationToken: cancellationToken);
+            //BasketItem.Price -= coupon.Amount;
+            //BasketItem.Coupon = coupon;
 
             BasketItems.Add(BasketItem);
         }

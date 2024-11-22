@@ -14,5 +14,5 @@ public class BasketItem
     public string ProductName { get; set; } = default!;
     public string Slug { get; set; } = default!;
     public string CoverImage { get; set; } = default!;
-    public CouponModel ? Coupon { get;  set; } = null!;
+    //public CouponModel ? Coupon { get;  set; } = null!;
 }

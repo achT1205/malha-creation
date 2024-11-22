@@ -8,6 +8,8 @@ package discount;
 service DiscountProtoService {
   rpc GetCouponForProduct (GetCouponForProductRequest) returns (GetCouponForProductResponse);
   rpc GetBasketDiscount (GetBasketDiscountRequest) returns (GetBasketDiscountResponse);
+  rpc GetCoupon (GetCouponRequest) returns (Coupon);
+  rpc GetCoupons (GetCouponsRequest) returns (GetCouponsResponse);
 
   rpc CreateCoupon (CreateCouponRequest) returns (CreateCouponResponse);
   rpc UpdateCoupon (UpdateCouponRequest) returns (UpdateCouponResponse);
@@ -17,106 +19,138 @@ service DiscountProtoService {
   rpc AddCustomerCoupon (AddCustomerRequest) returns (AddCustomerResponse);
 }
 
-// Messages for GetCouponForProduct
 message GetCouponForProductRequest {
-  string coupon_code = 1;
-  string product_id = 2;
-  double product_price = 3;
+  string CouponCode = 1;
+  string ProductId = 2;
+  double ProductPrice = 3;
 }
 
 message GetCouponForProductResponse {
-  string coupon_code = 1;
-  string description = 2;
-  double original_price = 3;
-  double discounted_price = 4;
-  double discount_amount = 5;
-  string discount_type = 6; // FlatAmount or Percentage
-  string discount_label = 7; // e.g., "$10 off" or "20%"
-  bool is_applicable = 8;
+  string Id = 1;
+  string CouponCode = 2;
+  string Description = 3;
+  double OriginalPrice = 4;
+  double DiscountedPrice = 5;
+  double DiscountAmount = 6;
+  string DiscountType = 7; // FlatAmount or Percentage
+  string DiscountLabel = 8; // e.g., "$10 off" or "20%"
 }
 
-// Messages for GetBasketDiscount
 message GetBasketDiscountRequest {
-  string coupon_code = 1;
-  string customer_id = 2;
-  double order_total = 3;
-  bool is_first_order = 4;
-  int32 redemption_count = 5;
+  string CouponCode = 1;
+  string CustomerId = 2;
+  double OrderTotal = 3;
 }
 
 message GetBasketDiscountResponse {
-  string coupon_code = 1;
-  string description = 2;
-  double original_order_total = 3;
-  double discounted_order_total = 4;
-  double discount_amount = 5;
-  bool is_applicable = 6;
+  string Id = 1;
+  string CouponCode = 2;
+  string Description = 3;
+  double OriginalOrderTotal = 4;
+  double DiscountedOrderTotal = 5;
+  double DiscountAmount = 6;
 }
 
-// Messages for CreateCoupon
 message CreateCouponRequest {
-  string coupon_code = 1;
-  string name = 2;
-  string description = 3;
-  double flat_amount = 4; // Optional
-  double percentage = 5; // Optional
-  string start_date = 6; // ISO-8601 string
-  string end_date = 7; // ISO-8601 string
-  int32 max_uses = 8;
-  int32 max_uses_per_customer = 9;
-  double minimum_order_value = 10;
-  bool is_first_time_order_only = 11;
+  string CouponCode = 1;
+  string Name = 2;
+  string Description = 3;
+  double FlatAmount = 4; 
+  int32 Percentage = 5;
+  string StartDate = 6; // ISO-8601 string
+  string EndDate = 7; // ISO-8601 string
+  int32 MaxUses = 8;
+  int32 MaxUsesPerCustomer = 9;
+  double MinimumOrderValue = 10;
+  bool IsFirstTimeOrderOnly = 11;
+  bool IsActive = 12;
 }
 
 message CreateCouponResponse {
-  string coupon_id = 1;
-  string coupon_code = 2;
+  string CouponId = 1;
+  string CouponCode = 2;
+  string Name = 3;
 }
 
-// Messages for UpdateCoupon
 message UpdateCouponRequest {
-  string coupon_code = 1;
-  string name = 2;
-  string description = 3;
-  double flat_amount = 4; // Optional
-  double percentage = 5; // Optional
-  string start_date = 6; // ISO-8601 string
-  string end_date = 7; // ISO-8601 string
-  int32 max_uses = 8;
-  int32 max_uses_per_customer = 9;
-  double minimum_order_value = 10;
-  bool is_first_time_order_only = 11;
+  string CouponId = 1;
+  string CouponCode = 2;
+  string Name = 3;
+  string Description = 4;
+  double FlatAmount = 5; // Optional
+  int32 Percentage = 6; // Optional
+  string StartDate = 7; // ISO-8601 string
+  string EndDate = 8; // ISO-8601 string
+  int32 MaxUses = 9;
+  int32 MaxUsesPerCustomer = 10;
+  double MinimumOrderValue = 11;
+  bool IsFirstTimeOrderOnly = 12;
+  bool IsActive = 13;
 }
 
 message UpdateCouponResponse {
-  bool success = 1;
+  bool IsSuccess = 1;
 }
 
-// Messages for DeleteCoupon
 message DeleteCouponRequest {
-  string coupon_code = 1;
+  string CouponId = 1;
 }
 
 message DeleteCouponResponse {
-  bool success = 1;
+  bool IsSuccess = 1;
 }
 
-// Messages for AddApplicableProduct
 message AddApplicableProductRequest {
-  string coupon_code = 1;
-  string product_id = 2;
+  string CouponId = 1;
+  string ProductId = 2;
 }
 
 message AddApplicableProductResponse {
-  bool success = 1;
+  bool IsSuccess = 1;
 }
 
-// Messages for AddCustomerCoupon
 message AddCustomerRequest {
-  string coupon_code = 1;
-  string customer_id = 2;
+  string CouponId = 1;
+  string CustomerId = 2;
 }
 
 message AddCustomerResponse {
-  bool success = 1;
+  bool IsSuccess = 1;
+}
+
+
+message GetCouponsRequest{
+
+}
+
+message GetCouponsResponse {
+  repeated Coupon Coupons = 1;
+}
+
+message GetCouponRequest{
+  string Id = 1;
+}
+
+message GetCouponResponse {
+  Coupon Coupon = 1;
+}
+
+message Coupon {
+    string Id = 1;
+	string Code = 2;
+    string Name = 3;
+    string Description = 4;
+    double FlatAmount = 5;  
+    int32 Percentage = 6;
+    string StartDate = 7;
+    string EndDate = 8;
+    int32  MaxUses = 9;
+    int32  TotalRedemptions = 10;
+    int32  MaxUsesPerCustomer = 11;
+    double  MinimumOrderValue  = 12;
+    bool IsFirstTimeOrderOnly = 13;
+    bool IsActive = 14;
+    bool IsDeleted = 15;
+    repeated string AllowedCustomerIds = 16; 
+    repeated string ProductIds = 17;
 }

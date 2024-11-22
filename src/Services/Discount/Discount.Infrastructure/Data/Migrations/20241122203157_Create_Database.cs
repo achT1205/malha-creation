@@ -28,7 +28,7 @@ namespace Discount.Infrastructure.Data.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     Code = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
-                    FlatAmount = table.Column<int>(type: "int", nullable: true),
+                    FlatAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Percentage = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),

@@ -28,6 +28,7 @@ public class Coupon : Aggregate<CouponId>
     private Coupon() { }
 
     private Coupon(
+        CouponId couponId,
         CouponCode code,
         string name,
         string description,
@@ -46,7 +47,7 @@ public class Coupon : Aggregate<CouponId>
         if (maxUses < 0) throw new ArgumentException("Max uses cannot be negative.", nameof(maxUses));
         if (maxUsesPerCustomer < 0) throw new ArgumentException("Max uses per customer cannot be negative.", nameof(maxUsesPerCustomer));
 
-        Id = CouponId.Of(Guid.NewGuid());
+        Id = couponId;
         Code = code;
         Name = name;
         Description = description;
@@ -63,6 +64,7 @@ public class Coupon : Aggregate<CouponId>
 
 
     public static Coupon Create(
+        CouponId couponId,
         CouponCode code,
         string name,
         string description,
@@ -84,6 +86,7 @@ public class Coupon : Aggregate<CouponId>
 
 
         return new Coupon(
+            couponId,
             code,
             name,
             description,
@@ -145,6 +148,9 @@ public class Coupon : Aggregate<CouponId>
         if (IsFirstTimeOrderOnly && !isFirstOrder)
             throw new InvalidOperationException("This coupon is valid only for first-time orders.");
 
+        if(AllowedCustomerIds.Any(id => id == customerId) && AllowedCustomerIds.FirstOrDefault(_=> _ == customerId) == null)
+            throw new InvalidOperationException($"The user {customerId.Value} is not whitelisted.");
+
         var discountAmount = Discountable.CalculateDiscount(orderTotal);
 
         return discountAmount;
@@ -175,6 +181,7 @@ public class Coupon : Aggregate<CouponId>
 
 
     public void UpdateDetails(
+    CouponCode code,
     string name,
     string description,
     Discountable discountable,
@@ -183,7 +190,8 @@ public class Coupon : Aggregate<CouponId>
     int? maxUses,
     int? maxUsesPerCustomer,
     decimal? minimumOrderValue,
-    bool isFirstTimeOrderOnly)
+    bool isFirstTimeOrderOnly,
+    bool isActive)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name cannot be empty.", nameof(name));
@@ -196,7 +204,7 @@ public class Coupon : Aggregate<CouponId>
 
         if (maxUsesPerCustomer.HasValue && maxUsesPerCustomer < 0)
             throw new InvalidOperationException("Max uses per customer cannot be negative.");
-
+        Code = code;
         Name = name;
         Description = description;
         Discountable = discountable;
@@ -206,6 +214,7 @@ public class Coupon : Aggregate<CouponId>
         MaxUsesPerCustomer = maxUsesPerCustomer;
         MinimumOrderValue = minimumOrderValue;
         IsFirstTimeOrderOnly = isFirstTimeOrderOnly;
+        IsActive = isActive;
     }
 
     public void Delete()

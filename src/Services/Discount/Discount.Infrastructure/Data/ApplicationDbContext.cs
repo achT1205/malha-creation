@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     : base(options) { }
 
     public DbSet<Coupon> Coupons { get; set; } = default!;
+    //public DbSet<CouponProduct> CouponProducts { get; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

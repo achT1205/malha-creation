@@ -23,25 +23,21 @@ public class GetCouponForProductQueryHandler(IApplicationDbContext dbContext) : 
 {
     public async Task<GetCouponForProductResult> Handle(GetCouponForProductQuery query, CancellationToken cancellationToken)
     {
+
         var coupon = await dbContext.Coupons
-        .Include(c => c.ProductIds)
-        .FirstOrDefaultAsync(c =>
-            c.IsActive &&
-            c.ProductIds.Contains(ProductId.Of(query.ProductId)),
-            cancellationToken);
+           .Include(c => c.ProductIds)
+           .FirstOrDefaultAsync(c => c.ProductIds.Any(_ => _.Value == query.ProductId), cancellationToken);
 
-
-        if (coupon == null)
-            return new GetCouponForProductResult
-            {
-                CouponCode = string.Empty,
-                Description = string.Empty,
-                OriginalPrice = query.ProductPrice,
-                DiscountedPrice = query.ProductPrice,
-                DiscountAmount = 0,
-                DiscountType = "None",
-                DiscountLabel = string.Empty,
-            };
+        if (coupon == null) return new GetCouponForProductResult
+        {
+            CouponCode = string.Empty,
+            Description = string.Empty,
+            OriginalPrice = query.ProductPrice,
+            DiscountedPrice = query.ProductPrice,
+            DiscountAmount = 0,
+            DiscountType = "None",
+            DiscountLabel = string.Empty,
+        };
 
         decimal discountAmount = 0;
         decimal discountedPrice = query.ProductPrice;
