@@ -1,6 +1,6 @@
 ﻿
 namespace Cart.API.Cart.Commands.Discount;
-public record ApplyCartDiscountRequest(ApplyCartDiscountDto DiscountDto);
+public record ApplyCartDiscountRequest(Guid UserId, string CouponCode);
 public record ApplyCartDiscountRsponse(Guid UserId);
 public class ApplyCartDiscountEndpoint : ICarterModule
 {

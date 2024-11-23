@@ -13,7 +13,6 @@ public record GetCouponForProductResult
     public decimal OriginalPrice { get; init; } // The original product price
     public decimal DiscountedPrice { get; init; } // The discounted product price
     public decimal DiscountAmount { get; init; } // The calculated discount amount
-    public bool IsApplicable { get; init; } // Whether the coupon applies to this product
     public string DiscountType { get; init; } = string.Empty; // FlatAmount or Percentage
     public string DiscountLabel { get; init; } = string.Empty;
 }
@@ -26,7 +25,7 @@ public class GetCouponForProductQueryHandler(IApplicationDbContext dbContext) : 
 
         var coupon = await dbContext.Coupons
            .Include(c => c.ProductIds)
-           .FirstOrDefaultAsync(c => c.ProductIds.Any(_ => _.Value == query.ProductId), cancellationToken);
+           .FirstOrDefaultAsync(c => c.ProductIds.Any(_ => _.Value == query.ProductId && c.IsDeleted == false && c.IsActive == true), cancellationToken);
 
         if (coupon == null) return new GetCouponForProductResult
         {

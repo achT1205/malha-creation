@@ -20,20 +20,18 @@ service DiscountProtoService {
 }
 
 message GetCouponForProductRequest {
-  string CouponCode = 1;
   string ProductId = 2;
   double ProductPrice = 3;
 }
 
 message GetCouponForProductResponse {
-  string Id = 1;
-  string CouponCode = 2;
-  string Description = 3;
-  double OriginalPrice = 4;
-  double DiscountedPrice = 5;
-  double DiscountAmount = 6;
-  string DiscountType = 7; // FlatAmount or Percentage
-  string DiscountLabel = 8; // e.g., "$10 off" or "20%"
+  string CouponCode = 1;
+  string Description = 2;
+  double OriginalPrice = 3;
+  double DiscountedPrice = 4;
+  double DiscountAmount = 5;
+  string DiscountType = 6; // FlatAmount or Percentage
+  string DiscountLabel = 7; // e.g., "$10 off" or "20%"
 }
 
 message GetBasketDiscountRequest {
@@ -43,12 +41,13 @@ message GetBasketDiscountRequest {
 }
 
 message GetBasketDiscountResponse {
-  string Id = 1;
-  string CouponCode = 2;
-  string Description = 3;
-  double OriginalOrderTotal = 4;
-  double DiscountedOrderTotal = 5;
-  double DiscountAmount = 6;
+  string CouponCode = 1;
+  string Description = 2;
+  double OriginalPrice = 3;
+  double DiscountedPrice = 4;
+  double DiscountAmount = 5;
+  string DiscountType = 6; // FlatAmount or Percentage
+  string DiscountLabel = 7; // e.g., "$10 off" or "20%"
 }
 
 message CreateCouponRequest {

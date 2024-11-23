@@ -5,7 +5,11 @@ public class Basket
     public Guid UserId { get; set; } = default!;
     public bool Checkout { get; set; } = false;
     public List<BasketItem> Items { get; set; } = new();
-    public decimal TotalPrice => Items.Sum(x => x.Price * x.Quantity);
+    public CouponModel? Coupon { get; set; } = null!;
+    public decimal TotalPrice => 
+        Coupon != null && !string.IsNullOrWhiteSpace(Coupon.CouponCode) ?
+        Coupon.DiscountedPrice 
+        : Items.Sum(x => x.Price * x.Quantity);
 
     public Basket(Guid userId)
     {

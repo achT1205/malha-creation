@@ -1,6 +1,4 @@
-﻿using Discount.Grpc;
-
-namespace Cart.API.Models;
+﻿namespace Cart.API.Models;
 
 public class BasketItem
 {
@@ -14,5 +12,5 @@ public class BasketItem
     public string ProductName { get; set; } = default!;
     public string Slug { get; set; } = default!;
     public string CoverImage { get; set; } = default!;
-    //public CouponModel ? Coupon { get;  set; } = null!;
+    public CouponModel? Coupon { get;  set; } = null!;
 }

@@ -16,6 +16,13 @@ public class Order : Aggregate<OrderId>
     public DateTime GracePeriodEnd { get; private set; }
     public string? PaymentIntentId { get; private set; }
     public string? StripeSessionId { get; private set; }
+    public string? CouponCode { get; private set; } = string.Empty; // The coupon code
+    public string? DiscountDescription { get; private set; } = string.Empty; // Coupon description
+    public decimal? OriginalPrice { get; private set; } // The original product price
+    public decimal? DiscountedPrice { get; private set; } // The discounted product price
+    public decimal? DiscountAmount { get; private set; } // The calculated discount amount
+    public string? DiscountType { get; private set; } = string.Empty; // FlatAmount or Percentage
+    public string? DiscountLabel { get; private set; } = string.Empty;
 
     public decimal TotalPrice
     {
@@ -23,7 +30,20 @@ public class Order : Aggregate<OrderId>
         private set { }
     }
 
-    public static Order Create(OrderId id, CustomerId customerId, OrderCode OrderCode, Address shippingAddress, Address billingAddress, Payment payment)
+    public static Order Create(
+        OrderId id, 
+        CustomerId customerId, 
+        OrderCode OrderCode, 
+        Address shippingAddress, 
+        Address billingAddress, 
+        Payment payment,
+        string? couponCode,
+        string? description,
+        decimal? originalPrice,
+        decimal? discountedPrice,
+        decimal? discountAmount,
+        string? discountType,
+        string? discountLabel)
     {
         var order = new Order
         {
@@ -35,7 +55,14 @@ public class Order : Aggregate<OrderId>
             Payment = payment,
             Status = OrderStatus.Draft,
             CreatedAt = DateTime.Now,
-            GracePeriodEnd = DateTime.Now.AddMinutes(2)
+            GracePeriodEnd = DateTime.Now.AddMinutes(2),
+            CouponCode = couponCode,
+            DiscountDescription = description,
+            DiscountType = discountType,
+            DiscountLabel = discountLabel,
+            OriginalPrice = originalPrice,
+            DiscountAmount = discountAmount,
+            DiscountedPrice = discountedPrice
         };
         order.AddDomainEvent(new OrderCreatedEvent(order));
         return order;
@@ -219,12 +246,27 @@ public class Order : Aggregate<OrderId>
     }
 
 
-    public void Add(OrderId id, ProductId productId, int quantity, decimal price, string color, string size, string productName, string slug, int? discount, string? description)
+    public void Add(
+        OrderId id, 
+        ProductId productId, 
+        int quantity, 
+        decimal price, 
+        string color, 
+        string size, 
+        string productName, 
+        string slug, 
+        string? couponCode,
+        string? description,
+        decimal? originalPrice,
+        decimal? discountedPrice,
+        decimal? discountAmount,
+        string? discountType,
+        string? discountLabel)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
 
-        var orderItem = new OrderItem(id, productId, quantity, price, color, size, productName, slug, discount, description);
+        var orderItem = new OrderItem(id, productId, quantity, price, color, size, productName, slug, couponCode, description, originalPrice, discountedPrice, discountAmount, discountType, discountLabel);
         _orderItems.Add(orderItem);
     }
 

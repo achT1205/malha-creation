@@ -12,7 +12,6 @@ public record GetBasketDiscountQuery : IQuery<GetBasketDiscountResult>
 
 public record GetBasketDiscountResult
 {
-    public Guid Id { get; init; }
     public string? CouponCode { get; init; } = string.Empty; // The coupon code
     public string? Description { get; init; } = string.Empty; // Coupon description
     public decimal OriginalOrderTotal { get; init; } // The original order total
@@ -30,7 +29,7 @@ public class GetBasketDiscountQueryHandler (IApplicationDbContext dbContext) : I
     {
         var coupon = await dbContext.Coupons
             .Include(c => c.AllowedCustomerIds)
-            .FirstOrDefaultAsync(c => c.Code.Value == query.CouponCode, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Code.Value == query.CouponCode && c.IsDeleted == false && c.IsActive == true, cancellationToken);
         if (coupon == null)
         {
             return new GetBasketDiscountResult
@@ -60,7 +59,6 @@ public class GetBasketDiscountQueryHandler (IApplicationDbContext dbContext) : I
 
         return new GetBasketDiscountResult
         {
-            Id = coupon.Id.Value,
             CouponCode = coupon.Code.Value,
             Description = coupon.Description,
             OriginalOrderTotal = query.OrderTotal,

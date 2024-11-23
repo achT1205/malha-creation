@@ -19,15 +19,15 @@ namespace Ordering.API.Endpoints;
 
 public static class OrderEndpoints
 {
-    public record CreateOrderRequest
-    {
-        public Guid CustomerId { get; set; }
-        public required AddressDto ShippingAddress { get; set; }
-        public required AddressDto BillingAddress { get; set; }
-        public required PaymentDto Payment { get; set; }
-        public required List<OrderItemDto> OrderItems { get; set; }
-    };
-    public record CreateOrderResponse(Guid Id);
+    //public record CreateOrderRequest
+    //{
+    //    public Guid CustomerId { get; set; }
+    //    public required AddressDto ShippingAddress { get; set; }
+    //    public required AddressDto BillingAddress { get; set; }
+    //    public required PaymentDto Payment { get; set; }
+    //    public required List<OrderItemDto> OrderItems { get; set; }
+    //};
+    //public record CreateOrderResponse(Guid Id);
     public record UpdateOrderRequest
     {
         public Guid Id { get; set; }
@@ -44,37 +44,6 @@ public static class OrderEndpoints
     public record GetOrderByIdResponse(OrderDto Order);
     public static void MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/orders", async (CreateOrderRequest request, ISender sender) =>
-        {
-            var command = request.Adapt<CreateOrderCommand>();
-
-            var result = await sender.Send(command);
-
-            var response = result.Adapt<CreateOrderResponse>();
-
-            return Results.Created($"/api/orders/{response.Id}", response);
-        })
-       .WithName("CreateOrder")
-       .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
-       .ProducesProblem(StatusCodes.Status400BadRequest)
-       .WithSummary("Create Order")
-       .WithDescription("Create Order");
-
-        app.MapDelete("/api/orders/{id}", async (Guid Id, ISender sender) =>
-        {
-            var result = await sender.Send(new DeleteOrderCommand(Id));
-
-            var response = result.Adapt<DeleteOrderResponse>();
-
-            return Results.Ok(response);
-        })
-        .WithName("DeleteOrder")
-        .Produces<DeleteOrderResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithSummary("Delete Order")
-        .WithDescription("Delete Order");
-
         app.MapPut("/api/orders/{id}/cancel", async (Guid Id, ISender sender) =>
         {
             var result = await sender.Send(new CancelOrderCommand(Id));

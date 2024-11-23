@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Exceptions;
 using Cart.API.Services.Interfaces;
 using Discount.Grpc;
+using Mapster;
 using ShoppingCart.API.Dtos;
 using ShoppingCart.API.Enums;
 
@@ -90,9 +91,9 @@ public class StoreCartCommandHandler(
             {
                 BasketItem.Price = cv.Price.Amount.Value;
             }
-            //var coupon = await discountProto.GetDiscountAsync(new GetDiscountRequest { ProductId = item.ProductId.ToString() }, cancellationToken: cancellationToken);
-            //BasketItem.Price -= coupon.Amount;
-            //BasketItem.Coupon = coupon;
+            var coupon = await discountProto.GetCouponForProductAsync(new GetCouponForProductRequest { ProductId = item.ProductId.ToString(), ProductPrice = (double)BasketItem.Price }, cancellationToken: cancellationToken);
+            BasketItem.Price = (decimal)coupon.DiscountedPrice;
+            BasketItem.Coupon = coupon.Adapt<CouponModel>();
 
             BasketItems.Add(BasketItem);
         }

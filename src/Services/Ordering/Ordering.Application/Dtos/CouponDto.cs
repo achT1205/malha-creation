@@ -1,6 +1,6 @@
-﻿namespace BuildingBlocks.Messaging.Events
+﻿namespace Ordering.Application.Dtos
 {
-    public class CouponModel
+    public class CouponDto
     {
         public string CouponCode { get; init; } = string.Empty; // The coupon code
         public string Description { get; init; } = string.Empty; // Coupon description

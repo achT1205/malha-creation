@@ -13,7 +13,7 @@ using Ordering.Infrastructure.Data;
 namespace Ordering.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241111153734_Create_Database")]
+    [Migration("20241123132253_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace Ordering.Infrastructure.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -31,8 +31,26 @@ namespace Ordering.Infrastructure.Data.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CouponCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DiscountDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DiscountLabel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DiscountType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("DiscountedPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("GracePeriodEnd")
                         .HasColumnType("datetime2");
@@ -40,11 +58,20 @@ namespace Ordering.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal?>("OriginalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PaymentIntentId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("Draft");
+
+                    b.Property<string>("StripeSessionId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(18, 2)
@@ -191,14 +218,35 @@ namespace Ordering.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CouponCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DiscountDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DiscountLabel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DiscountType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("DiscountedPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("OriginalPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
