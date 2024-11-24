@@ -13,7 +13,7 @@ public record CheckoutCartCommand
     public PaymentDto Payment { get; set; } = default!;
 
 }
-public record CheckoutCartResult(bool IsSuccess);
+public record CheckoutCartResult(Guid OrderId);
 
 public class CheckoutCartCommandValidator
     : AbstractValidator<CheckoutCartCommand>
@@ -50,6 +50,7 @@ public class CheckoutCartCommandHandler
 
         var eventMessage = command.Adapt<CartCheckoutEvent>();
         eventMessage.Basket = cart.Adapt<OrderBasket>();
+        eventMessage.NewOrderId = Guid.NewGuid();
 
         await publishEndpoint.Publish(eventMessage, cancellationToken);
 
@@ -58,6 +59,6 @@ public class CheckoutCartCommandHandler
 
         await repository.DeleteCart(command.UserId, cancellationToken);
 
-        return new CheckoutCartResult(true);
+        return new CheckoutCartResult(eventMessage.NewOrderId);
     }
 }

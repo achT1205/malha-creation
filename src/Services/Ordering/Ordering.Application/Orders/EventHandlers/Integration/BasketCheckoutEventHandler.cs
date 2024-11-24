@@ -1,5 +1,5 @@
-﻿using Ordering.Application.Dtos;
-using Ordering.Application.Orders.Commands.CreateOrder;
+﻿using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Orders.Commands.CreateStripeSession;
 namespace Ordering.Application.Orders.EventHandlers.Integration;
 public class BasketCheckoutEventHandler
     (
@@ -11,8 +11,20 @@ public class BasketCheckoutEventHandler
     {
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
         var order = CreateNewOrder(context.Message);
+        order.SubmitForProcessing();
         var command = new CreateOrderCommand(order);
-        await sender.Send(command);
+        var result = await sender.Send(command);
+        if (result != null)
+        {
+            var cmd = new CreateStripeSessionCommand()
+            {
+                ApprovedUrl = "https://dashboard.stripe.com",
+                CancelUrl = "https://dashboard.stripe.com",
+                OrderId = result.Id,
+                Basket = context.Message.Basket
+            };
+            await sender.Send(cmd);
+        }
     }
 
     private Order CreateNewOrder(CartCheckoutEvent message)
@@ -24,7 +36,7 @@ public class BasketCheckoutEventHandler
 
         var sAdd = Address.Of(shippingAddress.FirstName, shippingAddress.LastName, shippingAddress.EmailAddress, shippingAddress.AddressLine, shippingAddress.Country, shippingAddress.City, shippingAddress.ZipCode);
         var bAdd = Address.Of(billingAddress.FirstName, billingAddress.LastName, billingAddress.EmailAddress, billingAddress.AddressLine, billingAddress.Country, billingAddress.City, billingAddress.ZipCode);
-        var orderId = Guid.NewGuid();
+        var orderId = message.NewOrderId;
         var newOrder = Order.Create(
                 id: OrderId.Of(orderId),
                 customerId: CustomerId.Of(basket.UserId),

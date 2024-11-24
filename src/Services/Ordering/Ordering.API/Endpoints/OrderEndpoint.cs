@@ -8,11 +8,13 @@ using Ordering.Application.Orders.Commands.ShipOrder;
 using Ordering.Application.Orders.Commands.UpdateBillingAddress;
 using Ordering.Application.Orders.Commands.UpdatePayment;
 using Ordering.Application.Orders.Commands.UpdateShippingAddress;
+using Ordering.Application.Orders.Commands.ValidateStripeSession;
 using Ordering.Application.Orders.Queries.GetOrders;
 using Ordering.Application.Orders.Queries.GetOrdersByCustomer;
 using Ordering.Application.Orders.Queries.GetOrdersById;
 using Ordering.Application.Orders.Queries.GetOrdersByOrderCode;
 using Ordering.Application.Orders.Queries.GetOrdersForStockValidation;
+using Ordering.Application.Orders.Queries.GetStripeSessionUrl;
 
 namespace Ordering.API.Endpoints;
 
@@ -195,6 +197,29 @@ public static class OrderEndpoints
         .WithSummary("Get Order By Id")
         .WithDescription("Get Order By Id");
 
-        
+
+        app.MapGet("/api/orders/{id}/get-stripe-url", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new GetStripeSessionUrlQuery(id));
+            return Results.Ok(result);
+        })
+       .WithName("Get Stripe session Url for payment")
+       .Produces<GetStripeSessionUrlQueryResult>(StatusCodes.Status200OK)
+       .ProducesProblem(StatusCodes.Status400BadRequest)
+       .ProducesProblem(StatusCodes.Status404NotFound)
+       .WithSummary("Get Stripe session Url for payment")
+       .WithDescription("Get Stripe session Url for payment");
+
+        app.MapPost("/api/orders/{id}/validate-stripe-session", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new ValidateStripeSessionCommand(id));
+            return Results.Ok(result);
+        })
+      .WithName("validate-stripe-session")
+      .Produces<ValidateStripeSessionResult>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status400BadRequest)
+      .ProducesProblem(StatusCodes.Status404NotFound)
+      .WithSummary("validate-stripe-session")
+      .WithDescription("validate-stripe-session");
     }
 }

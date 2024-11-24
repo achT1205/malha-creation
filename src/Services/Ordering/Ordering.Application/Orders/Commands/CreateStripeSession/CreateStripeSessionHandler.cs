@@ -1,7 +1,5 @@
 ﻿
 using Stripe.Checkout;
-using Stripe;
-using MassTransit;
 using Ordering.Application.Orders.Queries.GetOrdersById;
 
 
@@ -9,22 +7,27 @@ namespace Ordering.Application.Orders.Commands.CreateStripeSession;
 
 public record CreateStripeSessionCommand : ICommand<CreateStripeSessionResult>
 {
-
-    public string? StripeSessionUrl { get; set; }
-    public string? StripeSessionId { get; set; }
     public string ApprovedUrl { get; set; } = default!;
     public string CancelUrl { get; set; } = default!;
+    public Guid OrderId { get; set; }
     public OrderBasket Basket { get; set; } = default!;
 };
 
-public record CreateStripeSessionResult();
+public record CreateStripeSessionResult(bool IsSuccess);
 
-public class CreateStripeSessionCommandHandler : ICommandHandler<CreateStripeSessionCommand, CreateStripeSessionResult>
+public class CreateStripeSessionCommandHandler(ISender sender, IApplicationDbContext dbContext) : ICommandHandler<CreateStripeSessionCommand, CreateStripeSessionResult>
 {
     public async Task<CreateStripeSessionResult> Handle(CreateStripeSessionCommand command, CancellationToken cancellationToken)
     {
         try
         {
+            var order = await dbContext.Orders
+                .SingleOrDefaultAsync(t => t.Id == OrderId.Of(command.OrderId), cancellationToken);
+            if (order is null)
+            {
+                throw new OrderNotFoundException(command.OrderId);
+            }
+
             var options = new SessionCreateOptions
             {
                 SuccessUrl = command.ApprovedUrl,
@@ -34,13 +37,18 @@ public class CreateStripeSessionCommandHandler : ICommandHandler<CreateStripeSes
 
             };
 
-            //var DiscountsObj = new List<SessionDiscountOptions>()
+            var DiscountsObj = new List<SessionDiscountOptions>();
+            //foreach (var item in command.Basket.Items)
+            //{
+            //    if (item.Coupon != null && !string.IsNullOrWhiteSpace(item.Coupon.CouponCode))
             //    {
-            //        new SessionDiscountOptions
+            //        DiscountsObj.Add(new SessionDiscountOptions
             //        {
-            //            Coupon=stripeRequestDto.OrderHeader.CouponCode
-            //        }
-            //    };
+            //            Coupon = item.Coupon.CouponCode
+            //        });
+            //    }
+
+            //}
 
             foreach (var item in command.Basket.Items)
             {
@@ -62,24 +70,22 @@ public class CreateStripeSessionCommandHandler : ICommandHandler<CreateStripeSes
                 options.LineItems.Add(sessionLineItem);
             }
 
-            //if (stripeRequestDto.OrderHeader.Discount > 0)
-            //{
-            //    options.Discounts = DiscountsObj;
-            //}
+            if (DiscountsObj.Any())
+            {
+                options.Discounts = DiscountsObj;
+            }
             var service = new SessionService();
             Session session = service.Create(options);
-            //command.StripeSessionUrl = session.Url;
-            //var cmd = GetOrdersByIdQuery()
-            //var order  = 
-            //OrderHeader orderHeader = _db.OrderHeaders.First(u => u.OrderHeaderId == stripeRequestDto.OrderHeader.OrderHeaderId);
-            //orderHeader.StripeSessionId = session.Id;
-            //_db.SaveChanges();
-            //_response.Result = stripeRequestDto;
+            var cmd = new GetOrdersByIdQuery(command.OrderId);
+            var result = await sender.Send(cmd);
+            order.SetStripeSessionId(session.Id);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception ex) { 
-        
+        catch (Exception ex)
+        {
+
         }
 
-        return new CreateStripeSessionResult();
+        return new CreateStripeSessionResult(true);
     }
 }

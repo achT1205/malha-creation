@@ -10,7 +10,7 @@ public record CheckoutCartRequest
     public AddressDto BillingAddress { get; set; } = default!;
     public PaymentDto Payment { get; set; } = default!;
 }
-public record CheckoutCartResponse(bool IsSuccess);
+public record CheckoutCartResponse(Guid OrderId);
 
 public class CheckoutCartEndpoints : ICarterModule
 {

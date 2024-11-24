@@ -1,4 +1,6 @@
-﻿namespace Discount.Application.Coupons.Queries;
+﻿using Microsoft.Extensions.Logging;
+
+namespace Discount.Application.Coupons.Queries;
 
 public record GetBasketDiscountQuery : IQuery<GetBasketDiscountResult>
 {
@@ -12,18 +14,17 @@ public record GetBasketDiscountQuery : IQuery<GetBasketDiscountResult>
 
 public record GetBasketDiscountResult
 {
-    public string? CouponCode { get; init; } = string.Empty; // The coupon code
-    public string? Description { get; init; } = string.Empty; // Coupon description
-    public decimal OriginalOrderTotal { get; init; } // The original order total
-    public decimal DiscountedPrice { get; init; } 
+    public string CouponCode { get; init; } = string.Empty; // The coupon code
+    public string Description { get; init; } = string.Empty; // Coupon description
+    public decimal OriginalPrice { get; init; } // The original product price
+    public decimal DiscountedPrice { get; init; } // The discounted product price
     public decimal DiscountAmount { get; init; } // The calculated discount amount
-    public decimal DiscountedOrderTotal { get; init; } // The order total after applying the discount
     public string DiscountType { get; init; } = string.Empty; // FlatAmount or Percentage
     public string DiscountLabel { get; init; } = string.Empty;
 }
 
 
-public class GetBasketDiscountQueryHandler (IApplicationDbContext dbContext) : IQueryHandler<GetBasketDiscountQuery, GetBasketDiscountResult>
+public class GetBasketDiscountQueryHandler(IApplicationDbContext dbContext, ILogger<GetBasketDiscountQueryHandler> logger) : IQueryHandler<GetBasketDiscountQuery, GetBasketDiscountResult>
 {
     public async Task<GetBasketDiscountResult> Handle(GetBasketDiscountQuery query, CancellationToken cancellationToken)
     {
@@ -36,9 +37,9 @@ public class GetBasketDiscountQueryHandler (IApplicationDbContext dbContext) : I
             {
                 CouponCode = string.Empty,
                 Description = string.Empty,
-                OriginalOrderTotal = query.OrderTotal,
+                OriginalPrice = query.OrderTotal,
                 DiscountAmount = 0,
-                DiscountedOrderTotal = query.OrderTotal,
+                DiscountedPrice = query.OrderTotal,
             };
         }
 
@@ -48,25 +49,33 @@ public class GetBasketDiscountQueryHandler (IApplicationDbContext dbContext) : I
             : $"{coupon.Discountable.Percentage.Value}%";
 
         var userid = query.CustomerId.HasValue ? CustomerId.Of(query.CustomerId.Value) : CustomerId.Of(new Guid());
-        var discountAmount = coupon.CalculateBasketDiscount(
+        try
+        {
+            var discountPrice = coupon.CalculateBasketDiscount(
                userid,
                query.OrderTotal,
-               false,//query.IsFirstOrder,
+               true,//query.IsFirstOrder,
                0//query.RedemptionCount
            );
 
-        var discountedOrderTotal = Math.Max(0, query.OrderTotal - discountAmount);
+            var discountedAmount = Math.Max(0, query.OrderTotal - discountPrice);
 
-        return new GetBasketDiscountResult
+            return new GetBasketDiscountResult
+            {
+                CouponCode = coupon.Code.Value,
+                Description = coupon.Description,
+                OriginalPrice = query.OrderTotal,
+                DiscountAmount = discountedAmount,
+                DiscountedPrice = discountPrice,
+                DiscountType = discountType,
+                DiscountLabel = discountLabel,
+            };
+        }
+        catch (Exception ex)
         {
-            CouponCode = coupon.Code.Value,
-            Description = coupon.Description,
-            OriginalOrderTotal = query.OrderTotal,
-            DiscountAmount = discountAmount,
-            DiscountedOrderTotal = discountedOrderTotal,
-            DiscountType = discountType,
-            DiscountLabel = discountLabel,
-        };
+            logger.LogError(ex.Message, ex);
+            throw;
+        }
 
     }
 }

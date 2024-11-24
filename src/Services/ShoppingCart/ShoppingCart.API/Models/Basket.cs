@@ -3,7 +3,6 @@ public class Basket
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid UserId { get; set; } = default!;
-    public bool Checkout { get; set; } = false;
     public List<BasketItem> Items { get; set; } = new();
     public CouponModel? Coupon { get; set; } = null!;
     public decimal TotalPrice => 

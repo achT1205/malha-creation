@@ -1,4 +1,5 @@
 ﻿using Discount.Domain.Abstractions;
+using Discount.Domain.Exceptions;
 
 namespace Discount.Domain.Models;
 
@@ -128,28 +129,28 @@ public class Coupon : Aggregate<CouponId>
     public decimal CalculateBasketDiscount(CustomerId customerId, decimal orderTotal, bool isFirstOrder, int redemptionCount)
     {
         if (!IsActive)
-            throw new InvalidOperationException("Coupon is not active.");
+            throw new CouponDomainException("Coupon is not active.");
 
         if (StartDate.HasValue && StartDate > DateTime.UtcNow)
-            throw new InvalidOperationException("Coupon is not valid yet.");
+            throw new CouponDomainException("Coupon is not valid yet.");
 
         if (EndDate.HasValue && EndDate < DateTime.UtcNow)
-            throw new InvalidOperationException("Coupon has expired.");
+            throw new CouponDomainException("Coupon has expired.");
 
         if (MaxUses.HasValue && TotalRedemptions >= MaxUses.Value)
-            throw new InvalidOperationException("Coupon usage limit has been reached.");
+            throw new CouponDomainException("Coupon usage limit has been reached.");
 
         if (MaxUsesPerCustomer.HasValue && redemptionCount >= MaxUsesPerCustomer.Value)
-            throw new InvalidOperationException("Customer usage limit has been reached.");
+            throw new CouponDomainException("Customer usage limit has been reached.");
 
         if (MinimumOrderValue.HasValue && orderTotal < MinimumOrderValue.Value)
-            throw new InvalidOperationException($"Order total must be at least {MinimumOrderValue.Value:C}.");
+            throw new CouponDomainException($"Order total must be at least {MinimumOrderValue.Value:C}.");
 
         if (IsFirstTimeOrderOnly && !isFirstOrder)
-            throw new InvalidOperationException("This coupon is valid only for first-time orders.");
+            throw new CouponDomainException("This coupon is valid only for first-time orders.");
 
         if(AllowedCustomerIds.Any(id => id == customerId) && AllowedCustomerIds.FirstOrDefault(_=> _ == customerId) == null)
-            throw new InvalidOperationException($"The user {customerId.Value} is not whitelisted.");
+            throw new CouponDomainException($"The user {customerId.Value} is not whitelisted.");
 
         var discountAmount = Discountable.CalculateDiscount(orderTotal);
 

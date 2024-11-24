@@ -1,5 +1,4 @@
 ﻿using Ordering.Domain.Orders.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Application.Orders.EventHandlers.Domain;
 public class OrderUpdatedEventHandler(IPublishEndpoint publishEndpoint, ILogger<OrderUpdatedEventHandler> logger)
@@ -28,9 +27,7 @@ public class OrderUpdatedEventHandler(IPublishEndpoint publishEndpoint, ILogger<
 
         if (domainEvent.status == OrderStatus.StockConfirmed)
         {
-            var evt = new StartOrderPaymentEvent(domainEvent.order.Id.Value);
 
-            await publishEndpoint.Publish(evt, cancellationToken);
         }
 
         if (domainEvent.status == OrderStatus.Rejected)
