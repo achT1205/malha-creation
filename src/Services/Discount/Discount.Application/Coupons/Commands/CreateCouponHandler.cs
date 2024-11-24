@@ -37,7 +37,7 @@ public class CreateCouponCommandHandler(IApplicationDbContext dbContext) : IComm
                command.IsFirstTimeOrderOnly,
                command.IsActive);
 
-        var options = new Stripe.CouponCreateOptions();
+        
 
         foreach (var customerId in command.CustomerIds)
         {
@@ -47,13 +47,12 @@ public class CreateCouponCommandHandler(IApplicationDbContext dbContext) : IComm
         foreach (var productId in command.ProductIds)
         {
             coupon.AddApplicableProduct(ProductId.Of(productId));
-            options.AppliesTo.Products.Add(productId.ToString());
         }
 
         await dbContext.Coupons.AddAsync(coupon);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        
+        var options = new Stripe.CouponCreateOptions();
         if (command.FlatAmount.HasValue && command.FlatAmount > 0)
             options.AmountOff = (long)(command.FlatAmount.Value * 100);
 

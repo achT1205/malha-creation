@@ -28,51 +28,45 @@ public class CreateStripeSessionCommandHandler(ISender sender, IApplicationDbCon
                 throw new OrderNotFoundException(command.OrderId);
             }
 
+            var sessionLineItems = command.Basket.Items.Select(item => new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
+                {
+                    Currency = "usd",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = item.ProductName,
+                        Images = [item.CoverImage],
+                        //Description = string.IsNullOrWhiteSpace(item.Coupon.Description)? item.Coupon.Description : "No discount"
+                    },
+                    UnitAmountDecimal = (long)(item.Price * 100), // Stripe expects amounts in cents
+                },
+                Quantity = item.Quantity,
+            }).ToList();
+
             var options = new SessionCreateOptions
             {
-                SuccessUrl = command.ApprovedUrl,
-                CancelUrl = command.CancelUrl,
-                LineItems = new List<SessionLineItemOptions>(),
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = sessionLineItems,
                 Mode = "payment",
-
+                SuccessUrl = "https://yourdomain.com/success?session_id={CHECKOUT_SESSION_ID}",
+                CancelUrl = "https://yourdomain.com/cancel",
+                Metadata = new Dictionary<string, string>
+                {
+                    { "OrderId", command.OrderId.ToString() },
+                    { "CustomerId", command.Basket.UserId.ToString() }
+                }
             };
 
-            var DiscountsObj = new List<SessionDiscountOptions>();
-            foreach (var item in command.Basket.Items)
+            if (!string.IsNullOrWhiteSpace(command.Basket.Coupon.CouponCode))
             {
-                if (item.Coupon != null && !string.IsNullOrWhiteSpace(item.Coupon.CouponCode))
+                options.Discounts = new List<SessionDiscountOptions>()
                 {
-                    DiscountsObj.Add(new SessionDiscountOptions
+                    new SessionDiscountOptions
                     {
-                        Coupon = item.Coupon.CouponCode
-                    });
-                }
-
-            }
-
-            foreach (var item in command.Basket.Items)
-            {
-                var sessionLineItem = new SessionLineItemOptions
-                {
-                    PriceData = new SessionLineItemPriceDataOptions
-                    {
-                        UnitAmount = (long)(item.Price * 100), // $20.99 -> 2099
-                        Currency = "usd",
-                        ProductData = new SessionLineItemPriceDataProductDataOptions
-                        {
-                            Name = item.ProductName,
-                            Images = [item.CoverImage],
-                        }
-                    },
-                    Quantity = item.Quantity
+                        Coupon = command.Basket.Coupon.CouponCode
+                    }
                 };
-
-                options.LineItems.Add(sessionLineItem);
-            }
-
-            if (DiscountsObj.Any())
-            {
-                options.Discounts = DiscountsObj;
             }
             var service = new SessionService();
             Session session = service.Create(options);
