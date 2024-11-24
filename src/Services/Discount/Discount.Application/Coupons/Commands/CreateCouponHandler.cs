@@ -37,6 +37,8 @@ public class CreateCouponCommandHandler(IApplicationDbContext dbContext) : IComm
                command.IsFirstTimeOrderOnly,
                command.IsActive);
 
+        var options = new Stripe.CouponCreateOptions();
+
         foreach (var customerId in command.CustomerIds)
         {
             coupon.AddSpecificCustomer(CustomerId.Of(customerId));
@@ -45,11 +47,28 @@ public class CreateCouponCommandHandler(IApplicationDbContext dbContext) : IComm
         foreach (var productId in command.ProductIds)
         {
             coupon.AddApplicableProduct(ProductId.Of(productId));
+            options.AppliesTo.Products.Add(productId.ToString());
         }
 
         await dbContext.Coupons.AddAsync(coupon);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new CreateCouponResult(coupon.Id.Value, coupon.Code.Value, coupon.Name); 
+        
+        if (command.FlatAmount.HasValue && command.FlatAmount > 0)
+            options.AmountOff = (long)(command.FlatAmount.Value * 100);
+
+        if (command.Percentage.HasValue && command.Percentage > 0)
+            options.PercentOff = (long)(command.Percentage.Value * 100);
+        options.Name = command.Name;
+        options.Currency = "usd";
+        options.Id = command.CouponCode;
+
+        var service = new Stripe.CouponService();
+        try { service.Create(options); }
+        catch (Exception ex) 
+        {
+            throw;
+        }
+        return new CreateCouponResult(coupon.Id.Value, coupon.Code.Value, coupon.Name);
     }
 }

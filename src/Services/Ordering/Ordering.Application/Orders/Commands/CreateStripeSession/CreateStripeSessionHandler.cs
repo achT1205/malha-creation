@@ -38,17 +38,17 @@ public class CreateStripeSessionCommandHandler(ISender sender, IApplicationDbCon
             };
 
             var DiscountsObj = new List<SessionDiscountOptions>();
-            //foreach (var item in command.Basket.Items)
-            //{
-            //    if (item.Coupon != null && !string.IsNullOrWhiteSpace(item.Coupon.CouponCode))
-            //    {
-            //        DiscountsObj.Add(new SessionDiscountOptions
-            //        {
-            //            Coupon = item.Coupon.CouponCode
-            //        });
-            //    }
+            foreach (var item in command.Basket.Items)
+            {
+                if (item.Coupon != null && !string.IsNullOrWhiteSpace(item.Coupon.CouponCode))
+                {
+                    DiscountsObj.Add(new SessionDiscountOptions
+                    {
+                        Coupon = item.Coupon.CouponCode
+                    });
+                }
 
-            //}
+            }
 
             foreach (var item in command.Basket.Items)
             {
