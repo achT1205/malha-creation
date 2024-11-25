@@ -69,7 +69,7 @@ public class CreateStripeSessionCommandHandler(ISender sender, IApplicationDbCon
                 };
             }
             var service = new SessionService();
-            Session session = service.Create(options);
+            Session session = await service.CreateAsync(options);
             var cmd = new GetOrdersByIdQuery(command.OrderId);
             var result = await sender.Send(cmd);
             order.SetStripeSessionId(session.Id);

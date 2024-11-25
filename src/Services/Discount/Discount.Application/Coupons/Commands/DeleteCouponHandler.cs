@@ -21,6 +21,12 @@ public class DeleteCouponCommandHandler(IApplicationDbContext dbContext) : IComm
         dbContext.Coupons.Update(coupon);
         await dbContext.SaveChangesAsync(cancellationToken);
 
+        if (!coupon.ProductIds.Any() && !coupon.AllowedCustomerIds.Any())
+        {
+            var service = new Stripe.CouponService();
+            await service.DeleteAsync(coupon.Code.Value);
+        }
+
         return new DeleteCouponResult(true);
     }
 }

@@ -30,8 +30,6 @@ public static class DependencyInjection
 
         // Register the external API service
         services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<ICartService, CartService>();
-
 
         return services;
     }

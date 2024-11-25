@@ -18,8 +18,6 @@ public static class DependencyInjection
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
         });
 
-        services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
-
         return services;
     }
 }

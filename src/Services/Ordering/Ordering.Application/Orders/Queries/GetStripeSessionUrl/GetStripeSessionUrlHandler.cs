@@ -22,7 +22,7 @@ public class GetStripeSessionUrlQueryHandler(IApplicationDbContext dbContext) : 
             }
 
             var service = new SessionService();
-            Session session = service.Get(order.StripeSessionId);
+            Session session = await service.GetAsync(order.StripeSessionId);
             return new GetStripeSessionUrlQueryResult(session.Url);
         }
         catch (Exception ex)

@@ -28,7 +28,7 @@ public class ApplyCartDiscountCommandHandler(
         }
 
         var service = new CouponService();
-        var stripeCoupon = service.Get(command.CouponCode);
+        var stripeCoupon = await service.GetAsync(command.CouponCode);
         if (stripeCoupon != null)
         {
 

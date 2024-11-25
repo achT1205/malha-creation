@@ -22,37 +22,48 @@ public class UpdateCouponCommdHandler(IApplicationDbContext dbContext) : IComman
 {
     public async Task<UpdateCouponResult> Handle(UpdateCouponCommand command, CancellationToken cancellationToken)
     {
-        try
+        var coupon = await dbContext.Coupons
+          .FirstOrDefaultAsync(c => c.Id == CouponId.Of(command.CouponId), cancellationToken);
+
+
+        if (coupon == null)
+            throw new NotFoundException($"Coupon with ID {command.CouponId} not found.");
+
+        coupon.UpdateDetails(
+            CouponCode.Of(command.CouponCode),
+            command.Name,
+            command.Description,
+            Discountable.Of(command.FlatAmount, command.Percentage),
+            command.StartDate,
+            command.EndDate,
+            command.MaxUses,
+            command.MaxUsesPerCustomer,
+            command.MinimumOrderValue,
+            command.IsFirstTimeOrderOnly,
+            command.IsActive
+        );
+
+        dbContext.Coupons.Update(coupon);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        if (!coupon.ProductIds.Any() && !coupon.AllowedCustomerIds.Any())
         {
-            var coupon = await dbContext.Coupons
-           .FirstOrDefaultAsync(c => c.Id == CouponId.Of(command.CouponId), cancellationToken);
+            var service = new Stripe.CouponService();
+            await service.DeleteAsync(coupon.Code.Value);
 
+            var options = new Stripe.CouponCreateOptions();
+            if (command.FlatAmount.HasValue && command.FlatAmount > 0)
+                options.AmountOff = (long)(command.FlatAmount.Value * 100);
 
-            if (coupon == null)
-                throw new NotFoundException($"Coupon with ID {command.CouponId} not found.");
+            if (command.Percentage.HasValue && command.Percentage > 0)
+                options.PercentOff = (long)(command.Percentage.Value * 100);
+            options.Name = command.Name;
+            options.Currency = "usd";
+            options.Id = command.CouponCode;
 
-            coupon.UpdateDetails(
-                CouponCode.Of(command.CouponCode),
-                command.Name,
-                command.Description,
-                Discountable.Of(command.FlatAmount, command.Percentage),
-                command.StartDate,
-                command.EndDate,
-                command.MaxUses,
-                command.MaxUsesPerCustomer,
-                command.MinimumOrderValue,
-                command.IsFirstTimeOrderOnly,
-                command.IsActive
-            );
-
-            dbContext.Coupons.Update(coupon);
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-            return new UpdateCouponResult(true);
+            await service.CreateAsync(options);
         }
-        catch (Exception ex)
-        {
-            throw ex;
-        }
+
+        return new UpdateCouponResult(true);
     }
 }

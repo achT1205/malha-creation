@@ -13,32 +13,8 @@ public static class DependencyInjection
     this IServiceCollection services,
     IConfiguration configuration) =>
     services
-        //.AddServices(configuration)
         .AddDatabase(configuration)
         .AddHealthChecks(configuration);
-
-
-    private static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        //services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
-
-        //services.AddScoped<ICategoryRepository, CategoryRepository>();
-        //services.AddScoped<ICollectionRepository, CollectionRepository>();
-        //services.AddScoped<IMaterialRepository, MaterialRepository>();
-        //services.AddScoped<IOccasionRepository, OccasionRepository>();
-        //services.AddScoped<IProductRepository, ProductRepository>();
-        //services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
-        //services.AddScoped<IBrandRepository, BrandRepository>();
-        //services.AddScoped<IOrderingService, OrderingService>();
-
-        // Bind the ExternalApiSettings from appsettings.json
-        //services.Configure<ExternalApiSettings>(configuration.GetSection("ExternalApiSettings"));
-
-        // Register HttpClient
-        //services.AddHttpClient();
-
-        return services;
-    }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
@@ -54,8 +30,6 @@ public static class DependencyInjection
 
         return services;
     }
-
-
     private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
     {
         services

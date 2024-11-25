@@ -1,4 +1,6 @@
-﻿namespace Discount.Application.Coupons.Commands;
+﻿using Discount.Application.Exceptions;
+
+namespace Discount.Application.Coupons.Commands;
 
 public record CreateCouponCommand : ICommand<CreateCouponResult>
 {
@@ -23,6 +25,15 @@ public class CreateCouponCommandHandler(IApplicationDbContext dbContext) : IComm
 {
     public async Task<CreateCouponResult> Handle(CreateCouponCommand command, CancellationToken cancellationToken)
     {
+        var oldcoupon = await dbContext.Coupons
+           .Include(c => c.ProductIds)
+           .FirstOrDefaultAsync(c => c.Code == CouponCode.Of(command.CouponCode), cancellationToken);
+
+        if (oldcoupon != null)
+        {
+            throw new CouponAlreadyExistsFoundException($"The coupon with code {command.CouponCode} already exixts.");
+        }
+
         var coupon = Coupon.Create(
                CouponId.Of(Guid.NewGuid()),
                CouponCode.Of(command.CouponCode),
@@ -37,7 +48,7 @@ public class CreateCouponCommandHandler(IApplicationDbContext dbContext) : IComm
                command.IsFirstTimeOrderOnly,
                command.IsActive);
 
-        
+
 
         foreach (var customerId in command.CustomerIds)
         {
@@ -52,22 +63,23 @@ public class CreateCouponCommandHandler(IApplicationDbContext dbContext) : IComm
         await dbContext.Coupons.AddAsync(coupon);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var options = new Stripe.CouponCreateOptions();
-        if (command.FlatAmount.HasValue && command.FlatAmount > 0)
-            options.AmountOff = (long)(command.FlatAmount.Value * 100);
 
-        if (command.Percentage.HasValue && command.Percentage > 0)
-            options.PercentOff = (long)(command.Percentage.Value * 100);
-        options.Name = command.Name;
-        options.Currency = "usd";
-        options.Id = command.CouponCode;
-
-        var service = new Stripe.CouponService();
-        try { service.Create(options); }
-        catch (Exception ex) 
+        if (!command.ProductIds.Any() && !command.CustomerIds.Any())
         {
-            throw;
+            var service = new Stripe.CouponService();
+            var options = new Stripe.CouponCreateOptions();
+            if (command.FlatAmount.HasValue && command.FlatAmount > 0)
+                options.AmountOff = (long)(command.FlatAmount.Value * 100);
+
+            if (command.Percentage.HasValue && command.Percentage > 0)
+                options.PercentOff = (long)(command.Percentage.Value * 100);
+            options.Name = command.Name;
+            options.Currency = "usd";
+            options.Id = command.CouponCode;
+
+            await service.CreateAsync(options);
         }
+
         return new CreateCouponResult(coupon.Id.Value, coupon.Code.Value, coupon.Name);
     }
 }

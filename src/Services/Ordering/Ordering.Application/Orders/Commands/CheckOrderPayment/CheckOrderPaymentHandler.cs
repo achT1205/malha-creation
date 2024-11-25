@@ -10,18 +10,18 @@ namespace Ordering.Application.Orders.Commands.CheckOrderPayment
     {
         public async Task<CheckOrderPaymentResult> Handle(CheckOrderPaymentCommand command, CancellationToken cancellationToken)
         {
-            try
-            {
-                var order = await dbContext.Orders
+            var order = await dbContext.Orders
                     .SingleOrDefaultAsync(t => t.Id == OrderId.Of(command.OrderId), cancellationToken);
-                if (order is null)
-                {
-                    throw new OrderNotFoundException(command.OrderId);
-                }
+            if (order is null)
+            {
+                throw new OrderNotFoundException(command.OrderId);
+            }
 
-                var service = new SessionService();
-                Session session = service.Get(order.StripeSessionId);
+            var service = new SessionService();
+            Session session = service.Get(order.StripeSessionId);
 
+            if (session.PaymentIntentId != null)
+            {
                 var paymentIntentService = new PaymentIntentService();
                 PaymentIntent paymentIntent = paymentIntentService.Get(session.PaymentIntentId);
                 if (paymentIntent.Status == "succeeded")
@@ -31,16 +31,8 @@ namespace Ordering.Application.Orders.Commands.CheckOrderPayment
                     await dbContext.SaveChangesAsync(cancellationToken);
                     return new CheckOrderPaymentResult(true);
                 }
-                else
-                    return new CheckOrderPaymentResult(false);
-
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-
+            return new CheckOrderPaymentResult(false);
         }
     }
 
