@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+//import "google/api/annotations.proto";
+
 option csharp_namespace = "Discount.Grpc";
 
 package discount;
@@ -17,7 +19,72 @@ service DiscountProtoService {
 
   rpc AddApplicableProduct (AddApplicableProductRequest) returns (AddApplicableProductResponse);
   rpc AddCustomerCoupon (AddCustomerRequest) returns (AddCustomerResponse);
-}
+
+
+//  rpc GetCouponForProduct (GetCouponForProductRequest) returns (GetCouponForProductResponse){
+//    option (google.api.http) = {
+//      post: "/api/discount/get-coupon-by-productid"
+//      body: "*"
+//    };
+//  };
+
+//rpc GetBasketDiscount(GetBasketDiscountRequest) returns(GetBasketDiscountResponse) {
+//    option(google.api.http) = {
+//    post: "/api/discount/get-basket-discount"
+//      body: "*"
+//    };
+//}
+
+//rpc GetCoupon(GetCouponRequest) returns(Coupon) {
+//    option(google.api.http) = {
+//    post: "/api/discount/get-coupon"
+//      body: "*"
+//    };
+//}
+
+//rpc GetCoupons(GetCouponsRequest) returns(GetCouponsResponse) {
+//    option(google.api.http) = {
+//    post: "/api/discount/get-coupons"
+//      body: "*"
+//    };
+//}
+
+
+//rpc CreateCoupon(CreateCouponRequest) returns(CreateCouponResponse) {
+//    option(google.api.http) = {
+//    post: "/api/discount/create-coupon"
+//      body: "*"
+//    };
+//}
+
+//rpc UpdateCoupon(UpdateCouponRequest) returns(UpdateCouponResponse) {
+//    option(google.api.http) = {
+//    put: "/api/discount/update-coupon"
+//      body: "*"
+//    };
+//}
+
+//rpc DeleteCoupon(DeleteCouponRequest) returns(DeleteCouponResponse) {
+//    option(google.api.http) = {
+//    delete: "/api/discount/delete-coupon"
+//    };
+//}
+
+//rpc AddApplicableProduct(AddApplicableProductRequest) returns(AddApplicableProductResponse) {
+//    option(google.api.http) = {
+//    post: "/api/discount/add-applicable-product"
+//      body: "*"
+//    };
+//}
+
+//rpc AddCustomerCoupon(AddCustomerRequest) returns(AddCustomerResponse) {
+//    option(google.api.http) = {
+//    post: "/api/discount/add-customer-coupon"
+//      body: "*"
+//    };
+//}
+
+ }
 
 message GetCouponForProductRequest {
   string ProductId = 2;

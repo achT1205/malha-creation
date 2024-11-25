@@ -55,24 +55,6 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/api/product-types/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 3000
-        }
-      ],
-      "UpstreamPathTemplate": "/api/product-types/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "FileCacheOptions": {
-        "TtlSeconds": 60,
-        "Region": "default",
-        "Header": "OC-Caching-Control",
-        "EnableContentHashing": false
-      }
-    },
-    {
       "DownstreamPathTemplate": "/api/collections/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -109,6 +91,24 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 3002
+        }
+      ],
+      "UpstreamPathTemplate": "/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "default",
+        "Header": "OC-Caching-Control",
+        "EnableContentHashing": false
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/carts/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -127,6 +127,24 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/api/cart-by-userid/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 3003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/cart-by-userid/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "default",
+        "Header": "OC-Caching-Control",
+        "EnableContentHashing": false
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/orders/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -136,6 +154,24 @@
         }
       ],
       "UpstreamPathTemplate": "/api/orders/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "default",
+        "Header": "OC-Caching-Control",
+        "EnableContentHashing": false
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/get-stock-order/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 3004
+        }
+      ],
+      "UpstreamPathTemplate": "/api/get-stock-order/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "FileCacheOptions": {
         "TtlSeconds": 60,
