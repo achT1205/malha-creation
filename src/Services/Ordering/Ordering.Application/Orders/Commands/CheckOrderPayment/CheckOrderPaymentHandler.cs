@@ -1,14 +1,14 @@
 ﻿using Stripe;
 using Stripe.Checkout;
 
-namespace Ordering.Application.Orders.Commands.ValidateStripeSession
+namespace Ordering.Application.Orders.Commands.CheckOrderPayment
 {
-    public record ValidateStripeSessionCommand(Guid OrderId) : ICommand<ValidateStripeSessionResult>;
-    public record ValidateStripeSessionResult(bool IsSuccess);
+    public record CheckOrderPaymentCommand(Guid OrderId) : ICommand<CheckOrderPaymentResult>;
+    public record CheckOrderPaymentResult(bool IsSuccess);
 
-    public class ValidateStripeSessionCommandHandler(IApplicationDbContext dbContext) : ICommandHandler<ValidateStripeSessionCommand, ValidateStripeSessionResult>
+    public class CheckOrderPaymentCommandHandler(IApplicationDbContext dbContext) : ICommandHandler<CheckOrderPaymentCommand, CheckOrderPaymentResult>
     {
-        public async Task<ValidateStripeSessionResult> Handle(ValidateStripeSessionCommand command, CancellationToken cancellationToken)
+        public async Task<CheckOrderPaymentResult> Handle(CheckOrderPaymentCommand command, CancellationToken cancellationToken)
         {
             try
             {
@@ -29,10 +29,10 @@ namespace Ordering.Application.Orders.Commands.ValidateStripeSession
                     //then payment was successful
                     order.SetPaymentIntentId(paymentIntent.Id);
                     await dbContext.SaveChangesAsync(cancellationToken);
-                    return new ValidateStripeSessionResult(true);
+                    return new CheckOrderPaymentResult(true);
                 }
                 else
-                    return new ValidateStripeSessionResult(false);
+                    return new CheckOrderPaymentResult(false);
 
             }
             catch (Exception ex)

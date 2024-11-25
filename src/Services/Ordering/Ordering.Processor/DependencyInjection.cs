@@ -15,7 +15,7 @@ public static class DependencyInjection
         services.AddHostedService<GracePeriodManagerService>();
         services.AddHostedService<OrderProcessingManagerService>();
         services.AddHostedService<OrderPackingManagerService>();
-
+        services.AddHostedService<OrderPaymentValidationManagerService>();
         return services;
     }
 

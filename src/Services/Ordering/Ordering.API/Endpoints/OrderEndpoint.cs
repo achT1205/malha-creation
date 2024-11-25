@@ -1,12 +1,12 @@
 ﻿using BuildingBlocks.Messaging.Events;
 using BuildingBlocks.Pagination;
 using Ordering.Application.Orders.Commands.CancelOrder;
+using Ordering.Application.Orders.Commands.CheckOrderPayment;
 using Ordering.Application.Orders.Commands.ConfirmOrder;
 using Ordering.Application.Orders.Commands.ShipOrder;
 using Ordering.Application.Orders.Commands.UpdateBillingAddress;
 using Ordering.Application.Orders.Commands.UpdatePayment;
 using Ordering.Application.Orders.Commands.UpdateShippingAddress;
-using Ordering.Application.Orders.Commands.ValidateStripeSession;
 using Ordering.Application.Orders.Queries.GetOrders;
 using Ordering.Application.Orders.Queries.GetOrdersByCustomer;
 using Ordering.Application.Orders.Queries.GetOrdersById;
@@ -201,11 +201,11 @@ public static class OrderEndpoints
 
         app.MapPost("/api/orders/{id}/validate-stripe-session", async (Guid id, ISender sender) =>
         {
-            var result = await sender.Send(new ValidateStripeSessionCommand(id));
+            var result = await sender.Send(new CheckOrderPaymentCommand(id));
             return Results.Ok(result);
         })
       .WithName("validate-stripe-session")
-      .Produces<ValidateStripeSessionResult>(StatusCodes.Status200OK)
+      .Produces<CheckOrderPaymentCommand>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status400BadRequest)
       .ProducesProblem(StatusCodes.Status404NotFound)
       .WithSummary("validate-stripe-session")

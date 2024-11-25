@@ -1,19 +1,20 @@
-﻿using Ordering.Application.Orders.Commands.PackOrder;
+﻿using Ordering.Application.Orders.Commands.CheckOrderPayment;
 using Ordering.Application.Orders.Commands.ProcessOrder;
-using Ordering.Application.Orders.Queries.GetStockConfirmedOrders;
+using Ordering.Application.Orders.Queries.GetGraceTimeConfirmedOrders;
+using Ordering.Application.Orders.Queries.GetPendingPaymentOrders;
 
 namespace Ordering.Processor.Services;
 
-public class OrderPackingManagerService : BackgroundService
+public class OrderPaymentValidationManagerService : BackgroundService
 {
     private readonly BackgroundTaskOptions _options;
     private readonly ILogger _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
-    public OrderPackingManagerService(
+    public OrderPaymentValidationManagerService(
         IOptions<BackgroundTaskOptions> options,
-        ILogger<OrderPackingManagerService> logger,
+        ILogger<OrderPaymentValidationManagerService> logger,
         IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
@@ -23,30 +24,30 @@ public class OrderPackingManagerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var delayTime = TimeSpan.FromSeconds(_options.PackingTime);
+        var delayTime = TimeSpan.FromSeconds(_options.PaymentCheckTime);
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("OrderPackingManagerService is starting.");
-            cancellationToken.Register(() => _logger.LogDebug("OrderPackingManagerService background task is stopping."));
+            _logger.LogDebug("OrderPaymentValidationManagerService is starting.");
+            cancellationToken.Register(() => _logger.LogDebug("OrderPaymentValidationManagerService background task is stopping."));
         }
 
         while (!cancellationToken.IsCancellationRequested)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("OrderPackingManagerService background task is doing background work.");
+                _logger.LogDebug("OrderPaymentValidationManagerService background task is doing background work.");
             }
 
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-               var result = await mediator.Send(new GetStockConfirmedOrdersQuery(), cancellationToken);
+               var result = await mediator.Send(new GetPendingPaymentOrdersQuery(), cancellationToken);
                 if (result != null && result.orders.Any()) {
                     foreach (var o in result.orders)
                     {
-                        var commad = new PackOrderCommand(o.Id);
+                        var commad = new CheckOrderPaymentCommand(o.Id);
                         await mediator.Send(commad);
                     }
                 }
@@ -58,7 +59,7 @@ public class OrderPackingManagerService : BackgroundService
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("OrderPackingManagerService background task is stopping.");
+            _logger.LogDebug("OrderPaymentValidationManagerService background task is stopping.");
         }
     }    
 }

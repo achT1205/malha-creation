@@ -22,7 +22,7 @@ public class OrderProcessingManagerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var delayTime = TimeSpan.FromSeconds(_options.CheckUpdateTime);
+        var delayTime = TimeSpan.FromSeconds(_options.ProcessTime);
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
