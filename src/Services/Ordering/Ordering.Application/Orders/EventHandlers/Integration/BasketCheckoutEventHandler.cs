@@ -12,8 +12,8 @@ public class BasketCheckoutEventHandler
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
         var order = CreateNewOrder(context.Message);
         order.SubmitForProcessing();
-        var command = new CreateOrderCommand(order);
-        var result = await sender.Send(command);
+        var createOrderCmd = new CreateOrderCommand(order);
+        var result = await sender.Send(createOrderCmd);
         if (result != null)
         {
             var cmd = new CreateStripeSessionCommand()

@@ -1,7 +1,6 @@
 ﻿using BuildingBlocks.Exceptions;
 using Cart.API.Services.Interfaces;
 using Discount.Grpc;
-using Mapster;
 using ShoppingCart.API.Dtos;
 using ShoppingCart.API.Enums;
 
@@ -50,7 +49,7 @@ public class StoreCartCommandHandler(
 
     private async Task<IEnumerable<BasketItem>> DeductDiscount(IEnumerable<CartItem> cartItems, CancellationToken cancellationToken)
     {
-        List<BasketItem> BasketItems = new List<BasketItem>();
+        List<BasketItem> basketItems = new List<BasketItem>();
 
         foreach (var item in cartItems)
         {
@@ -60,7 +59,8 @@ public class StoreCartCommandHandler(
                 throw new ProductNotFoundException(item.ProductId);
             }
 
-            var BasketItem = new BasketItem
+
+            var basketItem = new BasketItem
             {
                 Quantity = item.Quantity,
                 ProductId = item.ProductId,
@@ -74,9 +74,9 @@ public class StoreCartCommandHandler(
             {
                 throw new ProductNotFoundException($"No variant exists for this product in the colorId {item.ColorVariantId}");
             }
-            BasketItem.Color = cv.Color;
-            BasketItem.Slug = cv.Slug;
-            BasketItem.CoverImage = cv.Images[0].ImageSrc;
+            basketItem.Color = cv.Color;
+            basketItem.Slug = cv.Slug;
+            basketItem.CoverImage = cv.Images[0].ImageSrc;
             if (product.ProductType == ProductType.Clothing)
             {
                 var sv = cv.SizeVariants.Find(x => x.Id == item.SizeVariantId);
@@ -84,20 +84,28 @@ public class StoreCartCommandHandler(
                 {
                     throw new ProductNotFoundException($"No sizeId {item.SizeVariantId} exists for this product in the color {cv.Color} ");
                 }
-                BasketItem.Size = sv.Size;
-                BasketItem.Price = sv.Price;
+                if(sv.Quantity < basketItem.Quantity)
+                {
+                    throw new ProductNotFoundException($"The size variant {item.SizeVariantId} is out of stock.");
+                }
+                basketItem.Size = sv.Size;
+                basketItem.Price = sv.Price;
             }
             else
             {
-                BasketItem.Price = cv.Price.Amount.Value;
+                if (cv.Quantity < basketItem.Quantity)
+                {
+                    throw new ProductOutOfStockFoundException($"The color variant {item.ColorVariantId} is out of stock.");
+                }
+                basketItem.Price = cv.Price.Amount.Value;
             }
-            var coupon = await discountProto.GetCouponForProductAsync(new GetCouponForProductRequest { ProductId = item.ProductId.ToString(), ProductPrice = (double)BasketItem.Price }, cancellationToken: cancellationToken);
-            BasketItem.Price = (decimal)coupon.DiscountedPrice;
-            BasketItem.Coupon = coupon.Adapt<CouponModel>();
+            var coupon = await discountProto.GetCouponForProductAsync(new GetCouponForProductRequest { ProductId = item.ProductId.ToString(), ProductPrice = (double)basketItem.Price }, cancellationToken: cancellationToken);
+            basketItem.Price = (decimal)coupon.DiscountedPrice;
+            basketItem.Coupon = coupon.Adapt<CouponModel>();
 
-            BasketItems.Add(BasketItem);
+            basketItems.Add(basketItem);
         }
 
-        return BasketItems;
+        return basketItems;
     }
 }

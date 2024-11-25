@@ -8,9 +8,6 @@ public class GetOrderForStockValidationQueryHandler(IApplicationDbContext dbCont
 {
     public async Task<GetOrderForStockValidationResult> Handle(GetOrderForStockValidationQuery query, CancellationToken cancellationToken)
     {
-
-        var totalCount = await dbContext.Orders.LongCountAsync(cancellationToken);
-
         var order = await dbContext.Orders
             .Include(o => o.OrderItems)
             .AsNoTracking()

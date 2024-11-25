@@ -9,7 +9,7 @@ public class OrderItemStockRejectedEventHandler
     {
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
 
-        var command = new RejectOrderCommand(context.Message.OrderStockRejected.OrderId);
+        var command = new OrderItemStockRejectCommand(context.Message.OrderStockRejected);
         await sender.Send(command);
     }
 }

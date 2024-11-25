@@ -13,7 +13,8 @@ public static class DependencyInjection
             .BindConfiguration(nameof(BackgroundTaskOptions));
 
         services.AddHostedService<GracePeriodManagerService>();
-        services.AddHostedService<OrderValidationManagerService>();
+        services.AddHostedService<OrderProcessingManagerService>();
+        services.AddHostedService<OrderPackingManagerService>();
 
         return services;
     }

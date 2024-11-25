@@ -35,8 +35,8 @@ public class GetBasketDiscountQueryHandler(IApplicationDbContext dbContext, ILog
         {
             return new GetBasketDiscountResult
             {
-                CouponCode = string.Empty,
-                Description = string.Empty,
+                CouponCode = "None",
+                Description = "No discount",
                 OriginalPrice = query.OrderTotal,
                 DiscountAmount = 0,
                 DiscountedPrice = query.OrderTotal,

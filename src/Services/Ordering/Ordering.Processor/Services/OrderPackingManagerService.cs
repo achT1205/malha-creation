@@ -1,15 +1,19 @@
-﻿namespace Ordering.Processor.Services;
+﻿using Ordering.Application.Orders.Commands.PackOrder;
+using Ordering.Application.Orders.Commands.ProcessOrder;
+using Ordering.Application.Orders.Queries.GetStockConfirmedOrders;
 
-public class GracePeriodManagerService : BackgroundService
+namespace Ordering.Processor.Services;
+
+public class OrderPackingManagerService : BackgroundService
 {
     private readonly BackgroundTaskOptions _options;
     private readonly ILogger _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
-    public GracePeriodManagerService(
+    public OrderPackingManagerService(
         IOptions<BackgroundTaskOptions> options,
-        ILogger<GracePeriodManagerService> logger,
+        ILogger<OrderPackingManagerService> logger,
         IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
@@ -23,27 +27,26 @@ public class GracePeriodManagerService : BackgroundService
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("GracePeriodManagerService is starting.");
-            cancellationToken.Register(() => _logger.LogDebug("GracePeriodManagerService background task is stopping."));
+            _logger.LogDebug("OrderPackingManagerService is starting.");
+            cancellationToken.Register(() => _logger.LogDebug("OrderPackingManagerService background task is stopping."));
         }
 
         while (!cancellationToken.IsCancellationRequested)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("GracePeriodManagerService background task is doing background work.");
+                _logger.LogDebug("OrderPackingManagerService background task is doing background work.");
             }
 
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-               var result = await mediator.Send(new GetGraceTimeOrdersQuery(), cancellationToken);
+               var result = await mediator.Send(new GetStockConfirmedOrdersQuery(), cancellationToken);
                 if (result != null && result.orders.Any()) {
                     foreach (var o in result.orders)
                     {
-                        var commad = new ConfirmGracePeriodCommand(o.Id);
-
+                        var commad = new PackOrderCommand(o.Id);
                         await mediator.Send(commad);
                     }
                 }
@@ -55,7 +58,7 @@ public class GracePeriodManagerService : BackgroundService
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("GracePeriodManagerService background task is stopping.");
+            _logger.LogDebug("OrderPackingManagerService background task is stopping.");
         }
     }    
 }

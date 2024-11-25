@@ -37,7 +37,7 @@ public class CreateStripeSessionCommandHandler(ISender sender, IApplicationDbCon
                     {
                         Name = item.ProductName,
                         Images = [item.CoverImage],
-                        //Description = string.IsNullOrWhiteSpace(item.Coupon.Description)? item.Coupon.Description : "No discount"
+                        Description = item.Coupon.Description 
                     },
                     UnitAmountDecimal = (long)(item.Price * 100), // Stripe expects amounts in cents
                 },

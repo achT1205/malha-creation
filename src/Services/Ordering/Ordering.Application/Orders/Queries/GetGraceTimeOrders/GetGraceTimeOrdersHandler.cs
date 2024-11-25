@@ -9,7 +9,7 @@ public class GetGraceTimeOrdersQueryHandler(IApplicationDbContext dbContext)
     public async Task<GetGraceTimeOrdersResult> Handle(GetGraceTimeOrdersQuery query, CancellationToken cancellationToken)
     {
 
-        var orders = await dbContext.Orders.Where(_=> _.GracePeriodEnd >= DateTime.Now && _.Status == Domain.Orders.Enums.OrderStatus.Pending)
+        var orders = await dbContext.Orders.Where(_=> (_.Status == OrderStatus.Paid || _.Status == OrderStatus.Modified) && _.GracePeriodEnd >= DateTime.Now)
                        .ToListAsync(cancellationToken);
 
         return new GetGraceTimeOrdersResult(orders.ToOrderDtoList());

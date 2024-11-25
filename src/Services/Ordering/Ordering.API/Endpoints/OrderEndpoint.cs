@@ -2,8 +2,6 @@
 using BuildingBlocks.Pagination;
 using Ordering.Application.Orders.Commands.CancelOrder;
 using Ordering.Application.Orders.Commands.ConfirmOrder;
-using Ordering.Application.Orders.Commands.CreateOrder;
-using Ordering.Application.Orders.Commands.DeleteOrder;
 using Ordering.Application.Orders.Commands.ShipOrder;
 using Ordering.Application.Orders.Commands.UpdateBillingAddress;
 using Ordering.Application.Orders.Commands.UpdatePayment;
@@ -21,15 +19,6 @@ namespace Ordering.API.Endpoints;
 
 public static class OrderEndpoints
 {
-    //public record CreateOrderRequest
-    //{
-    //    public Guid CustomerId { get; set; }
-    //    public required AddressDto ShippingAddress { get; set; }
-    //    public required AddressDto BillingAddress { get; set; }
-    //    public required PaymentDto Payment { get; set; }
-    //    public required List<OrderItemDto> OrderItems { get; set; }
-    //};
-    //public record CreateOrderResponse(Guid Id);
     public record UpdateOrderRequest
     {
         public Guid Id { get; set; }

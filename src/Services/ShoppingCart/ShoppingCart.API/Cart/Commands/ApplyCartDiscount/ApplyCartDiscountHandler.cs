@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Exceptions;
 using Discount.Grpc;
+using Stripe;
 
 namespace Cart.API.Cart.Commands.Discount;
 public record ApplyCartDiscountCommand(Guid UserId, string CouponCode) : ICommand<ApplyCartDiscountResult>;
@@ -26,14 +27,24 @@ public class ApplyCartDiscountCommandHandler(
             throw new NotFoundException("Not Cat to checkout.");
         }
 
-        var coupon = await discountProto.GetBasketDiscountAsync(
-            new GetBasketDiscountRequest
-            {
-                CouponCode = command.CouponCode,
-                CustomerId = command.UserId.ToString(),
-                OrderTotal = (double)cart.TotalPrice
-            }, cancellationToken: cancellationToken);
-        cart.Coupon = coupon.Adapt<CouponModel>(); ;
+        var service = new CouponService();
+        var stripeCoupon = service.Get(command.CouponCode);
+        if (stripeCoupon != null)
+        {
+
+            var coupon = await discountProto.GetBasketDiscountAsync(
+                new GetBasketDiscountRequest
+                {
+                    CouponCode = command.CouponCode,
+                    CustomerId = command.UserId.ToString(),
+                    OrderTotal = (double)cart.TotalPrice
+                }, cancellationToken: cancellationToken);
+
+            if (coupon != null && coupon.CouponCode != "None")
+                cart.Coupon = coupon.Adapt<CouponModel>(); ;
+        }
+
+
 
         await repository.StoreCart(cart, cancellationToken);
 

@@ -1,25 +1,22 @@
-﻿using Ordering.Application.Orders.Commands.ValidateRoder;
+﻿using Ordering.Application.Orders.Commands.ProcessOrder;
 using Ordering.Application.Orders.Queries.GetGraceTimeConfirmedOrders;
 
 namespace Ordering.Processor.Services;
 
-public class OrderValidationManagerService : BackgroundService
+public class OrderProcessingManagerService : BackgroundService
 {
     private readonly BackgroundTaskOptions _options;
     private readonly ILogger _logger;
-    private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
-    public OrderValidationManagerService(
+    public OrderProcessingManagerService(
         IOptions<BackgroundTaskOptions> options,
-        ILogger<GracePeriodManagerService> logger,
-        IServiceProvider serviceProvider,
+        ILogger<OrderProcessingManagerService> logger,
         IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-        _serviceProvider = serviceProvider;
         _serviceScopeFactory = serviceScopeFactory;
     }
 
@@ -29,15 +26,15 @@ public class OrderValidationManagerService : BackgroundService
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("GracePeriodManagerService is starting.");
-            cancellationToken.Register(() => _logger.LogDebug("GracePeriodManagerService background task is stopping."));
+            _logger.LogDebug("ProcessingManagerService is starting.");
+            cancellationToken.Register(() => _logger.LogDebug("ProcessingManagerService background task is stopping."));
         }
 
         while (!cancellationToken.IsCancellationRequested)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("GracePeriodManagerService background task is doing background work.");
+                _logger.LogDebug("ProcessingManagerService background task is doing background work.");
             }
 
             using (var scope = _serviceScopeFactory.CreateScope())
@@ -48,10 +45,7 @@ public class OrderValidationManagerService : BackgroundService
                 if (result != null && result.orders.Any()) {
                     foreach (var o in result.orders)
                     {
-                        // implement all valivation here 
-
-                        var commad = new ValidateRoderCommand(o.Id);
-
+                        var commad = new ProcessOrderCommand(o.Id);
                         await mediator.Send(commad);
                     }
                 }
@@ -63,7 +57,7 @@ public class OrderValidationManagerService : BackgroundService
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("GracePeriodManagerService background task is stopping.");
+            _logger.LogDebug("ProcessingManagerService background task is stopping.");
         }
     }    
 }

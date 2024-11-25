@@ -11,7 +11,7 @@ public class GetGraceTimeConfirmedOrdersQueryHandler(IApplicationDbContext dbCon
 
         var totalCount = await dbContext.Orders.LongCountAsync(cancellationToken);
 
-        var orders = await dbContext.Orders.Where(_ => _.Status == Domain.Orders.Enums.OrderStatus.GracePeriodConfirmed)
+        var orders = await dbContext.Orders.Where(_ => _.Status == OrderStatus.GracePeriodConfirmed)
                        .ToListAsync(cancellationToken);
 
 

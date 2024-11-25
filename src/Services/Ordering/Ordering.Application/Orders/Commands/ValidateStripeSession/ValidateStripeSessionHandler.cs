@@ -28,7 +28,6 @@ namespace Ordering.Application.Orders.Commands.ValidateStripeSession
                 {
                     //then payment was successful
                     order.SetPaymentIntentId(paymentIntent.Id);
-                    order.MarkAsPaid();
                     await dbContext.SaveChangesAsync(cancellationToken);
                     return new ValidateStripeSessionResult(true);
                 }

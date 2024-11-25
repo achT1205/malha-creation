@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Ordering.Domain.ValueObjects;
-using Ordering.Domain.Orders.Enums;
 
 namespace Ordering.Infrastructure.Data.Configurations;
 

@@ -1,11 +1,11 @@
 ﻿using Catalog.Application.Products.Queries.GetProductForStockValidationById;
 
 namespace Catalog.Application.EventHandlers.Integrations;
-public class OrderValidationSucceededEventHandler
-    (IPublishEndpoint publishEndpoint, ISender sender, IOrderingService orderingService, ILogger<OrderValidationSucceededEventHandler> logger)
-    : IConsumer<OrderValidationSucceededEvent>
+public class OrderProcessingStartedEventHandler
+    (IPublishEndpoint publishEndpoint, ISender sender, IOrderingService orderingService, ILogger<OrderProcessingStartedEventHandler> logger)
+    : IConsumer<OrderProcessingStartedEvent>
 {
-    public async Task Consume(ConsumeContext<OrderValidationSucceededEvent> context)
+    public async Task Consume(ConsumeContext<OrderProcessingStartedEvent> context)
     {
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
 

@@ -1,6 +1,4 @@
-﻿using Ordering.Application.Orders.Commands.SetPaidOrderStatus;
-
-namespace Ordering.Application.Orders.EventHandlers.Integration;
+﻿namespace Ordering.Application.Orders.EventHandlers.Integration;
 
 public class OrderPaymentSucceededEventHandler
     (ISender sender, ILogger<OrderPaymentSucceededEventHandler> logger)
@@ -10,7 +8,5 @@ public class OrderPaymentSucceededEventHandler
     {
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
 
-        var command = new SetPaidOrderStatusCommand(context.Message.OrderId);
-        await sender.Send(command);
     }
 }

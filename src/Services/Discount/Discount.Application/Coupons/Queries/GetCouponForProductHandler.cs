@@ -29,13 +29,13 @@ public class GetCouponForProductQueryHandler(IApplicationDbContext dbContext) : 
 
         if (coupon == null) return new GetCouponForProductResult
         {
-            CouponCode = string.Empty,
-            Description = string.Empty,
+            CouponCode = "None",
+            Description = "No discount",
             OriginalPrice = query.ProductPrice,
             DiscountedPrice = query.ProductPrice,
             DiscountAmount = 0,
             DiscountType = "None",
-            DiscountLabel = string.Empty,
+            DiscountLabel = "None",
         };
 
         decimal discountAmount = 0;
