@@ -11,6 +11,19 @@ public static class DependencyInjection
     {
         //services.AddSwaggerGen();
         services.AddExceptionHandler<CustomExceptionHandler>();
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigins", policy =>
+            {
+                policy.WithOrigins("http://localhost:5175") // Replace with your frontend origin
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials(); // Optional, only if cookies or credentials are needed
+            });
+        });
+
+
         return services;
     }
 
@@ -28,6 +41,8 @@ public static class DependencyInjection
             {
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
+        // Use CORS middleware
+        app.UseCors("AllowSpecificOrigins");
         return app;
     }
 }

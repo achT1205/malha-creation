@@ -14,9 +14,9 @@ internal class InitialData
 
     public static IEnumerable<Collection> Collections => new List<Collection>
      {
-         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b26")),"Summer 2024",Image.Of( "Red T-shirt - Front", "/images/tshirt-red-front.jpg")),
-         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b27")), "Winter 2024", Image.Of( "Red T-shirt - Back", "/images/tshirt-red-back.jpg")),
-         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b28")), "Fall 2023", Image.Of( "Blue T-shirt - Front", "/images/tshirt-blue-front.jpg"))
+         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b26")),"Summer 2024",Image.Of("/images/tshirt-red-front.jpg", "Red T-shirt - Front")),
+         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b27")), "Winter 2024", Image.Of("/images/tshirt-red-back.jpg", "Red T-shirt - Back")),
+         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b28")), "Fall 2023", Image.Of("/images/tshirt-blue-front.jpg", "Blue T-shirt - Front"))
      };
 
     public static IEnumerable<Occasion> Occasions =>
