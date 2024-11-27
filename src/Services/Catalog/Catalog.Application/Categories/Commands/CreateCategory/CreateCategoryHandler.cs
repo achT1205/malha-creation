@@ -1,9 +1,7 @@
 ﻿namespace Catalog.Application.Categories.Commands.CreateCategory;
 
 
-public record CreateCategoryCommand(
-    string Name
-    )
+public record CreateCategoryCommand(string Name, string Description, ImageDto CoverImage)
     : ICommand<CreateCategoryResult>;
 public record CreateCategoryResult(Guid Id);
 
@@ -24,7 +22,9 @@ public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryComman
     }
     public async Task<CreateCategoryResult> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
     {
-        var category = Category.Create(CategoryId.Of(Guid.NewGuid()), CategoryName.Of(command.Name));
+        var coverImage = Image.Of(command.CoverImage.ImageSrc, command.CoverImage.AltText);
+
+        var category = Category.Create(CategoryId.Of(Guid.NewGuid()), CategoryName.Of(command.Name), command.Description, coverImage);
         await _CategoryRepository.AddAsync(category);
         await _CategoryRepository.SaveChangesAsync();
         return new CreateCategoryResult(category.Id.Value);

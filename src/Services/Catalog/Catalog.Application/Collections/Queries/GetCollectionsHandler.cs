@@ -13,7 +13,7 @@ public class GetCollectionsQueryHandler : IQueryHandler<GetCollectionsQuery, Get
     public async Task<GetCollectionsResult> Handle(GetCollectionsQuery request, CancellationToken cancellationToken)
     {
         var collections = await _CollectionRepository.GetAllAsync();
-        var dtos = collections.Select(x => new CollectionDto(x.Id.Value, x.Name, x.Image.ImageSrc, x.Image.AltText)).ToList();
+        var dtos = collections.Select(x => new CollectionDto(x.Id.Value, x.Name, x.Description, new ImageDto(x.CoverImage.ImageSrc, x.CoverImage.AltText))).ToList();
         return new GetCollectionsResult(dtos);
     }
 }

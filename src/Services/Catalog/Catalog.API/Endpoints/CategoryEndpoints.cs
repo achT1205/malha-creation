@@ -9,9 +9,7 @@ namespace Catalog.API.Endpoints;
 public static class CategoryEndpoints
 {
 
-    public record CreateCategoryRequest(
-    string Name
-        );
+    public record CreateCategoryRequest(string Name, string Description, ImageDto CoverImage);
     public record CreateCategoryResponse(Guid Id);
 
     public record  DeleteCategoryResponse(bool IsSuccess);

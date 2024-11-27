@@ -24,7 +24,20 @@ internal sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
                         .HasColumnName(nameof(Category.Name))
                         .HasMaxLength(100)
                         .IsRequired();
-                });
+                }
+        );
+        builder.Property(c => c.Description).HasMaxLength(500);
+        builder.ComplexProperty(
+              c => c.CoverImage, bb =>
+              {
+                  bb.Property(ci => ci.ImageSrc)
+                      .HasColumnName(nameof(Product.CoverImage.ImageSrc))
+                      .IsRequired();
 
+                  bb.Property(ci => ci.AltText)
+                     .HasColumnName(nameof(Product.CoverImage.AltText))
+                     .IsRequired();
+              }
+        );
     }
 }

@@ -13,7 +13,7 @@ public class GetMaterialsQueryHandler : IQueryHandler<GetMaterialsQuery, GetMate
     public async Task<GetMaterialsResult> Handle(GetMaterialsQuery request, CancellationToken cancellationToken)
     {
         var types = await _materialRepository.GetAllAsync();
-        var dtos = types.Select(x => new MaterialDto(x.Id.Value, x.Name)).ToList();
+        var dtos = types.Select(x => new MaterialDto(x.Id.Value, x.Name, x.Description)).ToList();
         return new GetMaterialsResult(dtos);
     }
 }

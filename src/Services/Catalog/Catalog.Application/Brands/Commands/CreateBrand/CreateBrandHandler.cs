@@ -1,7 +1,7 @@
 ﻿namespace Catalog.Application.Brands.Commands.CreateBrand;
 
 
-public record CreateBrandCommand(string Name)
+public record CreateBrandCommand(string Name, string Description, string WebsiteUrl, ImageDto Logo)
     : ICommand<CreateBrandResult>;
 public record CreateBrandResult(Guid Id);
 
@@ -22,7 +22,8 @@ public class CreateBrandCommandHandler : ICommandHandler<CreateBrandCommand, Cre
     }
     public async Task<CreateBrandResult> Handle(CreateBrandCommand command, CancellationToken cancellationToken)
     {
-        var brand = Brand.Create(BrandId.Of(Guid.NewGuid()), BrandName.Of(command.Name));
+        var logo = Image.Of(command.Logo.ImageSrc, command.Logo.AltText);
+        var brand = Brand.Create(BrandId.Of(Guid.NewGuid()), BrandName.Of(command.Name), command.Description, WebsiteUrl.Of(command.WebsiteUrl), logo);
 
         await _brandRepository.AddAsync(brand);
         await _brandRepository.SaveChangesAsync();

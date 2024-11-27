@@ -3,7 +3,7 @@
 namespace Catalog.Application.Products.Queries.GetProducts;
 
 public record GetProductsQuery(PaginationRequest PaginationRequest) : IQuery<GetProductsQueryResult>;
-public record GetProductsQueryResult(PaginatedResult<ProductDto> Products);
+public record GetProductsQueryResult(PaginatedResult<LiteProductDto> Products);
 
 public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, GetProductsQueryResult>
 {
@@ -23,7 +23,7 @@ public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, GetProduc
         var pageSize = query.PaginationRequest.PageSize;
 
         return new GetProductsQueryResult(
-            new PaginatedResult<ProductDto>(
+            new PaginatedResult<LiteProductDto>(
             pageIndex,
             pageSize,
             totalCount,

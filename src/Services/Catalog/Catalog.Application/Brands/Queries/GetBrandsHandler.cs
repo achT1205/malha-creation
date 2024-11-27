@@ -14,7 +14,7 @@ public class GetBrandsQueryHandler : IQueryHandler<GetBrandsQuery, GetBrandsResu
     {
         var Brands = await _BrandRepository.GetAllAsync();
 
-        var dtos = Brands.Select(x => new BrandDto(x.Id.Value, x.Name.Value)).ToList();
+        var dtos = Brands.Select(x => new BrandDto(x.Id.Value, x.Name.Value, x.Description, x.WebsiteUrl.Value, new ImageDto(x.Logo.ImageSrc, x.Logo.AltText))).ToList();
 
         return new GetBrandsResult(dtos);
     }

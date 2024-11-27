@@ -12,7 +12,7 @@ public class GetOccasionsQueryHandler : IQueryHandler<GetOccasionsQuery, GetOcca
     public async Task<GetOccasionsResult> Handle(GetOccasionsQuery request, CancellationToken cancellationToken)
     {
         var occasions = await _OccasionRepository.GetAllAsync();
-        var dtos = occasions.Select(x => new OccasionDto(x.Id.Value, x.Name.Value)).ToList();
+        var dtos = occasions.Select(x => new OccasionDto(x.Id.Value, x.Name.Value, x.Description)).ToList();
         return new GetOccasionsResult(dtos);
     }
 }

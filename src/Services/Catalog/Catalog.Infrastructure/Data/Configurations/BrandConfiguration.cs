@@ -24,6 +24,32 @@ internal sealed class BrandConfiguration : IEntityTypeConfiguration<Brand>
                     .HasMaxLength(100)
                     .IsRequired()
                     ;
-            });
+            }
+        );
+
+        builder.Property(b => b.Description).HasMaxLength(500);
+        builder.ComplexProperty(
+            b => b.WebsiteUrl, nb =>
+            {
+                nb.Property(n => n.Value)
+                    .HasColumnName(nameof(Brand.WebsiteUrl))
+                    .HasMaxLength(500)
+                    .IsRequired()
+                    ;
+            }
+        );
+
+        builder.ComplexProperty(
+              c => c.Logo, bb =>
+              {
+                  bb.Property(ci => ci.ImageSrc)
+                      .HasColumnName(nameof(Product.CoverImage.ImageSrc))
+                      .IsRequired();
+
+                  bb.Property(ci => ci.AltText)
+                     .HasColumnName(nameof(Product.CoverImage.AltText))
+                     .IsRequired();
+              }
+        );
     }
 }

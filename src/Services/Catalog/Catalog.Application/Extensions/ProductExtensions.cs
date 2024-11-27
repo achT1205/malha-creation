@@ -2,7 +2,7 @@
 
 public static class ProductExtensions
 {
-    public static IEnumerable<ProductDto> ToProductDtoList(this IEnumerable<Product> products)
+    public static IEnumerable<LiteProductDto> ToProductDtoList(this IEnumerable<Product> products)
     {
         return products.Select(product => DtoFromProduct(product)).ToList();
     }
@@ -57,11 +57,26 @@ public static class ProductExtensions
             IsHandmade: product.IsHandmade,
             ProductType: product.ProductType,
             CoverImage: new ImageDto(product.CoverImage.ImageSrc, product.CoverImage.AltText),
-            Material: new MaterialDto(material.Id.Value, material.Name),
-            Collection: new CollectionDto(collection.Id.Value, collection.Name, collection.Image.ImageSrc, collection.Image.AltText),
-            Brand: new BrandDto(brand.Id.Value, brand.Name.Value),
-            Occasions: occasions?.Select(i => new OccasionDto(i.Id.Value, i.Name.Value)).ToList(),
-            Categories: categories?.Select(i => new CategoryDto(i.Id.Value, i.Name.Value)).ToList(),
+            Material: new MaterialDto(material.Id.Value, material.Name, material.Description),
+            Collection: new CollectionDto(
+                collection.Id.Value, 
+                collection.Name, 
+                collection.Description,
+                new ImageDto(collection.CoverImage.ImageSrc, collection.CoverImage.AltText)),
+            Brand: new BrandDto(
+                brand.Id.Value, 
+                brand.Name.Value, 
+                brand.Description,
+                brand.WebsiteUrl.Value,
+                new ImageDto(brand.Logo.ImageSrc, brand.Logo.AltText)),
+            Occasions: occasions?.Select(i => new OccasionDto(i.Id.Value, i.Name.Value, i.Description)).ToList(),
+            Categories: categories?.Select(i => 
+            new CategoryDto(
+                i.Id.Value, 
+                i.Name.Value,
+                collection.Description,
+                new ImageDto(i.CoverImage.ImageSrc, i.CoverImage.AltText)
+                )).ToList(),
             ColorVariants: product.ColorVariants.Select(cv => new OutputColorVariantDto(
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,
@@ -80,11 +95,11 @@ public static class ProductExtensions
         );
     }
 
-    private static ProductDto DtoFromProduct(
+    private static LiteProductDto DtoFromProduct(
      Product product
     )
     {
-        return new ProductDto(
+        return new LiteProductDto(
             Id: product.Id.Value,
             Name: product.Name.Value,
             UrlFriendlyName: product.UrlFriendlyName.Value,
@@ -92,11 +107,11 @@ public static class ProductExtensions
             IsHandmade: product.IsHandmade,
             ProductType: product.ProductType,
             CoverImage: new ImageDto(product.CoverImage.ImageSrc, product.CoverImage.AltText),
-            Material: new MaterialDto(product.MaterialId.Value, ""),
-            Collection: new CollectionDto(product.CollectionId.Value,"","", ""),
-            Brand: new BrandDto(product.BrandId.Value, ""),
-            Occasions: product.OccasionIds?.Select(i => new OccasionDto(i.Value, "")).ToList(),
-            Categories: product.CategoryIds?.Select(i => new CategoryDto(i.Value,"")).ToList(),
+            MaterialId: product.MaterialId.Value,
+            CollectionId: product.CollectionId.Value,
+            BrandId: product.BrandId.Value,
+            OccasionIds: product.OccasionIds?.Select(i => i.Value).ToList(),
+            CategoryIds: product.CategoryIds?.Select(i => i.Value).ToList(),
             ColorVariants: product.ColorVariants.Select(cv => new OutputColorVariantDto(
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,

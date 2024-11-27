@@ -8,9 +8,7 @@ namespace Catalog.API.Endpoints;
 public static class BrandEndpoints
 {
 
-    public record CreateBrandRequest(
-    string Name
-        );
+    public record CreateBrandRequest(string Name, string Description, string WebsiteUrl, ImageDto Logo);
     public record CreateBrandResponse(Guid Id);
     public record DeleteBrandResponse(bool IsSuccess);
 

@@ -8,7 +8,7 @@ namespace Catalog.API.Endpoints;
 public static class MaterialEndpoints
 {
 
-    public record CreateMaterialRequest(string Name);
+    public record CreateMaterialRequest(string Name, string Description);
     public record CreateMaterialResponse(Guid Id);
     public record DeleteMaterialResponse(bool IsSuccess);
 

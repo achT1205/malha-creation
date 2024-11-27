@@ -4,42 +4,133 @@ internal class InitialData
 {
 
     public static IEnumerable<Category> Categories => new List<Category>
-     {
-         Category.Create(CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc73")), CategoryName.Of("T-shirts")),
-         Category.Create(CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc74")), CategoryName.Of("Pants")),
-         Category.Create(CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc75")), CategoryName.Of("Jackets")),
-         Category.Create(CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc76")), CategoryName.Of("Shoes")),
-         Category.Create(CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc77")), CategoryName.Of("Bags"))
-     };
+{
+    Category.Create(
+        CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc73")),
+        CategoryName.Of("T-shirts"),
+        "A variety of stylish and comfortable t-shirts for all occasions.",
+        Image.Of("https://example.com/tshirts.jpg", "T-shirts Category Cover")
+    ),
+    Category.Create(
+        CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc74")),
+        CategoryName.Of("Pants"),
+        "Discover a range of pants including jeans, chinos, and casual wear.",
+        Image.Of("https://example.com/pants.jpg", "Pants Category Cover")
+    ),
+    Category.Create(
+        CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc75")),
+        CategoryName.Of("Jackets"),
+        "High-quality jackets for every season and style preference.",
+        Image.Of("https://example.com/jackets.jpg", "Jackets Category Cover")
+    ),
+    Category.Create(
+        CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc76")),
+        CategoryName.Of("Shoes"),
+        "Shoes for every occasion, including casual, formal, and sportswear.",
+        Image.Of("https://example.com/shoes.jpg", "Shoes Category Cover")
+    ),
+    Category.Create(
+        CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc77")),
+        CategoryName.Of("Bags"),
+        "Explore our collection of stylish and functional bags.",
+        Image.Of("https://example.com/bags.jpg", "Bags Category Cover")
+    )
+};
+
 
     public static IEnumerable<Collection> Collections => new List<Collection>
-     {
-         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b26")),"Summer 2024",Image.Of("/images/tshirt-red-front.jpg", "Red T-shirt - Front")),
-         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b27")), "Winter 2024", Image.Of("/images/tshirt-red-back.jpg", "Red T-shirt - Back")),
-         Collection.Create(CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b28")), "Fall 2023", Image.Of("/images/tshirt-blue-front.jpg", "Blue T-shirt - Front"))
-     };
+{
+    Collection.Create(
+        CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b26")),
+        "Summer 2024",
+        "A vibrant collection featuring lightweight and trendy apparel for the summer season.",
+        Image.Of("/images/summer-2024.jpg", "Summer 2024 Collection Cover")
+    ),
+    Collection.Create(
+        CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b27")),
+        "Winter 2024",
+        "Stay warm with our Winter 2024 collection, including cozy jackets, scarves, and boots.",
+        Image.Of("/images/winter-2024.jpg", "Winter 2024 Collection Cover")
+    ),
+    Collection.Create(
+        CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b28")),
+        "Fall 2023",
+        "Embrace autumn with our Fall 2023 collection, featuring earthy tones and layered outfits.",
+        Image.Of("/images/fall-2023.jpg", "Fall 2023 Collection Cover")
+    )
+};
+
 
     public static IEnumerable<Occasion> Occasions =>
-    new List<Occasion>
-    {
-         Occasion.Create(OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d411")), OccasionName.Of("Casual")),
-         Occasion.Create(OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d412")), OccasionName.Of("Formal")),
-         Occasion.Create(OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d413")), OccasionName.Of("Sportswear")),
-         Occasion.Create(OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d414")), OccasionName.Of("Party")),
-         Occasion.Create(OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d415")), OccasionName.Of("Workwear")),
-         Occasion.Create(OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d416")), OccasionName.Of("Outdoor"))
-    };
+        new List<Occasion>
+        {
+        Occasion.Create(
+            OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d411")),
+            OccasionName.Of("Casual"),
+            "Relaxed and comfortable clothing suitable for everyday activities."
+        ),
+        Occasion.Create(
+            OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d412")),
+            OccasionName.Of("Formal"),
+            "Elegant and polished outfits perfect for formal events and occasions."
+        ),
+        Occasion.Create(
+            OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d413")),
+            OccasionName.Of("Sportswear"),
+            "Clothing designed for physical activities and sports, combining comfort and performance."
+        ),
+        Occasion.Create(
+            OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d414")),
+            OccasionName.Of("Party"),
+            "Trendy and stylish outfits ideal for parties and social gatherings."
+        ),
+        Occasion.Create(
+            OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d415")),
+            OccasionName.Of("Workwear"),
+            "Professional attire suited for office settings and corporate environments."
+        ),
+        Occasion.Create(
+            OccasionId.Of(new Guid("b3c6c410-d05a-4426-a6a6-2f086901d416")),
+            OccasionName.Of("Outdoor"),
+            "Durable and weather-appropriate clothing designed for outdoor adventures and activities."
+        )
+        };
+
 
     public static IEnumerable<Material> Materials =>
-    new List<Material>
-    {
-         Material.Create(MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf711")),"Cotton"),
-         Material.Create(MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf712")), "Leather"),
-         Material.Create(MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf713")), "Denim"),
-         Material.Create(MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf714")), "Wool"),
-         Material.Create(MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf715")), "Silk"),
-         Material.Create(MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf716")), "Polyester")
-    };
+        new List<Material>
+        {
+        Material.Create(
+            MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf711")),
+            "Cotton",
+            "A soft, breathable, and durable natural fiber widely used in clothing."
+        ),
+        Material.Create(
+            MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf712")),
+            "Leather",
+            "A strong and flexible material made from animal hide, often used in shoes, bags, and jackets."
+        ),
+        Material.Create(
+            MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf713")),
+            "Denim",
+            "A sturdy cotton fabric, typically blue, used for jeans and casual wear."
+        ),
+        Material.Create(
+            MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf714")),
+            "Wool",
+            "A natural fiber obtained from sheep, known for its warmth and softness."
+        ),
+        Material.Create(
+            MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf715")),
+            "Silk",
+            "A luxurious natural fiber known for its smooth texture and sheen, often used in high-end fashion."
+        ),
+        Material.Create(
+            MaterialId.Of(new Guid("a3addcb2-ce9c-4ca3-9068-6a8b8eccf716")),
+            "Polyester",
+            "A synthetic fiber known for its durability, resistance to wrinkles, and affordability."
+        )
+        };
 
     //public static IEnumerable<ProductType> ProductTypes =>
     //new List<ProductType>
@@ -55,9 +146,43 @@ internal class InitialData
     public static IEnumerable<Brand> Brands =>
         new List<Brand>
         {
-                 Brand.Create(BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a4")), BrandName.Of("ZARA")),
-                 Brand.Create(BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a5")), BrandName.Of("C&A")),
+        Brand.Create(
+            BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a4")),
+            BrandName.Of("ZARA"),
+            "ZARA is a leading international fashion retailer offering trendy apparel and accessories.",
+            WebsiteUrl.Of("https://www.zara.com"),
+            Image.Of("https://example.com/zara-logo.png", "ZARA Logo")
+        ),
+        Brand.Create(
+            BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a5")),
+            BrandName.Of("C&A"),
+            "C&A provides affordable fashion for men, women, and children worldwide.",
+            WebsiteUrl.Of("https://www.c-and-a.com"),
+            Image.Of("https://example.com/ca-logo.png", "C&A Logo")
+        ),
+        Brand.Create(
+            BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a6")),
+            BrandName.Of("H&M"),
+            "H&M offers fashion and quality at the best price in a sustainable way.",
+            WebsiteUrl.Of("https://www.hm.com"),
+            Image.Of("https://example.com/hm-logo.png", "H&M Logo")
+        ),
+        Brand.Create(
+            BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a7")),
+            BrandName.Of("Nike"),
+            "Nike is a world-renowned brand known for its athletic apparel, footwear, and accessories.",
+            WebsiteUrl.Of("https://www.nike.com"),
+            Image.Of("https://example.com/nike-logo.png", "Nike Logo")
+        ),
+        Brand.Create(
+            BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a8")),
+            BrandName.Of("Adidas"),
+            "Adidas is a global leader in sportswear manufacturing, producing high-quality products.",
+            WebsiteUrl.Of("https://www.adidas.com"),
+            Image.Of("https://example.com/adidas-logo.png", "Adidas Logo")
+        )
         };
+
 
     public static IEnumerable<Product> Products =>
             new List<Product>

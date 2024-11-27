@@ -298,7 +298,7 @@ public static class ProductEndpoints
             return Results.Ok(result);
         })
         .WithName("GetProducts")
-        .Produces<List<ProductDto>>(StatusCodes.Status200OK)
+        .Produces<GetProductsQueryResult>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Get Products")
         .WithDescription("Retrieve a list of all available products.");

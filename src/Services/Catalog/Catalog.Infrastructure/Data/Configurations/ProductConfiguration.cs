@@ -1,8 +1,4 @@
-﻿
-
-
-
-using Catalog.Domain.Enums;
+﻿using Catalog.Domain.Enums;
 
 namespace Catalog.Infrastructure.Data.Configurations;
 internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>

@@ -1,7 +1,5 @@
 ﻿namespace Catalog.Application.Occasions.Commands.CreateOccasion;
-public record CreateOccasionCommand(
-    string Name
-    )
+public record CreateOccasionCommand(string Name, string Description)
     : ICommand<CreateOccasionResult>;
 public record CreateOccasionResult(Guid Id);
 
@@ -22,7 +20,7 @@ public class CreateOccasionCommandHandler : ICommandHandler<CreateOccasionComman
     }
     public async Task<CreateOccasionResult> Handle(CreateOccasionCommand command, CancellationToken cancellationToken)
     {
-        var occasion = Occasion.Create(OccasionId.Of(Guid.NewGuid()), OccasionName.Of(command.Name));
+        var occasion = Occasion.Create(OccasionId.Of(Guid.NewGuid()), OccasionName.Of(command.Name), command.Description);
         await _OccasionRepository.AddAsync(occasion);
         await _OccasionRepository.SaveChangesAsync();
         return new CreateOccasionResult(occasion.Id.Value);

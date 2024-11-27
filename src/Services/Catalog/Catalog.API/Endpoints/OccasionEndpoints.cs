@@ -3,14 +3,10 @@ using Catalog.Application.Occasions.Commands.CreateOccasion;
 using Catalog.Application.Occasions.Queries;
 
 namespace Catalog.API.Endpoints;
-
-
 public static class OccasionEndpoints
 {
 
-    public record CreateOccasionRequest(
-    string Name
-        );
+    public record CreateOccasionRequest(string Name, string Description);
     public record CreateOccasionResponse(Guid Id);
 
     public record DeleteOccasionResponse(bool IsSuccess);

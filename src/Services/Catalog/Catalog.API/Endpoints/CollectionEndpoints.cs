@@ -7,12 +7,7 @@ namespace Catalog.API.Endpoints;
 
 public static class CollectionEndpoints
 {
-
-    public record CreateCollectionRequest(
-    string Name,
-    string ImageSrc,
-    string AltText
-        );
+    public record CreateCollectionRequest(string Name, string Description, ImageDto CoverImage);
     public record CreateCollectionResponse(Guid Id);
 
     public record DeleteCollectionResponse(bool IsSuccess);
