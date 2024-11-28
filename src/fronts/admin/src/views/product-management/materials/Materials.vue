@@ -22,15 +22,23 @@ const deleteItem = (itemId) => {
 };
 
 const headers = [
-    {
-        fieldName: 'name',
-        headerName: 'Name',
-        sortable: true,
-        extarea: false,
-        fieldType:"textinput",
-        required: true,
-        headerStyle: 'min-width: 16rem'
-    }
+  {
+    fieldName: 'name',
+    headerName: 'Name',
+    sortable: true,
+    extarea: false,
+    fieldType: "textinput",
+    required: true,
+    headerStyle: 'min-width: 16rem'
+  },
+  {
+    fieldName: 'description',
+    headerName: 'Description',
+    sortable: false,
+    fieldType: "textarea",
+    required: true,
+    headerStyle: 'min-width: 16rem'
+  }
 ];
 
 
@@ -41,14 +49,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <ParameterManager 
-    :items="items"
-    :isLoading="isLoading"
-    :error="error"
-    :headers="headers"
-    itemLabel="Material" 
-    @fetchItems="loadItems"
-    @addItem="addItem"
-    @deleteItem="deleteItem"
-  />
+  <ParameterManager :items="items" :isLoading="isLoading" :error="error" :headers="headers" itemLabel="Material"
+    @fetchItems="loadItems" @addItem="addItem" @deleteItem="deleteItem" />
 </template>

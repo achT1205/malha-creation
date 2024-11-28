@@ -16,7 +16,7 @@ public static class DependencyInjection
         {
             options.AddPolicy("AllowSpecificOrigins", policy =>
             {
-                policy.WithOrigins("http://localhost:5175") // Replace with your frontend origin
+                policy.WithOrigins("http://localhost:5173") // Replace with your frontend origin
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials(); // Optional, only if cookies or credentials are needed

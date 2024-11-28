@@ -23,24 +23,6 @@ const deleteItem = (itemId) => {
 
 const headers = [
     {
-        fieldName: 'imageSrc',
-        headerName: 'Image',
-        sortable: false,
-        extarea: false,
-        fieldType: "textinput",
-        required: true,
-        headerStyle: 'min-width: 16rem'
-    },
-    {
-        fieldName: 'altText',
-        headerName: 'AltText',
-        sortable: false,
-        extarea: false,
-        fieldType: "textinput",
-        required: true,
-        headerStyle: 'min-width: 16rem'
-    },
-    {
         fieldName: 'name',
         headerName: 'Name',
         sortable: true,
@@ -48,7 +30,23 @@ const headers = [
         fieldType: "textinput",
         required: true,
         headerStyle: 'min-width: 16rem'
-    }
+    },
+  {
+    fieldName: 'description',
+    headerName: 'Description',
+    sortable: false,
+    fieldType: "textarea",
+    required: true,
+    headerStyle: 'min-width: 16rem'
+  },
+  {
+    fieldName: 'coverImage',
+    headerName: 'LoverImage',
+    sortable: false,
+    fieldType: "image",
+    required: true,
+    headerStyle: 'min-width: 16rem'
+  }
 ];
 
 onMounted(() => {
@@ -57,6 +55,6 @@ onMounted(() => {
 </script>
 
 <template>
-    <ParameterManager :items="items" :isLoading="isLoading" :error="error" :headers="headers" itemLabel="Collection"
+    <ParameterManager :items="items" :isLoading="isLoading" :error="error" :headers="headers"  imageFieldName="coverImage" itemLabel="Collection"
         @fetchItems="loadItems" @addItem="addItem" @deleteItem="deleteItem" />
 </template>

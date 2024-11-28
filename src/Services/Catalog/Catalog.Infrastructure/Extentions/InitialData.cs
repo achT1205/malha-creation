@@ -9,31 +9,31 @@ internal class InitialData
         CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc73")),
         CategoryName.Of("T-shirts"),
         "A variety of stylish and comfortable t-shirts for all occasions.",
-        Image.Of("https://example.com/tshirts.jpg", "T-shirts Category Cover")
+        Image.Of("https://placehold.co/200", "T-shirts Category Cover")
     ),
     Category.Create(
         CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc74")),
         CategoryName.Of("Pants"),
         "Discover a range of pants including jeans, chinos, and casual wear.",
-        Image.Of("https://example.com/pants.jpg", "Pants Category Cover")
+        Image.Of("https://placehold.co/200", "Pants Category Cover")
     ),
     Category.Create(
         CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc75")),
         CategoryName.Of("Jackets"),
         "High-quality jackets for every season and style preference.",
-        Image.Of("https://example.com/jackets.jpg", "Jackets Category Cover")
+        Image.Of("https://placehold.co/200", "Jackets Category Cover")
     ),
     Category.Create(
         CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc76")),
         CategoryName.Of("Shoes"),
         "Shoes for every occasion, including casual, formal, and sportswear.",
-        Image.Of("https://example.com/shoes.jpg", "Shoes Category Cover")
+        Image.Of("https://placehold.co/200", "Shoes Category Cover")
     ),
     Category.Create(
         CategoryId.Of(new Guid("6cbe22ca-900f-4b38-9030-368e0f89bc77")),
         CategoryName.Of("Bags"),
         "Explore our collection of stylish and functional bags.",
-        Image.Of("https://example.com/bags.jpg", "Bags Category Cover")
+        Image.Of("https://placehold.co/200", "Bags Category Cover")
     )
 };
 
@@ -44,19 +44,19 @@ internal class InitialData
         CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b26")),
         "Summer 2024",
         "A vibrant collection featuring lightweight and trendy apparel for the summer season.",
-        Image.Of("/images/summer-2024.jpg", "Summer 2024 Collection Cover")
+        Image.Of("https://placehold.co/300", "Summer 2024 Collection Cover")
     ),
     Collection.Create(
         CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b27")),
         "Winter 2024",
         "Stay warm with our Winter 2024 collection, including cozy jackets, scarves, and boots.",
-        Image.Of("/images/winter-2024.jpg", "Winter 2024 Collection Cover")
+        Image.Of("https://placehold.co/300", "Winter 2024 Collection Cover")
     ),
     Collection.Create(
         CollectionId.Of(new Guid("e6ef95a7-29f7-4ec4-8984-0d8602c94b28")),
         "Fall 2023",
         "Embrace autumn with our Fall 2023 collection, featuring earthy tones and layered outfits.",
-        Image.Of("/images/fall-2023.jpg", "Fall 2023 Collection Cover")
+        Image.Of("https://placehold.co/300", "Fall 2023 Collection Cover")
     )
 };
 
@@ -151,35 +151,35 @@ internal class InitialData
             BrandName.Of("ZARA"),
             "ZARA is a leading international fashion retailer offering trendy apparel and accessories.",
             WebsiteUrl.Of("https://www.zara.com"),
-            Image.Of("https://example.com/zara-logo.png", "ZARA Logo")
+            Image.Of("https://placehold.co/300", "ZARA Logo")
         ),
         Brand.Create(
             BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a5")),
             BrandName.Of("C&A"),
             "C&A provides affordable fashion for men, women, and children worldwide.",
             WebsiteUrl.Of("https://www.c-and-a.com"),
-            Image.Of("https://example.com/ca-logo.png", "C&A Logo")
+            Image.Of("https://placehold.co/300", "C&A Logo")
         ),
         Brand.Create(
             BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a6")),
             BrandName.Of("H&M"),
             "H&M offers fashion and quality at the best price in a sustainable way.",
             WebsiteUrl.Of("https://www.hm.com"),
-            Image.Of("https://example.com/hm-logo.png", "H&M Logo")
+            Image.Of("https://placehold.co/300", "H&M Logo")
         ),
         Brand.Create(
             BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a7")),
             BrandName.Of("Nike"),
             "Nike is a world-renowned brand known for its athletic apparel, footwear, and accessories.",
             WebsiteUrl.Of("https://www.nike.com"),
-            Image.Of("https://example.com/nike-logo.png", "Nike Logo")
+            Image.Of("https://placehold.co/300", "Nike Logo")
         ),
         Brand.Create(
             BrandId.Of(new Guid("b7bcda18-05cc-450b-b99a-3c5eafe111a8")),
             BrandName.Of("Adidas"),
             "Adidas is a global leader in sportswear manufacturing, producing high-quality products.",
             WebsiteUrl.Of("https://www.adidas.com"),
-            Image.Of("https://example.com/adidas-logo.png", "Adidas Logo")
+            Image.Of("https://placehold.co/300", "Adidas Logo")
         )
         };
 

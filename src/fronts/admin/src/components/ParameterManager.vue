@@ -16,6 +16,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  imageFieldName: {
+    type: String
+  },
   error: {
     type: String,
     default: null,
@@ -33,6 +36,7 @@ const dt = ref();
 const itemDialog = ref(false);
 const deleteItemDialog = ref(false);
 const item = ref({});
+const image = ref({});
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
@@ -52,6 +56,9 @@ function hideDialog() {
 function saveItem() {
   submitted.value = true;
   if (item?.value.name?.trim()) {
+    if (props.imageFieldName) {
+      item.value[props.imageFieldName] = image.value
+    }
     emit('addItem', item.value);
     itemDialog.value = false;
     item.value = {};
@@ -82,8 +89,7 @@ function deleteItem() {
 
       <DataTable ref="dt" :value="items" dataKey="id" :paginator="true" :rows="10" :filters="filters"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        :rowsPerPageOptions="[5, 10, 25]"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} {{ itemLabel }}s">
+        :rowsPerPageOptions="[5, 10, 25]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} ">
         <template #header>
           <div class="flex flex-wrap gap-2 items-center justify-between">
             <h4 class="m-0">Manage {{ itemLabel }}s</h4>
@@ -96,9 +102,14 @@ function deleteItem() {
           </div>
         </template>
 
-        <!--<Column field="name" :header="itemLabel + ' Name'" sortable style="min-width: 16rem" />-->
         <Column v-for="header in headers" :key="header.fieldName" :field="header.fieldName" :header="header.headerName"
-          :sortable="header.sortable" :headerStyle="header.headerStyle" />
+          :sortable="header.sortable" :headerStyle="header.headerStyle">
+          <template #body="slotProps">
+            <img v-if="header.fieldType === 'image'" :src="slotProps.data[header.fieldName].imageSrc"
+              :alt="slotProps.data[header.fieldName].altText" class="shadow-2" width="100" />
+            <span v-else> {{ slotProps.data[header.fieldName] }}</span>
+          </template>
+        </Column>
 
 
         <Column>
@@ -112,10 +123,25 @@ function deleteItem() {
     <Dialog v-model:visible="itemDialog" :style="{ width: '450px' }" :header="'New ' + itemLabel" :modal="true">
       <div class="flex flex-col gap-6">
         <div v-for="header in headers" :key="header.fieldName">
-          <label for="name" class="block font-bold mb-3">{{ header.headerName }}</label>
+          <label v-if="header.fieldType !== 'image'" for="name" class="block font-bold mb-3">{{ header.headerName
+            }}</label>
           <InputText v-if="header.fieldType == 'textinput'" :id="header.fieldName" v-model.trim="item[header.fieldName]"
             :required="item.required" :invalid="submitted && !item[header.fieldName]" fluid />
-          <small v-if="submitted && (!item || !item[header.fieldName]) && header.required" class="text-red-500">{{ header.headerName }} is required.</small>
+
+
+          <Textarea v-else-if="header.fieldType == 'textarea'" :id="header.fieldName"
+            :invalid="submitted && !item[header.fieldName]" v-model="item[header.fieldName]" :required="item.required"
+            rows="3" cols="53" />
+
+          <div v-else-if="header.fieldType == 'image'">
+            <label for="name" class="block font-bold mb-3">imageSrc</label>
+            <InputText :id="header.fieldName" v-model.trim="image.imageSrc" :required="item.required"
+              :invalid="submitted && !image.imageSrc" fluid />
+
+            <label for="name" class="block font-bold mb-3 mt-5">altText</label>
+            <InputText :id="header.fieldName" v-model.trim="image.altText" :required="item.required"
+              :invalid="submitted && !image.altText" fluid />
+          </div>
         </div>
       </div>
 

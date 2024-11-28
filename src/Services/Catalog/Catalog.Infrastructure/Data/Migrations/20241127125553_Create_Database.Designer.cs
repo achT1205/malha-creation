@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241121172419_Create_Database")]
+    [Migration("20241127125553_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -37,11 +37,31 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
+
+                    b.ComplexProperty<Dictionary<string, object>>("Logo", "Catalog.Domain.Models.Brand.Logo#Image", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("AltText")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("AltText");
+
+                            b1.Property<string>("ImageSrc")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("ImageSrc");
+                        });
 
                     b.ComplexProperty<Dictionary<string, object>>("Name", "Catalog.Domain.Models.Brand.Name#BrandName", b1 =>
                         {
@@ -52,6 +72,17 @@ namespace Catalog.Infrastructure.Data.Migrations
                                 .HasMaxLength(100)
                                 .HasColumnType("nvarchar(100)")
                                 .HasColumnName("Name");
+                        });
+
+                    b.ComplexProperty<Dictionary<string, object>>("WebsiteUrl", "Catalog.Domain.Models.Brand.WebsiteUrl#WebsiteUrl", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("WebsiteUrl");
                         });
 
                     b.HasKey("Id");
@@ -70,11 +101,31 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
+
+                    b.ComplexProperty<Dictionary<string, object>>("CoverImage", "Catalog.Domain.Models.Category.CoverImage#Image", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("AltText")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("AltText");
+
+                            b1.Property<string>("ImageSrc")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("ImageSrc");
+                        });
 
                     b.ComplexProperty<Dictionary<string, object>>("Name", "Catalog.Domain.Models.Category.Name#CategoryName", b1 =>
                         {
@@ -103,6 +154,11 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
@@ -114,7 +170,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.ComplexProperty<Dictionary<string, object>>("Image", "Catalog.Domain.Models.Collection.Image#Image", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("CoverImage", "Catalog.Domain.Models.Collection.CoverImage#Image", b1 =>
                         {
                             b1.IsRequired();
 
@@ -145,6 +201,11 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
@@ -161,7 +222,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.ToTable("Materials", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Models.Occasion", b =>
+            modelBuilder.Entity("Occasion", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -172,13 +233,18 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ComplexProperty<Dictionary<string, object>>("Name", "Catalog.Domain.Models.Occasion.Name#OccasionName", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Name", "Occasion.Name#OccasionName", b1 =>
                         {
                             b1.IsRequired();
 
