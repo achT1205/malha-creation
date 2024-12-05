@@ -8,9 +8,29 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         ConfigureProductsTable(builder);
         ConfigureColorVariantsTable(builder);
         ConfigureCategoryIdsTable(builder);
+        ConfigureOutfitIdsTable(builder);
         ConfigureOccasionIdsTable(builder);
         ConfigureProductReviewsTable(builder);
     }
+
+    private void ConfigureOutfitIdsTable(EntityTypeBuilder<Product> builder)
+    {
+        builder.OwnsMany(p => p.ColorVariants, cvb =>
+        {
+            cvb.OwnsMany(cvb => cvb.Outfits, oufb =>
+            {
+                oufb.ToTable("ColorVariantOutfit");
+                oufb.Property(r => r.Value)
+                   .HasColumnName("OutfitId")
+                   .ValueGeneratedNever();
+
+            });
+
+        });
+        //builder.Metadata.FindNavigation(nameof(ColorVariant.Outfits))!
+        //    .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+
     private void ConfigureProductReviewsTable(EntityTypeBuilder<Product> builder)
     {
         builder.OwnsMany(p => p.Reviews, rib =>
@@ -149,7 +169,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                   .IsRequired()
                   .HasMaxLength(200);
             });
-            
+
 
             cvb.OwnsOne(cv => cv.Price, prb =>
             {
@@ -176,6 +196,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             {
                 imsb.ToTable("ColorVariantImages");
             });
+
+ 
 
             cvb.OwnsMany(cv => cv.SizeVariants, svb =>
             {
@@ -254,8 +276,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 nb.Property(n => n.Value)
                     .HasColumnName(nameof(Product.Name))
                     .HasMaxLength(100)
-                    .IsRequired()
-                    ;
+                    .IsRequired();
             });
 
         // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
@@ -287,15 +308,24 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .IsRequired();
             });
 
+        builder.Property(p => p.ShippingAndReturns)
+            .HasColumnName(nameof(Product.ShippingAndReturns))
+            .HasMaxLength(500)
+            .IsRequired();
+
+        builder.Property(p => p.Code)
+            .HasColumnName(nameof(Product.Code))
+            .HasMaxLength(50);
+
 
         builder.ComplexProperty(
-                p => p.Description, desb =>
-                {
-                    desb.Property(n => n.Value)
-                        .HasColumnName(nameof(Product.Description))
-                        .HasMaxLength(100)
-                        .IsRequired();
-                });
+            p => p.Description, desb =>
+            {
+                desb.Property(n => n.Value)
+                .HasColumnName(nameof(Product.Description))
+                .HasMaxLength(1000)
+                .IsRequired();
+            });
 
         builder.ComplexProperty(
           p => p.AverageRating, avb =>
@@ -356,6 +386,12 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .WithMany()
             .HasForeignKey(p => p.MaterialId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(o => o.Status)
+            .HasDefaultValue(ProductStatus.Draft) // Default value
+            .HasConversion(s => s.ToString(), // Converts enum to string before storing in the DB
+                dbStatus => (ProductStatus)Enum.Parse(typeof(ProductStatus), dbStatus)) // Converts string back to enum when reading from DB
+            .IsRequired(); // Ensure it's required
 
     }
 }

@@ -24,6 +24,10 @@ public class RemoveColorVariantCommandHandler : ICommandHandler<RemoveColorVaria
         try
         {
             var product = await _productRepository.GetByIdAsync(ProductId.Of(command.Id));
+            if (product == null)
+            {
+                throw new NotFoundException($"The product {command.Id} was not found");
+            }
             product.RemoveColorVariant(ColorVariantId.Of(command.ColorVariantId));
             _productRepository.UpdateAsync(product);
             await _productRepository.SaveChangesAsync();

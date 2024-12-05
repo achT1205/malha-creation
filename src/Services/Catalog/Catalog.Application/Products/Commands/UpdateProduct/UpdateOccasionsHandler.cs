@@ -25,6 +25,10 @@ public class UpdateOccasionsCommandHandler : ICommandHandler<UpdateOccasionsComm
         try
         {
             var product = await _productRepository.GetByIdAsync(ProductId.Of(command.Id));
+            if (product == null)
+            {
+                throw new NotFoundException($"The product {command.Id} was not found");
+            }
             product.RemoveOccasions(product.OccasionIds.ToList());
             var ids = command.OccasionIds.Select(id => OccasionId.Of(id)).ToList();
             product.AddOccasions(ids);

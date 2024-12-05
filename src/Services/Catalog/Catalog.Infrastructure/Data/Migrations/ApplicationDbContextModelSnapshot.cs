@@ -265,6 +265,12 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<Guid>("BrandId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Code");
+
                     b.Property<Guid>("CollectionId")
                         .HasColumnType("uniqueidentifier");
 
@@ -299,6 +305,18 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<string>("ProductType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShippingAndReturns")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("ShippingAndReturns");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("Draft");
 
                     b.Property<string>("UrlFriendlyName_Value")
                         .IsRequired()
@@ -341,8 +359,8 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasMaxLength(1000)
+                                .HasColumnType("nvarchar(1000)")
                                 .HasColumnName("Description");
                         });
 
@@ -507,6 +525,32 @@ namespace Catalog.Infrastructure.Data.Migrations
                                     b2.HasKey("ColorVariantId", "ColorVariantProductId");
 
                                     b2.ToTable("ColorVariants");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ColorVariantId", "ColorVariantProductId");
+                                });
+
+                            b1.OwnsMany("Catalog.Domain.ValueObjects.ColorVariantId", "Outfits", b2 =>
+                                {
+                                    b2.Property<Guid>("ColorVariantId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<Guid>("ColorVariantProductId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("int");
+
+                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
+
+                                    b2.Property<Guid>("Value")
+                                        .HasColumnType("uniqueidentifier")
+                                        .HasColumnName("OutfitId");
+
+                                    b2.HasKey("ColorVariantId", "ColorVariantProductId", "Id");
+
+                                    b2.ToTable("ColorVariantOutfit", (string)null);
 
                                     b2.WithOwner()
                                         .HasForeignKey("ColorVariantId", "ColorVariantProductId");
@@ -741,6 +785,8 @@ namespace Catalog.Infrastructure.Data.Migrations
                                 .IsRequired();
 
                             b1.Navigation("Images");
+
+                            b1.Navigation("Outfits");
 
                             b1.Navigation("Price")
                                 .IsRequired();

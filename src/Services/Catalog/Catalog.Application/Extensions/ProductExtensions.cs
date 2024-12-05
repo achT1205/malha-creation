@@ -54,25 +54,29 @@ public static class ProductExtensions
             Name: product.Name.Value,
             UrlFriendlyName: product.UrlFriendlyName.Value,
             Description: product.Description.Value,
+            ShippingAndReturns: product.ShippingAndReturns,
+            Code: product.Code,
+            Status: product.Status,
             IsHandmade: product.IsHandmade,
             ProductType: product.ProductType,
+            ProductTypeString: product.ProductType.ToString(),
             CoverImage: new ImageDto(product.CoverImage.ImageSrc, product.CoverImage.AltText),
             Material: new MaterialDto(material.Id.Value, material.Name, material.Description),
             Collection: new CollectionDto(
-                collection.Id.Value, 
-                collection.Name, 
+                collection.Id.Value,
+                collection.Name,
                 collection.Description,
                 new ImageDto(collection.CoverImage.ImageSrc, collection.CoverImage.AltText)),
             Brand: new BrandDto(
-                brand.Id.Value, 
-                brand.Name.Value, 
+                brand.Id.Value,
+                brand.Name.Value,
                 brand.Description,
                 brand.WebsiteUrl.Value,
                 new ImageDto(brand.Logo.ImageSrc, brand.Logo.AltText)),
             Occasions: occasions?.Select(i => new OccasionDto(i.Id.Value, i.Name.Value, i.Description)).ToList(),
-            Categories: categories?.Select(i => 
+            Categories: categories?.Select(i =>
             new CategoryDto(
-                i.Id.Value, 
+                i.Id.Value,
                 i.Name.Value,
                 collection.Description,
                 new ImageDto(i.CoverImage.ImageSrc, i.CoverImage.AltText)
@@ -80,12 +84,13 @@ public static class ProductExtensions
             ColorVariants: product.ColorVariants.Select(cv => new OutputColorVariantDto(
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,
+                Background: $"bg-{cv.Color.Value.ToLower()}-500",
                 Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
-                Price: 
-                product.ProductType == ProductType.Clothing ? null 
+                Price:
+                product.ProductType == ProductType.Clothing ? null
                 : new PriceDto(cv.Price.Currency, cv.Price.Amount),
                 Quantity:
-                product.ProductType == ProductType.Clothing ? null 
+                product.ProductType == ProductType.Clothing ? null
                 : cv.Quantity.Value,
                 RestockThreshold: cv.RestockThreshold.Value,
                 Slug: cv.Slug.Value,
@@ -104,8 +109,12 @@ public static class ProductExtensions
             Name: product.Name.Value,
             UrlFriendlyName: product.UrlFriendlyName.Value,
             Description: product.Description.Value,
+            ShippingAndReturns: product.ShippingAndReturns,
+            Code: product.Code,
+            Status: product.Status,
             IsHandmade: product.IsHandmade,
             ProductType: product.ProductType,
+            ProductTypeString: product.ProductType.ToString(),
             CoverImage: new ImageDto(product.CoverImage.ImageSrc, product.CoverImage.AltText),
             MaterialId: product.MaterialId.Value,
             CollectionId: product.CollectionId.Value,
@@ -115,6 +124,7 @@ public static class ProductExtensions
             ColorVariants: product.ColorVariants.Select(cv => new OutputColorVariantDto(
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,
+                Background: $"bg-{cv.Color.Value.ToLower()}-500",
                 Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
                 Price:
                 product.ProductType == ProductType.Clothing ? null

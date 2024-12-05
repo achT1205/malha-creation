@@ -11,6 +11,8 @@ public class Product : Aggregate<ProductId>
     public ProductName Name { get; private set; } = default!;
     public UrlFriendlyName UrlFriendlyName { get; private set; } = default!;
     public ProductDescription Description { get; private set; } = default!;
+    public string ShippingAndReturns { get; private set; } = default!;
+    public string Code { get; private set; } = default!;
     public AverageRating AverageRating { get; private set; } = default!;
     public Image CoverImage { get; private set; } = default!;
     public bool IsHandmade { get; private set; } = default!;
@@ -18,17 +20,19 @@ public class Product : Aggregate<ProductId>
     public ProductType ProductType { get; private set; } = default!;
     public MaterialId MaterialId { get; private set; } = default!;
     public BrandId BrandId { get; private set; } = default!;
+    public ProductStatus Status { get; private set; } = default!;
     public CollectionId CollectionId { get; private set; } = default!;
     private readonly List<Review> _reviews = new();
     private readonly List<OccasionId> _occasionIds = new();
     private readonly List<CategoryId> _categoryIds = new();
     private readonly List<ColorVariant> _colorVariants = new();
-
     private Product() { }
     private Product(
         ProductName name,
         UrlFriendlyName urlFriendlyName,
         ProductDescription description,
+        string shippingAndReturns,
+        string code,
         bool isHandmade,
         Image coverImage,
         ProductType productType,
@@ -48,11 +52,16 @@ public class Product : Aggregate<ProductId>
         CollectionId = collectionId ?? throw new ArgumentNullException(nameof(collectionId));
         AverageRating = AverageRating.Of(0, 0);
         ProductType = productType;
+        ShippingAndReturns = shippingAndReturns;
+        Status = ProductStatus.Draft;
+        Code = code;
     }
     public static Product Create(
         ProductName name,
         UrlFriendlyName urlFriendlyName,
         ProductDescription description,
+        string shippingAndReturns,
+        string code,
         bool isHandmade,
         Image coverImage,
         ProductType productType,
@@ -65,6 +74,8 @@ public class Product : Aggregate<ProductId>
              name,
              urlFriendlyName,
              description,
+             shippingAndReturns,
+             code,
              isHandmade,
              coverImage,
              productType,
@@ -215,6 +226,13 @@ public class Product : Aggregate<ProductId>
         Description = newDescription ?? throw new ArgumentNullException(nameof(newDescription));
     }
 
+    public void UpdateDescription(string shippingAndReturns)
+    {
+        if (ShippingAndReturns == shippingAndReturns)
+            return;
+        ShippingAndReturns = shippingAndReturns ?? throw new ArgumentNullException(nameof(shippingAndReturns));
+    }
+
     public void UpdateCoverImage(Image coverImage)
     {
         if (CoverImage.ImageSrc == coverImage.ImageSrc)
@@ -228,6 +246,20 @@ public class Product : Aggregate<ProductId>
             return;
         Name = newName ?? throw new ArgumentNullException(nameof(newName));
         UrlFriendlyName = urlFriendlyName ?? throw new ArgumentNullException(nameof(urlFriendlyName));
+    }
+
+    public void UpdateStatus(ProductStatus status)
+    {
+        if (status == Status)
+            return;
+        Status = status;
+    }
+
+    public void UpdateCode(string code)
+    {
+        if (Code == code)
+            return;
+        Code = code;
     }
 
     public void UpdateHandMade(bool isHandmade)
@@ -292,6 +324,33 @@ public class Product : Aggregate<ProductId>
         var oldPrice = cv.Price;
         cv.UpdatePrice(price);
         AddDomainEvent(new ProductColorVariantPriceChangedDomainEvent(Id.Value, colorVariantId.Value, price.Amount.Value, oldPrice.Amount.Value, price.Currency));
+    }
+
+
+    public void AddOutfit(ColorVariantId colorVariantId, ColorVariantId outfitId)
+    {
+        var cv = _colorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
+        if (cv == null)
+        {
+            throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
+        }
+        cv.AddOutfit(outfitId);
+    }
+
+    public void RemoveOutfit(ColorVariantId colorVariantId, ColorVariantId outfitId)
+    {
+        var cv = _colorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
+        if (cv == null)
+        {
+            throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
+        }
+
+        var outfit = cv.Outfits.FirstOrDefault(_ => _ == outfitId);
+        if (outfit == null)
+        {
+            throw new CatalogDomainException($"No outfit {outfitId} was not found");
+        }
+        cv.RemoveOutfit(outfit);
     }
 
     public void ToogleOnReorder()

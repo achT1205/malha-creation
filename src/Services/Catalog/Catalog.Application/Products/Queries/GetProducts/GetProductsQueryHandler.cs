@@ -5,12 +5,12 @@ namespace Catalog.Application.Products.Queries.GetProducts;
 public record GetProductsQuery(PaginationRequest PaginationRequest) : IQuery<GetProductsQueryResult>;
 public record GetProductsQueryResult(PaginatedResult<LiteProductDto> Products);
 
-public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, GetProductsQueryResult>
+public class GetProductWithDetailsQueryHandler : IQueryHandler<GetProductsQuery, GetProductsQueryResult>
 {
     private readonly IProductRepository _productRepository;
 
 
-    public GetProductsQueryHandler(IProductRepository productRepository)
+    public GetProductWithDetailsQueryHandler(IProductRepository productRepository)
     {
         _productRepository = productRepository;
 

@@ -13,6 +13,7 @@ public class ColorVariantDto
 public record OutputColorVariantDto(
     Guid Id,
     string Color,
+    string Background,
     List<ImageDto> Images,
     PriceDto Price,
     int? Quantity,

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from "primevue/useconfirm";
 
 import { useBrandStore } from '@/stores/brandStore';
 import { useCategoryStore } from '@/stores/categoryStore';
@@ -9,6 +10,7 @@ import { useMaterialStore } from '@/stores/materialStore';
 import { useOccasionStore } from '@/stores/occasionStore';
 import { useProductStore } from '@/stores/productStore';
 
+const confirm = useConfirm();
 const toast = useToast();
 const brandStore = useBrandStore();
 const categoryStore = useCategoryStore();
@@ -41,6 +43,16 @@ const productTypes = ref([{
     id: 1, name: "Accessory"
 }])
 
+const status = ref([{
+    id: 0, name: "Draft"
+},
+{
+    id: 1, name: "Published"
+},
+{
+    id: 1, name: "Deleted"
+}])
+
 const colors = ref([{
     id: 'red', name: "Red", background: 'bg-red-900'
 },
@@ -50,26 +62,71 @@ const colors = ref([{
 {
     id: 'blue', name: "Blue", background: 'bg-blue-500'
 }])
+
 const colorOverlay = ref();
 const selectedColor = ref(null);
 const colorVariantTabRefs = ref([]);
-const product = ref({
-    "name": '',
-    "urlFriendlyName": '',
-    "description": '',
-    "isHandmade": false,
-    "coverImage": {
-        "imageSrc": '',
-        "altText": ''
-    },
-    "productType": 0,
-    "materialId": '',
-    "brandId": '',
-    "collectionId": '',
-    "occasionIds": [],
-    "categoryIds": [],
-    "colorVariants": []
-});
+const product = ref(
+    {
+        "name": "Slim Fit Chino Pants",
+        "urlFriendlyName": "slim-fit-chino-pants",
+        "description": "Chino pants with a modern slim fit, versatile and stylish.",
+        "shippingAndReturns": "Chino pants with a modern slim fit, versatile and stylish.",
+        "code":"CODE1",
+        "status": 0,
+        "isHandmade": false,
+        "onReorder": true,
+        "coverImage": {
+            "imageSrc": "https://placehold.co/300",
+            "altText": "Slim Fit Chino Pants"
+        },
+        "productType": 0,
+        "materialId": "a3addcb2-ce9c-4ca3-9068-6a8b8eccf711",
+        "brandId": "b7bcda18-05cc-450b-b99a-3c5eafe111a4",
+        "collectionId": "e6ef95a7-29f7-4ec4-8984-0d8602c94b27",
+        "occasionIds": [
+            "b3c6c410-d05a-4426-a6a6-2f086901d411"
+        ],
+        "categoryIds": [
+            "6cbe22ca-900f-4b38-9030-368e0f89bc74"
+        ],
+        "colorVariants": [
+            {
+                "color": "Red",
+                background: 'bg-red-500',
+                "images": [
+                    {
+                        "imageSrc": "https://placehold.co/300",
+                        "altText": "Red Chino Pants Front"
+                    }
+                ],
+                "sizeVariants": [
+                    {
+                        "size": "S",
+                        "price": 35,
+                        "currency": "$",
+                        "quantity": 10,
+                        "restockThreshold": 5
+                    },
+                    {
+                        "size": "M",
+                        "price": 35,
+                        "currency": "$",
+                        "quantity": 7,
+                        "restockThreshold": 5
+                    },
+                    {
+                        "size": "L",
+                        "price": 35,
+                        "currency": "$",
+                        "quantity": 5,
+                        "restockThreshold": 5
+                    }
+                ]
+            }
+        ]
+    }
+);
 
 const toggleColorOverlay = (event) => {
     colorOverlay.value.toggle(event);
@@ -92,7 +149,7 @@ const onColorSelect = async (col) => {
                 "imageSrc": "",
                 "altText": ""
             }],
-            background: selectedColor.value.background,
+            background: 'bg-' + selectedColor.value.id + '-500' //selectedColor.value.background,
         };
         if (product.value.productType == 0) {
             newColor.sizeVariants = [{
@@ -145,6 +202,31 @@ const removeColorVariantImage = async (colorVariantIndex, imageIndex) => {
     await nextTick();
 }
 
+const confirRemovingColorVariant = (event, colorVariantIndex) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: 'Do you want to delete ' + product.value.colorVariants[colorVariantIndex].color + '?',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            product.value.colorVariants.splice(colorVariantIndex, 1)
+            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+        },
+        reject: () => {
+            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+};
+
+
 // Watch for changes in isLoading
 watch(isLoading, (newValue, oldValue) => {
     if (newValue === false && oldValue === true) {
@@ -181,60 +263,59 @@ const saveProduct = () => {
             <div class="col-span-12 lg:col-span-8">
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-12">
-                        <InputText type="text" placeholder="Product Name" v-model="product.name" />
+                        <label for="productName">Product Name</label>
+                        <InputText id="productName" type="text" placeholder="Product Name" v-model="product.name" />
                     </div>
                     <div class="col-span-12">
-                        <InputText type="text" placeholder="Product Url Friendly Name"
+                        <label for="urlFriendlyName">Product Url Friendly Name</label>
+                        <InputText id="urlFriendlyName" type="text" placeholder="Product Url Friendly Name"
                             v-model="product.urlFriendlyName" />
                     </div>
                     <div class="col-span-12 lg:col-span-6">
-                        <Select :options="productTypes" v-model="product.productType" optionLabel="name"
-                            optionValue="id" placeholder="Select a Type" />
+                        <label for="productType">Product type</label>
+                        <Select id="productType" :options="productTypes" v-model="product.productType"
+                            optionLabel="name" optionValue="id" placeholder="Select a Type" />
                     </div>
                     <div class="col-span-12 lg:col-span-6">
-                        <InputText type="text" placeholder="Product Code" label="Product Code" v-model="product.code" />
+                        <label for="productCode">Product Code</label>
+                        <InputText id="productCode" type="text" placeholder="Product Code" label="Product Code"
+                            v-model="product.code" />
                     </div>
                     <div class="col-span-12 lg:col-span-6">
-                        <InputText type="text" placeholder="CoverImage Src" label="CoverImage Src"
+                        <label for="coverImageSrc">CoverImage Src</label>
+                        <InputText id="coverImageSrc" type="text" placeholder="CoverImage Src" label="CoverImage Src"
                             v-model="product.coverImage.imageSrc" />
                     </div>
                     <div class="col-span-12 lg:col-span-6">
-                        <InputText type="text" placeholder="CoverImage AltText" label="CoverImage AltText"
-                            v-model="product.coverImage.altText" />
+                        <label for="coverImageAltText">CoverImage AltText</label>
+                        <InputText id="coverImageAltText" type="text" placeholder="CoverImage AltText"
+                            label="CoverImage AltText" v-model="product.coverImage.altText" />
                     </div>
 
                     <div class="col-span-12">
-                        <Toolbar>
-                            <template v-slot:start>
+                        <Button type="button" icon="pi pi-plus" label="Add a color" @click="toggleColorOverlay"
+                            class="min-w-48" />
+                        <Popover ref="colorOverlay">
+                            <div class="flex flex-col gap-4">
                                 <div>
-                                    <Button type="button" icon="pi pi-plus" label="Add a color"
-                                        @click="toggleColorOverlay" class="min-w-48" />
-                                    <Popover ref="colorOverlay">
-                                        <div class="flex flex-col gap-4">
-                                            <div>
-                                                <span class="font-medium block mb-2">Available colors</span>
-                                                <ul class="list-none p-0 m-0 flex flex-col">
-                                                    <li v-for="color in colors" :key="color.name"
-                                                        class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border"
-                                                        @click="onColorSelect(color)">
-                                                        <div
-                                                            :class="['w-8 h-8 mr-2 border border-surface-200 dark:border-surface-700 rounded-full cursor-pointer flex justify-center items-center', color.background]">
-                                                            <i class="pi pi-check text-sm text-white z-50"
-                                                                v-if="colorExist(color)" />
-                                                        </div>
-                                                        <div>
-                                                            <span class="font-medium">{{ color.name }}</span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
+                                    <span class="font-medium block mb-2">Available colors</span>
+                                    <ul class="list-none p-0 m-0 flex flex-col">
+                                        <li v-for="color in colors" :key="color.name"
+                                            class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border"
+                                            @click="onColorSelect(color)">
+                                            <div
+                                                :class="['w-8 h-8 mr-2 border border-surface-200 dark:border-surface-700 rounded-full cursor-pointer flex justify-center items-center', color.background]">
+                                                <i class="pi pi-check text-sm text-white z-50"
+                                                    v-if="colorExist(color)" />
                                             </div>
-                                        </div>
-                                    </Popover>
+                                            <div>
+                                                <span class="font-medium">{{ color.name }}</span>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
-                            </template>
-                            <template v-slot:end> <Button icon="pi pi-trash" class="mr-2" severity="warning" />
-                            </template>
-                        </Toolbar>
+                            </div>
+                        </Popover>
                     </div>
 
                     <div class="col-span-12" v-if="product.colorVariants.length">
@@ -261,21 +342,35 @@ const saveProduct = () => {
                                         :key="colorVariantIndex" :value="colorVariantIndex" asChild>
                                         <div v-show="slotProps.active" :class="slotProps.class"
                                             v-bind="slotProps.a11yAttrs">
-                                            <div class="grid grid-cols-12 gap-4" v-if="product.productType !== 0">
-                                                <div class="col-span-12">
-                                                    {{ colorVariant.color }}
-                                                </div>
 
+                                            <Toolbar>
+                                                <template v-slot:start>
+                                                    <h2> {{ colorVariant.color }}</h2>
+                                                </template>
+
+                                                <template v-slot:end>
+                                                    <Button icon="pi pi-trash" class="mr-2" severity="danger" outlined
+                                                        @click="confirRemovingColorVariant($event, colorVariantIndex)" />
+                                                </template>
+                                            </Toolbar>
+
+
+                                            <div class="grid grid-cols-12 gap-4" v-if="product.productType !== 0">
                                                 <div class="col-span-12 lg:col-span-4">
-                                                    <InputText type="number" placeholder="Price"
-                                                        v-model="colorVariant.price" />
+                                                    <label :for="colorVariant.color + 'price'">Price</label>
+                                                    <InputText :id="colorVariant.color + 'price'" type="number"
+                                                        placeholder="Price" v-model="colorVariant.price" />
                                                 </div>
                                                 <div class="col-span-12 lg:col-span-4">
-                                                    <InputText type="number" placeholder="Quantity"
-                                                        v-model="colorVariant.quantity" />
+                                                    <label :for="colorVariant.color + 'quantity'">Quantity</label>
+                                                    <InputText :id="colorVariant.color + 'quantity'" type="number"
+                                                        placeholder="Quantity" v-model="colorVariant.quantity" />
                                                 </div>
                                                 <div class="col-span-12 lg:col-span-4">
-                                                    <InputText type="number" placeholder="Restock Threshold"
+                                                    <label :for="colorVariant.color + 'restockThreshold'">Restock
+                                                        Threshold</label>
+                                                    <InputText :id="colorVariant.color + 'restockThreshold'"
+                                                        type="number" placeholder="Restock Threshold"
                                                         v-model="colorVariant.restockThreshold" />
                                                 </div>
                                             </div>
@@ -308,19 +403,33 @@ const saveProduct = () => {
 
                                                     <div class="grid grid-cols-12 gap-3">
                                                         <div class="col-span-12 lg:col-span-6">
-                                                            <InputText type="text" placeholder="Size"
+                                                            <label
+                                                                :for="colorVariant.color + index + 'size'">Size</label>
+                                                            <InputText :id="colorVariant.color + index + 'size'"
+                                                                type="text" placeholder="Size"
                                                                 v-model="sizeVariant.size" />
                                                         </div>
                                                         <div class="col-span-12 lg:col-span-6">
-                                                            <InputText type="text" placeholder="Price"
+                                                            <label
+                                                                :for="colorVariant.color + index + 'price'">Price</label>
+                                                            <InputText :id="colorVariant.color + index + 'price'"
+                                                                type="text" placeholder="Price"
                                                                 v-model="sizeVariant.price" />
                                                         </div>
                                                         <div class="col-span-12 lg:col-span-6">
-                                                            <InputText type="text" placeholder="Quantity"
+                                                            <label
+                                                                :for="colorVariant.color + index + 'price'">Quantity</label>
+                                                            <InputText :id="colorVariant.color + index + 'price'"
+                                                                type="text" placeholder="Quantity"
                                                                 v-model="sizeVariant.quantity" />
                                                         </div>
                                                         <div class="col-span-12 lg:col-span-6">
-                                                            <InputText type="text" placeholder="Restock Threshold"
+                                                            <label
+                                                                :for="colorVariant.color + index + 'restockThreshold'">Restock
+                                                                Threshold</label>
+                                                            <InputText
+                                                                :id="colorVariant.color + index + 'restockThreshold'"
+                                                                type="text" placeholder="Restock Threshold"
                                                                 v-model="sizeVariant.restockThreshold" />
                                                         </div>
                                                     </div>
@@ -345,18 +454,24 @@ const saveProduct = () => {
                                                         <div class="flex items-center pl-2"
                                                             @click="removeColorVariantImage(colorVariantIndex, index)">
                                                             <div
-                                                                :class="['w-6 h-6 mr-2 border border-surface-200 dark:border-surface-700 rounded-full cursor-pointer flex justify-center items-center bg-gray-500']">
+                                                                :class="['w-6 h-6 border border-surface-200 dark:border-surface-700 rounded-full cursor-pointer flex justify-center items-center bg-gray-500']">
                                                                 <i class="pi pi-times text-sm text-white z-50" />
                                                             </div>
                                                         </div>
                                                     </Divider>
                                                     <div class="grid grid-cols-12 gap-4 m-0">
                                                         <div class="col-span-12 lg:col-span-6">
-                                                            <InputText type="text" placeholder="Image Src"
+                                                            <label :for="colorVariant.color + index + 'imageSrc'">Image
+                                                                Src</label>
+                                                            <InputText :id="colorVariant.color + index + 'imageSrc'"
+                                                                type="text" placeholder="Image Src"
                                                                 v-model="image.imageSrc" />
                                                         </div>
                                                         <div class="col-span-12 lg:col-span-6 m-0">
-                                                            <InputText type="text" placeholder="Alt Text"
+                                                            <label :for="colorVariant.color + index + 'altText'">Alt
+                                                                Text</label>
+                                                            <InputText :id="colorVariant.color + index + 'altText'"
+                                                                type="text" placeholder="Alt Text"
                                                                 v-model="image.altText" />
                                                         </div>
                                                     </div>
@@ -370,11 +485,17 @@ const saveProduct = () => {
                     </div>
 
                     <div class="col-span-12">
-                        <Editor v-model="product.description" editorStyle="height: 320px" />
+                        <label for="description">Description</label>
+                        <Editor id="description" v-model="product.description" editorStyle="height: 320px" />
+                    </div>
+
+                    <div class="col-span-12">
+                        <label for="shippingAndReturns">Shipping & Returns</label>
+                        <Editor id="shippingAndReturns" v-model="product.shippingAndReturns"
+                            editorStyle="height: 200px" />
                     </div>
 
                 </div>
-                {{ product }}
             </div>
             <div class="col-span-12 lg:col-span-4 flex flex-col gap-y-4">
                 <div class="border border-surface-200 dark:border-surface-700 rounded">
@@ -382,9 +503,8 @@ const saveProduct = () => {
                         class="text-surface-900 dark:text-surface-0 font-bold block border-b border-surface-200 dark:border-surface-700 p-4">Publish</span>
                     <div class="p-4">
                         <div class="bg-surface-100 dark:bg-surface-700 py-2 px-4 flex items-center rounded">
-                            <span class="text-black/90 font-bold mr-4">Status:</span>
-                            <span class="text-black/60 font-semibold">Draft</span>
-                            <Button type="button" icon="pi pi-fw pi-pencil" class="ml-auto" text rounded />
+                            <Select id="status" :options="status" v-model="product.status" optionLabel="name"
+                                optionValue="id" placeholder="Select a Status" />
                         </div>
                     </div>
                 </div>

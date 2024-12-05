@@ -5,6 +5,9 @@ public record UpdateProductInfosCommand(
     string Name,
     string UrlFriendlyName,
     string Description,
+    string ShippingAndReturns,
+    string code,
+    ProductStatus Status,
     bool IsHandmade,
     ImageDto CoverImage,
     Guid MaterialId,
@@ -50,6 +53,10 @@ public class UpdateProductInfosCommandHandler : ICommandHandler<UpdateProductInf
         try
         {
             var product = await _productRepository.GetByIdAsync(ProductId.Of(command.Id));
+            if (product == null)
+            {
+                throw new NotFoundException($"The product {command.Id} was not found");
+            }
             var updatedProduct = UpdateProductInfosEntity(product, command);
             _productRepository.UpdateAsync(updatedProduct);
             await _productRepository.SaveChangesAsync();
@@ -65,8 +72,11 @@ public class UpdateProductInfosCommandHandler : ICommandHandler<UpdateProductInf
 
     private Product UpdateProductInfosEntity(Product product, UpdateProductInfosCommand command)
     {
+        product.UpdateStatus(command.Status);
+        product.UpdateCode(product.Code);
         product.UpdateNames(ProductName.Of(command.Name), UrlFriendlyName.Of(command.UrlFriendlyName));
         product.UpdateDescription(ProductDescription.Of(command.Description));
+        product.UpdateDescription(command.ShippingAndReturns);
         product.UpdateMaterial(MaterialId.Of(command.MaterialId));
         product.UpdateCollection(CollectionId.Of(command.CollectionId));
         product.UpdateBrand(BrandId.Of(command.BrandId));

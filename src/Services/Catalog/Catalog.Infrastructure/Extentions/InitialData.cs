@@ -191,6 +191,7 @@ internal class InitialData
                 name: "T-shirt Sport",
                 friendlyName: "t-shirt-sport",
                 description: "T-shirt respirant pour le sport",
+                shippingAndReturns: "",
                 colors: new List<string> { "Black", "Grey" },
                 sizes: new List<string> { "M", "L", "XL" }
             ),
@@ -198,6 +199,7 @@ internal class InitialData
                 name: "T-shirt Basic",
                 friendlyName: "t-shirt-basic",
                 description: "T-shirt confortable en coton",
+                                shippingAndReturns: "",
                 colors: new List<string> { "Red", "Blue" },
                 sizes: new List<string> { "S", "M", "L" }
             ),
@@ -205,6 +207,8 @@ internal class InitialData
                 name: "Pantalon Cargo",
                 friendlyName: "pantalon-cargo",
                 description: "Pantalon avec poches multiples, style décontracté",
+                                shippingAndReturns: "",
+
                 colors: new List<string> { "Kaki", "Beige" },
                 sizes: new List<string> { "32", "34", "36" }
             ),
@@ -212,6 +216,8 @@ internal class InitialData
                 name: "Pantalon Classique",
                 friendlyName: "pantalon-classique",
                 description: "Pantalon élégant pour des occasions formelles",
+                                shippingAndReturns: "",
+
                 colors: new List<string> { "Black", "Blue" },
                 sizes: new List<string> { "30", "32", "34" }
             ),
@@ -219,23 +225,29 @@ internal class InitialData
                 name: "Sac à Dos Urban",
                 friendlyName: "sac-dos-urban",
                 description: "Sac à dos moderne pour usage quotidien",
+                                shippingAndReturns: "",
+
                 colors: new List<string> { "Black", "Grey" }
             ),
             NewAccessoryProduct(
                 name: "Sac à Main Élégant",
                 friendlyName: "sac-main-elegant",
                 description: "Sac à main élégant pour des occasions formelles",
+                                shippingAndReturns: "",
+
                 colors: new List<string> { "Red", "Blue" }
             )
             };
 
-    private static Product NewClothingProduct(string name, string friendlyName, string description, List<string> colors, List<string> sizes)
+    private static Product NewClothingProduct(string name, string friendlyName, string description, string shippingAndReturns, List<string> colors, List<string> sizes)
     {
         var urlFriendlyName = UrlFriendlyName.Of(friendlyName);
         var product = Product.Create(
                 ProductName.Of(friendlyName),
                 urlFriendlyName,
                 ProductDescription.Of(description),
+                 shippingAndReturns,
+                 "CODE1",
                 true,
                 Image.Of($"src-{friendlyName}", $"alt-{friendlyName}"),
                 Domain.Enums.ProductType.Clothing,
@@ -272,13 +284,15 @@ internal class InitialData
     }
 
 
-    private static Product NewAccessoryProduct(string name, string friendlyName, string description, List<string> colors)
+    private static Product NewAccessoryProduct(string name, string friendlyName, string description, string shippingAndReturns, List<string> colors)
     {
         var urlFriendlyName = UrlFriendlyName.Of(friendlyName);
         var product = Product.Create(
                 ProductName.Of(friendlyName),
                 urlFriendlyName,
                 ProductDescription.Of(description),
+                shippingAndReturns,
+                "CODE2",
                 true,
                 Image.Of($"src-{friendlyName}", $"alt-{friendlyName}"),
                 Domain.Enums.ProductType.Accessory,

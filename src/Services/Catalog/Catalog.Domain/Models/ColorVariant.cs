@@ -6,8 +6,9 @@ public class ColorVariant : Entity<ColorVariantId>
     public Color Color { get; protected set; } = default!;
     public Slug Slug { get; protected set; } = default!;
     public bool OnOrdering { get; private set; } = default!;
+    public IReadOnlyList<ColorVariantId> Outfits => _outfits.AsReadOnly();
 
-    // Available stock at which we should reorder
+    private readonly List<ColorVariantId> _outfits = new();
     public ColorVariantQuantity RestockThreshold { get; private set; } = default!;
 
     private readonly List<Image> _images = new();
@@ -85,6 +86,25 @@ public class ColorVariant : Entity<ColorVariantId>
             throw new InvalidOperationException($"A Size Variant with the same Name \"{sizeVariant.Size.Value}\"  already exists.");
         _sizeVariants.Add(sizeVariant);
     }
+    public void AddOutfit(ColorVariantId colorVariantId )
+    {
+        if (colorVariantId == null)
+        {
+            throw new ArgumentNullException(nameof(colorVariantId));
+        }
+
+        if (_outfits.Any(id => id == colorVariantId))
+            throw new InvalidOperationException($"\"{colorVariantId}\"  already exists.");
+        _outfits.Add(colorVariantId);
+    }
+    public void RemoveOutfit(ColorVariantId colorVariantId)
+    {
+        var size = _outfits.FirstOrDefault(_ => _ == colorVariantId);
+        if (size != null)
+        {
+            _outfits.Remove(colorVariantId);
+        }
+    }
     public void RemoveSizeVariant(SizeVariantId sizeVariantId)
     {
         var size = _sizeVariants.FirstOrDefault(_ => _.Id.Value == sizeVariantId.Value);
@@ -112,7 +132,6 @@ public class ColorVariant : Entity<ColorVariantId>
             _images.Remove(image);
         }
     }
-
     internal void UpdateSizeVariantPrice(SizeVariantId sizeVariantId, Price price)
     {
         var sv = _sizeVariants.FirstOrDefault(_ => _.Id == sizeVariantId);

@@ -108,11 +108,14 @@ namespace Catalog.Infrastructure.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ShippingAndReturns = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     IsHandmade = table.Column<bool>(type: "bit", nullable: false),
                     OnReorder = table.Column<bool>(type: "bit", nullable: false),
                     ProductType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BrandId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Draft"),
                     CollectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UrlFriendlyName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -120,7 +123,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                     AverageRating = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     AltText = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageSrc = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -267,6 +270,27 @@ namespace Catalog.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ColorVariantOutfit",
+                columns: table => new
+                {
+                    ColorVariantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ColorVariantProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OutfitId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ColorVariantOutfit", x => new { x.ColorVariantId, x.ColorVariantProductId, x.Id });
+                    table.ForeignKey(
+                        name: "FK_ColorVariantOutfit_ColorVariants_ColorVariantId_ColorVariantProductId",
+                        columns: x => new { x.ColorVariantId, x.ColorVariantProductId },
+                        principalTable: "ColorVariants",
+                        principalColumns: new[] { "ColorVariantId", "ProductId" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SizeVariants",
                 columns: table => new
                 {
@@ -362,6 +386,9 @@ namespace Catalog.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ColorVariantImages");
+
+            migrationBuilder.DropTable(
+                name: "ColorVariantOutfit");
 
             migrationBuilder.DropTable(
                 name: "Occasions");

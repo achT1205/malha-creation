@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Pagination;
 using Catalog.Application.Products.Commands.AddColorVariant;
 using Catalog.Application.Products.Commands.AddColorVariantStock;
+using Catalog.Application.Products.Commands.AddOutfit;
 using Catalog.Application.Products.Commands.AddSizeVariant;
 using Catalog.Application.Products.Commands.AddSizeVariantStock;
 using Catalog.Application.Products.Commands.DeleteProduct;
@@ -15,7 +16,6 @@ using Catalog.Application.Products.Queries.GetProductById;
 using Catalog.Application.Products.Queries.GetProductBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
 using Catalog.Domain.Enums;
-using Catalog.Domain.ValueObjects;
 
 namespace Catalog.API.Endpoints;
 
@@ -25,6 +25,8 @@ public static class ProductEndpoints
     string Name,
     string UrlFriendlyName,
     string Description,
+    string ShippingAndReturns,
+    string? Code,
     bool IsHandmade,
     bool OnReorder,
     ImageDto CoverImage,
@@ -42,6 +44,8 @@ public static class ProductEndpoints
         string Name,
         string UrlFriendlyName,
         string Description,
+        string ShippingAndReturns,
+        string code,
         bool IsHandmade,
         ImageDto CoverImage,
         Guid MaterialId,
@@ -73,6 +77,10 @@ public static class ProductEndpoints
     public record UpdateProductResponse(bool IsSuccess);
     public record DeleteProductResponse(bool IsSuccess);
     public record CreateProductResponse(Guid Id);
+
+    public record AddOutfitRequest(Guid ProductId, Guid ColorVariantId, Guid OutfitId);
+    public record AddOutfitResponse(bool IsSuccess);
+
 
     public static void MapProductEndpoints(this IEndpointRouteBuilder app)
     {
@@ -194,8 +202,6 @@ public static class ProductEndpoints
         .WithSummary("Update Product: Update Size variant Price.")
         .WithDescription("Update Product: Update Size variant Price.");
 
-        //
-
         app.MapDelete("/api/products/{id}/color-variants/{colorVariantId}", async (Guid id, Guid colorVariantId, ISender sender) =>
         {
             var command = new RemoveColorVariantCommand(id, colorVariantId);
@@ -302,5 +308,20 @@ public static class ProductEndpoints
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Get Products")
         .WithDescription("Retrieve a list of all available products.");
+
+        app.MapPut("/api/products/{id}/color-variants/{colorVariantId}/add-outfit/{outfitId}/update-price", async (Guid id, Guid colorVariantId, Guid outfitId, AddOutfitRequest requst, ISender sender) =>
+        {
+            var command = requst.Adapt<AddOutfitCommand>();
+            var result = await sender.Send(command);
+            var response = result.Adapt<AddOutfitResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("Add Outfit")
+        .Produces<AddOutfitResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Add Outfit to a color variant")
+        .WithDescription("Add Outfit to a color variant");
+
+
     }
 }

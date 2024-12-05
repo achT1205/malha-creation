@@ -1,4 +1,5 @@
 ﻿
+
 namespace Catalog.Application.Interfaces;
 
 public interface IBrandRepository

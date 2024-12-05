@@ -24,6 +24,10 @@ public class UpdateCategoriesCommandHandler : ICommandHandler<UpdateCategoriesCo
         try
         {
             var product = await _productRepository.GetByIdAsync(ProductId.Of(command.Id));
+            if (product == null)
+            {
+                throw new NotFoundException($"The product {command.Id} was not found");
+            }
             product.RemoveCategories(product.CategoryIds.ToList());
             var ids = command.CategoryIds.Select(id => CategoryId.Of(id)).ToList();
             product.AddCategories(ids);

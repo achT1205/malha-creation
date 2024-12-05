@@ -1,4 +1,6 @@
-﻿namespace Catalog.Application.Dtos;
+﻿using MassTransit.Internals.GraphValidation;
+
+namespace Catalog.Application.Dtos;
 
 public record ProductDto
 (
@@ -6,8 +8,12 @@ public record ProductDto
     string Name,
     string UrlFriendlyName,
     string Description,
+    string ShippingAndReturns,
+    string? Code,
+    ProductStatus Status,
     bool IsHandmade,
     ProductType ProductType,
+    string ProductTypeString,
     ImageDto CoverImage,
     MaterialDto Material,
     CollectionDto Collection,
@@ -23,8 +29,12 @@ public record LiteProductDto
     string Name,
     string UrlFriendlyName,
     string Description,
+    string ShippingAndReturns,
+    string Code,
+    ProductStatus Status,
     bool IsHandmade,
     ProductType ProductType,
+    string ProductTypeString,
     ImageDto CoverImage,
     Guid MaterialId,
     Guid CollectionId,
