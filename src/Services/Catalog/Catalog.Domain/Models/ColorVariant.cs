@@ -24,7 +24,7 @@ public class ColorVariant : Entity<ColorVariantId>
     {
 
     }
-    private ColorVariant(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold)
+    private ColorVariant(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold, List<ColorVariantId> outfits)
     {
         Id = ColorVariantId.Of(Guid.NewGuid());
         Price = price;
@@ -33,11 +33,18 @@ public class ColorVariant : Entity<ColorVariantId>
         Color = color ?? throw new ArgumentNullException(nameof(color));
         Slug = slug ?? throw new ArgumentNullException(nameof(slug));
         RestockThreshold = restockThreshold;
+        if (outfits.Any())
+        {
+            foreach (var outfit in outfits)
+            {
+                AddOutfit(outfit);
+            }
+        }
     }
 
-    public static ColorVariant Create(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold)
+    public static ColorVariant Create(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold, List<ColorVariantId> outfits)
     {
-        return new ColorVariant(productId, color, slug, price, quantity, restockThreshold);
+        return new ColorVariant(productId, color, slug, price, quantity, restockThreshold, outfits);
     }
     public void UpdatePrice(ColorVariantPrice newPrice)
     {
@@ -86,7 +93,7 @@ public class ColorVariant : Entity<ColorVariantId>
             throw new InvalidOperationException($"A Size Variant with the same Name \"{sizeVariant.Size.Value}\"  already exists.");
         _sizeVariants.Add(sizeVariant);
     }
-    public void AddOutfit(ColorVariantId colorVariantId )
+    public void AddOutfit(ColorVariantId colorVariantId)
     {
         if (colorVariantId == null)
         {

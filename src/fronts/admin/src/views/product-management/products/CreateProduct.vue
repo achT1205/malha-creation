@@ -2,13 +2,14 @@
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
-
+import { useRouter } from 'vue-router';
 import { useBrandStore } from '@/stores/brandStore';
 import { useCategoryStore } from '@/stores/categoryStore';
 import { useCollectionStore } from '@/stores/collectionStore';
 import { useMaterialStore } from '@/stores/materialStore';
 import { useOccasionStore } from '@/stores/occasionStore';
 import { useProductStore } from '@/stores/productStore';
+import { useLocalStorage } from '@/composables/useLocalStorage';
 
 const confirm = useConfirm();
 const toast = useToast();
@@ -18,6 +19,7 @@ const collectionStore = useCollectionStore();
 const materialStore = useMaterialStore();
 const occasionStore = useOccasionStore();
 const productStore = useProductStore();
+const router = useRouter();
 
 
 
@@ -27,7 +29,9 @@ const collections = computed(() => collectionStore.collections);
 const materials = computed(() => materialStore.materials);
 const occasions = computed(() => occasionStore.occasions);
 const isLoading = computed(() => productStore.isLoading);
+const successed = computed(() => productStore.successed);
 const error = computed(() => productStore.error);
+const colorVariants = computed(() => productStore.colorVariants);
 
 onMounted(() => {
     brandStore.fetchBrands()
@@ -35,6 +39,14 @@ onMounted(() => {
     collectionStore.fetchCollections()
     materialStore.fetchMaterials()
     occasionStore.fetchOccasions()
+    productStore.fetchProducts()
+    nextTick(() => {
+        if (colorVariantTabRefs.value) {
+            if (colorVariantTabRefs.value && colorVariantTabRefs.value.length) {
+                colorVariantTabRefs.value[colorVariantTabRefs.value.length - 1].click()
+            }
+        }
+    });
 });
 
 const productTypes = ref([{
@@ -62,17 +74,19 @@ const colors = ref([{
 {
     id: 'blue', name: "Blue", background: 'bg-blue-500'
 }])
-
+const removeColorVariantDialog = ref(false)
 const colorOverlay = ref();
 const selectedColor = ref(null);
 const colorVariantTabRefs = ref([]);
-const product = ref(
+const colorVariantIndex = ref(null)
+
+const product = useLocalStorage(
     {
         "name": "Slim Fit Chino Pants",
         "urlFriendlyName": "slim-fit-chino-pants",
         "description": "Chino pants with a modern slim fit, versatile and stylish.",
         "shippingAndReturns": "Chino pants with a modern slim fit, versatile and stylish.",
-        "code":"CODE1",
+        "code": "CODE1",
         "status": 0,
         "isHandmade": false,
         "onReorder": true,
@@ -125,7 +139,8 @@ const product = ref(
                 ]
             }
         ]
-    }
+    },
+    'newProduct'
 );
 
 const toggleColorOverlay = (event) => {
@@ -202,44 +217,29 @@ const removeColorVariantImage = async (colorVariantIndex, imageIndex) => {
     await nextTick();
 }
 
-const confirRemovingColorVariant = (event, colorVariantIndex) => {
-    confirm.require({
-        target: event.currentTarget,
-        message: 'Do you want to delete ' + product.value.colorVariants[colorVariantIndex].color + '?',
-        icon: 'pi pi-info-circle',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: () => {
-            product.value.colorVariants.splice(colorVariantIndex, 1)
-            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
-        },
-        reject: () => {
-            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-        }
-    });
+const confirmRemoveColorVariant = async () => {
+    removeColorVariantDialog.value = true
 };
 
+const removeColorVariant = async () => {
+    product.value.colorVariants.splice(colorVariantIndex.value, 1)
+    removeColorVariantDialog.value = false
+    await nextTick();
+}
 
-// Watch for changes in isLoading
-watch(isLoading, (newValue, oldValue) => {
-    if (newValue === false && oldValue === true) {
+
+watch(successed, (newValue, oldValue) => {
+    if (newValue === true && oldValue === false) {
         toast.add({
             severity: 'success',
             summary: 'Successful',
             detail: 'Product Updated',
             life: 3000,
         });
+        router.push('/product-anagement/products/product-list')
     }
 });
 
-// Watch for changes in error
 watch(error, (newValue, oldValue) => {
     if (newValue !== null && oldValue === null) {
         toast.add({
@@ -250,6 +250,7 @@ watch(error, (newValue, oldValue) => {
         });
     }
 });
+
 const saveProduct = () => {
     productStore.addProduct(product.value)
 }
@@ -257,7 +258,7 @@ const saveProduct = () => {
 </script>
 
 <template>
-    <div class="card">
+    <div class="card" v-if="product">
         <span class="block text-surface-900 dark:text-surface-0 font-bold text-xl mb-6">Create Product</span>
         <Fluid class="grid grid-cols-12 gap-4 flex-wrap">
             <div class="col-span-12 lg:col-span-8">
@@ -281,12 +282,12 @@ const saveProduct = () => {
                         <InputText id="productCode" type="text" placeholder="Product Code" label="Product Code"
                             v-model="product.code" />
                     </div>
-                    <div class="col-span-12 lg:col-span-6">
+                    <div class="col-span-12 lg:col-span-6" v-if="product.coverImage">
                         <label for="coverImageSrc">CoverImage Src</label>
                         <InputText id="coverImageSrc" type="text" placeholder="CoverImage Src" label="CoverImage Src"
                             v-model="product.coverImage.imageSrc" />
                     </div>
-                    <div class="col-span-12 lg:col-span-6">
+                    <div class="col-span-12 lg:col-span-6" v-if="product.coverImage">
                         <label for="coverImageAltText">CoverImage AltText</label>
                         <InputText id="coverImageAltText" type="text" placeholder="CoverImage AltText"
                             label="CoverImage AltText" v-model="product.coverImage.altText" />
@@ -318,7 +319,7 @@ const saveProduct = () => {
                         </Popover>
                     </div>
 
-                    <div class="col-span-12" v-if="product.colorVariants.length">
+                    <div class="col-span-12" v-if="product.colorVariants && product.colorVariants.length">
                         <div class="card">
                             <Tabs value="0">
                                 <TabList>
@@ -350,10 +351,25 @@ const saveProduct = () => {
 
                                                 <template v-slot:end>
                                                     <Button icon="pi pi-trash" class="mr-2" severity="danger" outlined
-                                                        @click="confirRemovingColorVariant($event, colorVariantIndex)" />
+                                                        @click="confirmRemoveColorVariant(colorVariantIndex)" />
                                                 </template>
                                             </Toolbar>
-
+                                            <Dialog v-model:visible="removeColorVariantDialog"
+                                                :style="{ width: '450px' }" header="Confirm" :modal="true">
+                                                <div class="flex items-center gap-4">
+                                                    <i class="pi pi-exclamation-triangle !text-3xl" />
+                                                    <span v-if="colorVariant">Are you sure you want to delete ==> {{
+                                                        colorVariantIndex }}<b>{{
+                                                            product.colorVariants[colorVariantIndex].color
+                                                            }}</b>?</span>
+                                                </div>
+                                                <template #footer>
+                                                    <Button label="No" icon="pi pi-times" text
+                                                        @click="removeColorVariantDialog = false" />
+                                                    <Button label="Yes" icon="pi pi-check"
+                                                        @click="removeColorVariant" />
+                                                </template>
+                                            </Dialog>
 
                                             <div class="grid grid-cols-12 gap-4" v-if="product.productType !== 0">
                                                 <div class="col-span-12 lg:col-span-4">
@@ -475,6 +491,29 @@ const saveProduct = () => {
                                                                 v-model="image.altText" />
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </Fieldset>
+                                            <Fieldset>
+                                                <template #legend>
+                                                    <div class="flex items-center pl-2">
+                                                        <span class="font-bold p-2">Outfits</span>
+                                                    </div>
+                                                </template>
+                                                <div class="col-span-12">
+                                                    <MultiSelect :disabled="colorVariants.length === 0" id="outfit"
+                                                        :options="colorVariants" filter v-model="colorVariant.outfitIds"
+                                                        optionLabel="slug" optionValue="id"
+                                                        placeholder="Select an Outfit" display="chip"
+                                                        :maxSelectedLabels="3" class="w-full md:w-30rem">
+                                                        <template #option="slotProps">
+                                                            <div class="flex items-center">
+                                                                <img :alt="slotProps.option.altText"
+                                                                    :src="slotProps.option.imageSrc" class="mr-2"
+                                                                    style="width: 18px" />
+                                                                <div>{{ slotProps.option.slug }}</div>
+                                                            </div>
+                                                        </template>
+                                                    </MultiSelect>
                                                 </div>
                                             </Fieldset>
                                         </div>

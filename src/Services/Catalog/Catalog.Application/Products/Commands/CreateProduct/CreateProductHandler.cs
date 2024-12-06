@@ -129,7 +129,8 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                         product.ProductType == ProductType.Clothing ? null : "USD",
                         colorVariant.Price),
                     ColorVariantQuantity.Of(colorVariant.Quantity),
-                    ColorVariantQuantity.Of(colorVariant.RestockThreshold));
+                    ColorVariantQuantity.Of(colorVariant.RestockThreshold),
+                    colorVariant.OutfitIds.Select(id=> ColorVariantId.Of(id)).ToList());
 
             foreach (var image in colorVariant.Images)
             {

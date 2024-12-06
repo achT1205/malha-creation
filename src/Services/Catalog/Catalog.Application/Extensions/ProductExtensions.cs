@@ -1,4 +1,6 @@
-﻿namespace Catalog.Application.Extensions;
+﻿using Catalog.Domain.ValueObjects;
+
+namespace Catalog.Application.Extensions;
 
 public static class ProductExtensions
 {
@@ -94,9 +96,15 @@ public static class ProductExtensions
                 : cv.Quantity.Value,
                 RestockThreshold: cv.RestockThreshold.Value,
                 Slug: cv.Slug.Value,
+                OutfitIds: cv.Outfits.Select(id => id.Value).ToList(),
                 SizeVariants: cv.SizeVariants.Select(
                     sv => new SizeVariantDto(sv.Id.Value, sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value, sv.RestockThreshold.Value)).ToList()
-                )).ToList()
+                )).ToList(),
+            MaterialId : product.MaterialId.Value,
+            CollectionId: product.CollectionId.Value,
+            BrandId: product.BrandId.Value,
+            OccasionIds : product.OccasionIds.Select(_=> _.Value).ToList(),
+            CategoryIds: product.CategoryIds.Select(_ => _.Value).ToList()
         );
     }
 
@@ -134,6 +142,7 @@ public static class ProductExtensions
                 : cv.Quantity.Value,
                 RestockThreshold: cv.RestockThreshold.Value,
                 Slug: cv.Slug.Value,
+                OutfitIds: cv.Outfits.Select(id => id.Value).ToList(),
                 SizeVariants: cv.SizeVariants.Select(
                     sv => new SizeVariantDto(sv.Id.Value, sv.Size.Value, sv.Price.Amount, sv.Price.Currency, sv.Quantity.Value, sv.RestockThreshold.Value)).ToList()
                 )).ToList()

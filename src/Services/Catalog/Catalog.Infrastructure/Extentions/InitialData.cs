@@ -265,7 +265,8 @@ internal class InitialData
                Slug.Of(urlFriendlyName, color),
                ColorVariantPrice.Of(null, null),
                ColorVariantQuantity.Of(null),
-               ColorVariantQuantity.Of(null)
+               ColorVariantQuantity.Of(null),
+               null
                );
 
             foreach (var s in sizes)
@@ -309,7 +310,8 @@ internal class InitialData
                Slug.Of(urlFriendlyName, color),
                ColorVariantPrice.Of("USD", 15),
                ColorVariantQuantity.Of(80),
-               ColorVariantQuantity.Of(10)
+               ColorVariantQuantity.Of(10),
+               null
                );
             product.AddColorVariant(cv);
         }

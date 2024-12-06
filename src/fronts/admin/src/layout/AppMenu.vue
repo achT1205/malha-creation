@@ -22,12 +22,12 @@ const model = ref([
             {
                 label: 'New Product',
                 icon: 'pi pi-fw pi-plus',
-                to: '/product-anagement/new-product'
+                to: '/product-anagement/products/new-product'
             },
             {
                 label: 'Products',
                 icon: 'pi pi-fw pi-list',
-                to: '/product-anagement/product-list'
+                to: '/product-anagement/products/product-list'
             },
             {
                 label: 'Parametres',

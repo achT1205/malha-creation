@@ -20,7 +20,12 @@ public record ProductDto
     BrandDto Brand,
     List<OutputColorVariantDto> ColorVariants,
     List<OccasionDto>? Occasions,
-    List<CategoryDto>? Categories
+    List<CategoryDto>? Categories,
+    Guid MaterialId,
+    Guid CollectionId,
+    Guid BrandId,
+    List<Guid>? OccasionIds,
+    List<Guid>? CategoryIds
 );
 
 public record LiteProductDto

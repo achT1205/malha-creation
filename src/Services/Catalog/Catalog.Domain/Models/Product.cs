@@ -226,7 +226,7 @@ public class Product : Aggregate<ProductId>
         Description = newDescription ?? throw new ArgumentNullException(nameof(newDescription));
     }
 
-    public void UpdateDescription(string shippingAndReturns)
+    public void UpdateShippingAndReturns(string shippingAndReturns)
     {
         if (ShippingAndReturns == shippingAndReturns)
             return;

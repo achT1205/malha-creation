@@ -17,15 +17,23 @@ const routes = [
                 component: () => import('@/views/dashboard/EcommerceView.vue')
             },
             {
-                path: '/product-anagement/new-product',
+                path: '/product-anagement/products/new-product',
                 name: 'new-product',
                 meta: {
                     breadcrumb: ['Product Management', 'New Product']
                 },
-                component: () => import('@/views/product-management/products/ProductCreate.vue')
+                component: () => import('@/views/product-management/products/CreateProduct.vue')
             },
             {
-                path: '/product-anagement/product-list',
+                path: '/product-anagement/products/:id/edit',
+                name: 'edit-product',
+                meta: {
+                    breadcrumb: ['Product Management', 'Edit Product']
+                },
+                component: () => import('@/views/product-management/products/EditProduct.vue')
+            },
+            {
+                path: '/product-anagement/products/product-list',
                 name: 'product-list',
                 meta: {
                     breadcrumb: ['Product Management', 'Product List']
