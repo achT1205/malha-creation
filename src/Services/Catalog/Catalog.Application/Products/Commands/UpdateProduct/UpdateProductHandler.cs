@@ -141,14 +141,9 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
     }
     private void RemoveColorVariants(UpdateProductCommand command, Product product)
     {
-        var toBeDeletedIds = command.ColorVariants.Where(c => c.Id != null).Select(cv => cv.Id).ToList();
-
-        if (toBeDeletedIds.Any())
+        foreach (var cvId in product.ColorVariants.Select(cv => cv.Id).ToList())
         {
-            foreach (var cvId in toBeDeletedIds)
-            {
-                product.RemoveColorVariant(ColorVariantId.Of(cvId.Value));
-            }
+            product.RemoveColorVariant(cvId);
         }
     }
     private void AddColorVariants(UpdateProductCommand command, Product product)

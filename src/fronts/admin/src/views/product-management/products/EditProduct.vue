@@ -71,10 +71,11 @@ const colors = ref([{
 {
     id: 'blue', name: "Blue", background: 'bg-blue-500'
 }])
-
+const colorVariantIndex = ref(null)
 const colorOverlay = ref();
 const selectedColor = ref(null);
 const colorVariantTabRefs = ref([]);
+const removeColorVariantDialog = ref(false)
 
 const product = useLocalStorage(
     null,
@@ -155,34 +156,26 @@ const removeColorVariantImage = async (colorVariantIndex, imageIndex) => {
     await nextTick();
 }
 
-const confirRemovingColorVariant = (event, colorVariantIndex) => {
-    confirm.require({
-        target: event.currentTarget,
-        message: 'Do you want to delete ' + product.value.colorVariants[colorVariantIndex].color + '?',
-        icon: 'pi pi-info-circle',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: () => {
-            product.value.colorVariants.splice(colorVariantIndex, 1)
-            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
-        },
-        reject: () => {
-            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-        }
-    });
+const confirmRemoveColorVariant = async (index) => {
+    colorVariantIndex.value = index
+    removeColorVariantDialog.value = true
 };
+
+const removeColorVariant = async () => {
+
+const index = colorVariants.value.findIndex(_ => _.id === product.value.colorVariants[colorVariantIndex.value])
+product.value.colorVariants.splice(colorVariantIndex.value, 1)
+if (index > -1)
+    colorVariants.value.splice(index, 1)
+
+removeColorVariantDialog.value = false
+await nextTick();
+}
+
 
 const isOptionDisabled = (option, colorVariant) => {
     return option.id === colorVariant.id;
 }
-
 
 watch(successed, (newValue, oldValue) => {
     if (newValue === true && oldValue === false) {
@@ -323,7 +316,7 @@ const saveProduct = () => {
 
                                                 <template v-slot:end>
                                                     <Button icon="pi pi-trash" class="mr-2" severity="danger" outlined
-                                                        @click="confirRemovingColorVariant($event, colorVariantIndex)" />
+                                                        @click="confirmRemoveColorVariant(colorVariantIndex)" />
                                                 </template>
                                             </Toolbar>
 
@@ -477,6 +470,20 @@ const saveProduct = () => {
                                     </TabPanel>
                                 </TabPanels>
                             </Tabs>
+                            <Dialog v-model:visible="removeColorVariantDialog" :style="{ width: '450px' }"
+                                header="Confirm" :modal="true">
+                                <div class="flex items-center gap-4">
+                                    <i class="pi pi-exclamation-triangle !text-3xl" />
+                                    <span v-if="colorVariantIndex != null">Are you sure you want to delete <b>{{
+                                        product.colorVariants[colorVariantIndex].color
+                                            }}</b>?</span>
+                                </div>
+                                <template #footer>
+                                    <Button label="No" icon="pi pi-times" text
+                                        @click="removeColorVariantDialog = false" />
+                                    <Button label="Yes" icon="pi pi-check" @click="removeColorVariant" />
+                                </template>
+                            </Dialog>
                         </div>
                     </div>
 

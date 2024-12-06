@@ -217,12 +217,18 @@ const removeColorVariantImage = async (colorVariantIndex, imageIndex) => {
     await nextTick();
 }
 
-const confirmRemoveColorVariant = async () => {
+const confirmRemoveColorVariant = async (index) => {
+    colorVariantIndex.value = index
     removeColorVariantDialog.value = true
 };
 
 const removeColorVariant = async () => {
+
+    const index = colorVariants.value.findIndex(_ => _.id === product.value.colorVariants[colorVariantIndex.value])
     product.value.colorVariants.splice(colorVariantIndex.value, 1)
+    if (index > -1)
+        colorVariants.value.splice(index, 1)
+
     removeColorVariantDialog.value = false
     await nextTick();
 }
@@ -354,23 +360,6 @@ const saveProduct = () => {
                                                         @click="confirmRemoveColorVariant(colorVariantIndex)" />
                                                 </template>
                                             </Toolbar>
-                                            <Dialog v-model:visible="removeColorVariantDialog"
-                                                :style="{ width: '450px' }" header="Confirm" :modal="true">
-                                                <div class="flex items-center gap-4">
-                                                    <i class="pi pi-exclamation-triangle !text-3xl" />
-                                                    <span v-if="colorVariant">Are you sure you want to delete ==> {{
-                                                        colorVariantIndex }}<b>{{
-                                                            product.colorVariants[colorVariantIndex].color
-                                                            }}</b>?</span>
-                                                </div>
-                                                <template #footer>
-                                                    <Button label="No" icon="pi pi-times" text
-                                                        @click="removeColorVariantDialog = false" />
-                                                    <Button label="Yes" icon="pi pi-check"
-                                                        @click="removeColorVariant" />
-                                                </template>
-                                            </Dialog>
-
                                             <div class="grid grid-cols-12 gap-4" v-if="product.productType !== 0">
                                                 <div class="col-span-12 lg:col-span-4">
                                                     <label :for="colorVariant.color + 'price'">Price</label>
@@ -520,6 +509,20 @@ const saveProduct = () => {
                                     </TabPanel>
                                 </TabPanels>
                             </Tabs>
+                            <Dialog v-model:visible="removeColorVariantDialog" :style="{ width: '450px' }"
+                                header="Confirm" :modal="true">
+                                <div class="flex items-center gap-4">
+                                    <i class="pi pi-exclamation-triangle !text-3xl" />
+                                    <span v-if="colorVariantIndex != null">Are you sure you want to delete <b>{{
+                                        product.colorVariants[colorVariantIndex].color
+                                            }}</b>?</span>
+                                </div>
+                                <template #footer>
+                                    <Button label="No" icon="pi pi-times" text
+                                        @click="removeColorVariantDialog = false" />
+                                    <Button label="Yes" icon="pi pi-check" @click="removeColorVariant" />
+                                </template>
+                            </Dialog>
                         </div>
                     </div>
 
