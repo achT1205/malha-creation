@@ -1,6 +1,5 @@
 ﻿using Catalog.Application.Interfaces;
 using Catalog.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Repositories;
 
@@ -13,15 +12,21 @@ public class ProductRepository : IProductRepository
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-
-    //Récupérer un produit par son ID
     public async Task<Product> GetByIdAsync(ProductId id)
     {
         return await _context.Products
-            .Include(p => p.ColorVariants) 
+            .Include(p => p.ColorVariants)
                 .ThenInclude(cv => cv.Images)
             .Include(p => p.ColorVariants)
-                .ThenInclude(cv => (cv).SizeVariants) 
+                .ThenInclude(cv => (cv).SizeVariants)
+            .FirstOrDefaultAsync(product => product.Id == id)
+            ?? throw new KeyNotFoundException($"Product with ID {id.Value} not found.");
+    }
+
+    public async Task<Product> GetByIdWithColorVariantAsync(ProductId id)
+    {
+        return await _context.Products
+            .Include(p => p.ColorVariants)
             .FirstOrDefaultAsync(product => product.Id == id)
             ?? throw new KeyNotFoundException($"Product with ID {id.Value} not found.");
     }
@@ -37,16 +42,40 @@ public class ProductRepository : IProductRepository
     }
 
     // Récupérer tous les produits
-    public async Task<List<Product>> GetAllAsync()
+    public async Task<(List<Product>, long)> GetAllAsync()
     {
-        return await _context.Products
+        var totalCount = await _context.Products.LongCountAsync();
+
+        var products = await _context.Products
             .Include(p => p.ColorVariants)
                 .ThenInclude(cv => cv.Images)
             .Include(p => p.ColorVariants)
                 .ThenInclude(cv => (cv).SizeVariants)
             .ToListAsync();
+
+        return (products, totalCount);
     }
-    // Ajouter un nouveau produit
+
+    public async Task<List<Product>> GetProducstWithDetailsAsync()
+    {
+        return await _context.Products
+            .Include(p => p.ColorVariants)
+            .Include(p => p.Reviews)
+            .Include(p => p.CategoryIds)
+            .Include(p => p.OccasionIds)
+            .ToListAsync();
+    }
+
+    public async Task<Product?> GetProductWithDetailsAsync(ProductId productId)
+    {
+        return await _context.Products
+            .Include(p => p.ColorVariants)
+            .Include(p => p.Reviews)
+            .Include(p => p.CategoryIds)
+            .Include(p => p.OccasionIds)
+            .FirstOrDefaultAsync(p => p.Id == productId);
+    }
+
     public async Task AddAsync(Product product)
     {
         if (product == null)
@@ -57,12 +86,14 @@ public class ProductRepository : IProductRepository
     }
 
     // Mettre à jour un produit existant
-    public  void UpdateAsync(Product product)
+    public void UpdateAsync(Product product)
     {
         if (product == null)
         {
             throw new ArgumentNullException(nameof(product));
         }
+        _context.Entry(product).Property("Name_Value").CurrentValue = product.Name.Value;
+        _context.Entry(product).Property("UrlFriendlyName_Value").CurrentValue = product.UrlFriendlyName.Value;
         _context.Products.Update(product);
     }
 

@@ -19,8 +19,10 @@ internal sealed class CollectionConfiguration : IEntityTypeConfiguration<Collect
         builder.Property(c => c.Name)
             .HasMaxLength(100);
 
+        builder.Property(c => c.Description).HasMaxLength(500);
+
         builder.ComplexProperty(
-              c => c.Image, cb =>
+              c => c.CoverImage, cb =>
               {
                   cb.Property(ci => ci.ImageSrc)
                       .HasColumnName(nameof(Product.CoverImage.ImageSrc))

@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-using Ordering.Application.Abstractions.Services;
-using Ordering.Infrastructure.Configs;
 using Ordering.Infrastructure.Data;
 using Ordering.Infrastructure.Interceptors;
 using Ordering.Infrastructure.Services;

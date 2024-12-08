@@ -13,7 +13,7 @@ public record ProductReviewId
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("ProductReviewId cannot be empty.");
+            throw new CatalogDomainException("ProductReviewId cannot be empty.");
         }
 
         return new ProductReviewId(value);

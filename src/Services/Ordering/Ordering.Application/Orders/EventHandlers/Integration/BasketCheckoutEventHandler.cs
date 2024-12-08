@@ -1,43 +1,78 @@
-﻿using BuildingBlocks.Messaging.Events;
-using Ordering.Application.Orders.Commands.CreateOrder;
-
+﻿using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Orders.Commands.CreateStripeSession;
 namespace Ordering.Application.Orders.EventHandlers.Integration;
 public class BasketCheckoutEventHandler
-    (ISender sender, ILogger<BasketCheckoutEventHandler> logger)
+    (
+    ISender sender,
+    ILogger<BasketCheckoutEventHandler> logger)
     : IConsumer<CartCheckoutEvent>
 {
     public async Task Consume(ConsumeContext<CartCheckoutEvent> context)
     {
-        // TODO: Create new order and start order fullfillment process
         logger.LogInformation("Integration Event handled: {IntegrationEvent}", context.Message.GetType().Name);
-
-        var command = MapToCreateOrderCommand(context.Message);
-        await sender.Send(command);
+        var order = CreateNewOrder(context.Message);
+        order.SubmitForProcessing();
+        var createOrderCmd = new CreateOrderCommand(order);
+        var result = await sender.Send(createOrderCmd);
+        if (result != null)
+        {
+            var cmd = new CreateStripeSessionCommand()
+            {
+                ApprovedUrl = "https://dashboard.stripe.com",
+                CancelUrl = "https://dashboard.stripe.com",
+                OrderId = result.Id,
+                Basket = context.Message.Basket
+            };
+            await sender.Send(cmd);
+        }
     }
 
-    private AutoCreateOrderCommand MapToCreateOrderCommand(CartCheckoutEvent message)
+    private Order CreateNewOrder(CartCheckoutEvent message)
     {
-        // Create full order with incoming event data
-        var address = new AddressDto(message.FirstName, message.LastName, message.EmailAddress, message.AddressLine, message.Country, message.State, message.ZipCode);
-        var payment = new PaymentDto(message.CardName, message.CardNumber, message.Expiration, message.CVV, message.PaymentMethod);
-        var orderId = Guid.NewGuid();
+        var shippingAddress = message.ShippingAddress;
+        var billingAddress = message.BillingAddress;
+        var payment = message.Payment;
+        var basket = message.Basket;
 
-        var orderItems = message.Cart.Items.Select(cartItem => new OrderItemDto(
-                 cartItem.ProductId,
-                 cartItem.Quantity,
-                 cartItem.Color,
-                 cartItem.Size,
-                 cartItem.Price
-        )).ToList();
+        var sAdd = Address.Of(shippingAddress.FirstName, shippingAddress.LastName, shippingAddress.EmailAddress, shippingAddress.AddressLine, shippingAddress.Country, shippingAddress.City, shippingAddress.ZipCode);
+        var bAdd = Address.Of(billingAddress.FirstName, billingAddress.LastName, billingAddress.EmailAddress, billingAddress.AddressLine, billingAddress.Country, billingAddress.City, billingAddress.ZipCode);
+        var orderId = message.NewOrderId;
+        var newOrder = Order.Create(
+                id: OrderId.Of(orderId),
+                customerId: CustomerId.Of(basket.UserId),
+                OrderCode: OrderCode.Of(OrderCodeGenerator.GenerateOrderCode(basket.UserId)),
+                shippingAddress: sAdd,
+                billingAddress: bAdd,
+                payment: Payment.Of(payment.CardHolderName, payment.CardNumber, payment.Expiration, payment.Cvv, payment.PaymentMethod),
+                basket.Coupon?.CouponCode,
+                basket.Coupon?.Description,
+                basket.Coupon?.OriginalPrice,
+                basket.Coupon?.DiscountedPrice,
+                basket.Coupon?.DiscountAmount,
+                basket.Coupon?.DiscountType,
+                basket.Coupon?.DiscountLabel
+                );
 
-
-        return new AutoCreateOrderCommand()
+        foreach (var orderItemDto in basket.Items)
         {
-            CustomerId = message.UserId,
-            BillingAddress = address,
-            ShippingAddress = address,
-            Payment = payment,
-            OrderItems = orderItems
-        };
+            newOrder.Add(
+                OrderId.Of(orderId),
+                ProductId.Of(orderItemDto.ProductId),
+                orderItemDto.Quantity,
+                orderItemDto.Price,
+                orderItemDto.Color,
+                orderItemDto.Size,
+                orderItemDto.ProductName,
+                orderItemDto.Slug,
+                orderItemDto.Coupon?.CouponCode,
+                orderItemDto.Coupon?.Description,
+                orderItemDto.Coupon?.OriginalPrice,
+                orderItemDto.Coupon?.DiscountedPrice,
+                orderItemDto.Coupon?.DiscountAmount,
+                orderItemDto.Coupon?.DiscountType,
+                orderItemDto.Coupon?.DiscountLabel
+                );
+        }
+        return newOrder;
     }
 }

@@ -13,7 +13,7 @@ public record ProductTypeId
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("ProductTypeId cannot be empty.");
+            throw new CatalogDomainException("ProductTypeId cannot be empty.");
         }
 
         return new ProductTypeId(value);

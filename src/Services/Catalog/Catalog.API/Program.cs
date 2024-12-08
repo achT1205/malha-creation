@@ -22,13 +22,14 @@ if (app.Environment.IsDevelopment())
 {
     await app.InitialiseDatabaseAsync();
 }
-app.UseMiddleware<RetrictAccessMiddleware>();
+//app.UseMiddleware<RetrictAccessMiddleware>();
 
 app.MapProductEndpoints();
 app.MapCategoryEndpoints();
 app.MapCollectionEndpoints();
 app.MapMaterialEndpoints();
 app.MapOccasionEndpoints();
-app.MapProductTypeEndpoints();
+//app.MapProductTypeEndpoints();
+app.MapBrandEndpoints();
 
 app.Run();

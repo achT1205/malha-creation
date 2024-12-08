@@ -19,5 +19,8 @@ internal sealed class MaterialConfiguration : IEntityTypeConfiguration<Material>
 
         builder.Property(m => m.Name)
             .HasMaxLength(100);
+
+        builder.Property(c => c.Description).HasMaxLength(500);
+
     }
 }

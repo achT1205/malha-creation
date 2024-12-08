@@ -1,9 +1,15 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
+﻿namespace Catalog.Application.Products.Commands.DeleteProduct;
 
-namespace Catalog.Application.Products.Commands.DeleteProduct;
+public record DeleteProductCommand(Guid Id) : ICommand<DeleteProductResult>;
+public record DeleteProductResult(bool IsSuccess);
 
+public class DeleteProductCommandValidation : AbstractValidator<DeleteProductCommand>
+{
+    public DeleteProductCommandValidation()
+    {
+        RuleFor(x => x.Id).NotEmpty().WithMessage("Product Id is required");
+    }
+}
 public class DeleteProducCommandtHandler : ICommandHandler<DeleteProductCommand, DeleteProductResult>
 {
     private readonly IProductRepository _productRepository;

@@ -28,8 +28,8 @@ internal class Program
 
 
         app.UseCors();
-        app.UseMiddleware<InterceptionMiddleware>();
-        app.UseMiddleware<TokenCheckerMiddleware>();
+        //app.UseMiddleware<InterceptionMiddleware>();
+        //app.UseMiddleware<TokenCheckerMiddleware>();
         app.UseOcelot().Wait();
         app.Run();
     }

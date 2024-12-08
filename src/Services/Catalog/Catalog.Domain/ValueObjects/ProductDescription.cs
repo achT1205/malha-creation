@@ -4,7 +4,7 @@ public record ProductDescription
 {
     public string Value { get; private set; } = default!;
 
-    private const int MaxLength = 500;
+    private const int MaxLength = 1000;
 
     private ProductDescription()
     {

@@ -24,6 +24,9 @@ internal sealed class OccasionConfiguration : IEntityTypeConfiguration<Occasion>
                         .HasColumnName(nameof(Occasion.Name))
                         .HasMaxLength(100)
                         .IsRequired();
-                });
+                }
+        );
+
+        builder.Property(c => c.Description).HasMaxLength(500);
     }
 }

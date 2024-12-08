@@ -1,7 +1,9 @@
 ﻿using Catalog.Application.Interfaces;
+using Catalog.Application.Services;
 using Catalog.Infrastructure.Data;
 using Catalog.Infrastructure.Interceptors;
 using Catalog.Infrastructure.Repositories;
+using Catalog.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Catalog.Infrastructure;
@@ -27,7 +29,16 @@ public static class DependencyInjection
         services.AddScoped<IMaterialRepository, MaterialRepository>();
         services.AddScoped<IOccasionRepository, OccasionRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
+        services.AddScoped<IColorVariantRepository, ColorVariantRepository>();
+        //services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
+        services.AddScoped<IBrandRepository, BrandRepository>();
+        services.AddScoped<IOrderingService, OrderingService>();
+
+        // Bind the ExternalApiSettings from appsettings.json
+        services.Configure<ExternalApiSettings>(configuration.GetSection("ExternalApiSettings"));
+
+        // Register HttpClient
+        services.AddHttpClient();
 
         return services;
     }

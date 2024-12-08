@@ -1,8 +1,8 @@
 ﻿namespace Catalog.Domain.Exceptions;
 
-public class DomainException : Exception
+public class CatalogDomainException : Exception
 {
-    public DomainException(string message)
+    public CatalogDomainException(string message)
         : base($"Domain Exception: \"{message}\" throws from Domain Layer.")
     {
     }

@@ -30,7 +30,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    //app.ApplyMigrations();
+    app.ApplyMigrations();
 }
 
 app.MapGet("/api/users/me", async (ClaimsPrincipal claims, ApplicationDbContext context) =>

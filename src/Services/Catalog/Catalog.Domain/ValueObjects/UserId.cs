@@ -14,7 +14,7 @@ public record UserId
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("UserId cannot be empty.");
+            throw new CatalogDomainException("UserId cannot be empty.");
         }
 
         return new UserId(value);

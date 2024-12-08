@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Dtos;
+﻿using Catalog.Application.Materials.Commands.DeleteMaterial;
 using Catalog.Application.Materials.Commands.CreateMaterial;
 using Catalog.Application.Materials.Queries;
 
@@ -8,23 +8,17 @@ namespace Catalog.API.Endpoints;
 public static class MaterialEndpoints
 {
 
-    public record CreateMaterialRequest(string Name);
+    public record CreateMaterialRequest(string Name, string Description);
     public record CreateMaterialResponse(Guid Id);
+    public record DeleteMaterialResponse(bool IsSuccess);
 
     public static void MapMaterialEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/materials", async (CreateMaterialRequest request, ISender sender) =>
         {
-            // Adapter la requête en commande
             var command = request.Adapt<CreateMaterialCommand>();
-
-            // Envoyer la commande via MediatR
             var result = await sender.Send(command);
-
-            // Adapter le résultat en réponse
             var response = result.Adapt<CreateMaterialResponse>();
-
-            // Retourner la réponse avec un statut 201 Created
             return Results.Created($"/api/materials/{result.Id}", response);
         })
         .WithName("CreateMaterial")
@@ -44,6 +38,20 @@ public static class MaterialEndpoints
        .ProducesProblem(StatusCodes.Status400BadRequest)
        .WithSummary("Get materials")
        .WithDescription("Retrieve a list of all available materials.");
+
+        app.MapDelete("/api/materials/{id}", async (Guid id, ISender sender) =>
+        {
+            var query = new DeleteMaterialCommand(id);
+            var result = await sender.Send(query);
+            var response = result.Adapt<DeleteMaterialResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("DeleteMaterialResponse")
+        .Produces<DeleteMaterialResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Delete Material")
+        .WithDescription("Delete Material.");
     }
 
 }
+

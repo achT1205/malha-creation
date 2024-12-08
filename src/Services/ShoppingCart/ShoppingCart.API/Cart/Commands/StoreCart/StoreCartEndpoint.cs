@@ -1,10 +1,12 @@
-﻿namespace Cart.API.Cart.Commands.StoreCart;
+﻿using ShoppingCart.API.Dtos;
+
+namespace Cart.API.Cart.Commands.StoreCart;
 public record StoreCartRequest
 {
     public Guid UserId { get; set; } = default!;
     public List<CartItem> Items { get; set; } = new();
 };
-public record StoreCartResponse(ShoppingCart ShoppingCart);
+public record StoreCartResponse(Basket Basket);
 public class StoreCartEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

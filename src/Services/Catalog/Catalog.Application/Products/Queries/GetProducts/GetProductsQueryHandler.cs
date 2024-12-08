@@ -1,24 +1,33 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Extensions;
-using Catalog.Application.Interfaces;
+﻿using BuildingBlocks.Pagination;
 
 namespace Catalog.Application.Products.Queries.GetProducts;
 
-public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, GetProductsQueryResult>
+public record GetProductsQuery(PaginationRequest PaginationRequest) : IQuery<GetProductsQueryResult>;
+public record GetProductsQueryResult(PaginatedResult<LiteProductDto> Products);
+
+public class GetProductWithDetailsQueryHandler : IQueryHandler<GetProductsQuery, GetProductsQueryResult>
 {
     private readonly IProductRepository _productRepository;
 
 
-    public GetProductsQueryHandler(IProductRepository productRepository)
+    public GetProductWithDetailsQueryHandler(IProductRepository productRepository)
     {
         _productRepository = productRepository;
 
     }
     public async Task<GetProductsQueryResult> Handle(GetProductsQuery query, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetAllAsync();
-        
+        var (products, totalCount) = await _productRepository.GetAllAsync();
 
-        return new GetProductsQueryResult(products.ToProductDtoList());
+        var pageIndex = query.PaginationRequest.PageIndex;
+        var pageSize = query.PaginationRequest.PageSize;
+
+        return new GetProductsQueryResult(
+            new PaginatedResult<LiteProductDto>(
+            pageIndex,
+            pageSize,
+            totalCount,
+            products.ToProductDtoList())
+            );
     }
 }

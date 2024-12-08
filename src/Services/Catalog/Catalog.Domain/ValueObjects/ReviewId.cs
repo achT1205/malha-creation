@@ -14,7 +14,7 @@ public record ReviewId
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("ReviewId cannot be empty.");
+            throw new CatalogDomainException("ReviewId cannot be empty.");
         }
 
         return new ReviewId(value);

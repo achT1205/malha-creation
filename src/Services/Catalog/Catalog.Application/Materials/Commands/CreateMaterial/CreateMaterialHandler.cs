@@ -1,11 +1,7 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using FluentValidation;
-
-namespace Catalog.Application.Materials.Commands.CreateMaterial;
+﻿namespace Catalog.Application.Materials.Commands.CreateMaterial;
 
 
-public record CreateMaterialCommand(string Name) : ICommand<CreateMaterialResult>;
+public record CreateMaterialCommand(string Name, string Description) : ICommand<CreateMaterialResult>;
 public record CreateMaterialResult(Guid Id);
 
 
@@ -25,7 +21,7 @@ public class CreateMaterialCommandHandler : ICommandHandler<CreateMaterialComman
     }
     public async Task<CreateMaterialResult> Handle(CreateMaterialCommand command, CancellationToken cancellationToken)
     {
-        var type = Material.Create(command.Name);
+        var type = Material.Create(MaterialId.Of(Guid.NewGuid()), command.Name, command.Description);
         await _materialRepository.AddAsync(type);
         await _materialRepository.SaveChangesAsync();
         return new CreateMaterialResult(type.Id.Value);

@@ -1,8 +1,4 @@
-﻿
-
-
-
-using Catalog.Domain.Enums;
+﻿using Catalog.Domain.Enums;
 
 namespace Catalog.Infrastructure.Data.Configurations;
 internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
@@ -12,9 +8,27 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         ConfigureProductsTable(builder);
         ConfigureColorVariantsTable(builder);
         ConfigureCategoryIdsTable(builder);
+        ConfigureOutfitIdsTable(builder);
         ConfigureOccasionIdsTable(builder);
         ConfigureProductReviewsTable(builder);
     }
+
+    private void ConfigureOutfitIdsTable(EntityTypeBuilder<Product> builder)
+    {
+        builder.OwnsMany(p => p.ColorVariants, cvb =>
+        {
+            cvb.OwnsMany(cvb => cvb.Outfits, oufb =>
+            {
+                oufb.ToTable("ColorVariantOutfit");
+                oufb.Property(r => r.Value)
+                   .HasColumnName("OutfitId")
+                   .ValueGeneratedNever();
+
+            });
+
+        });
+    }
+
     private void ConfigureProductReviewsTable(EntityTypeBuilder<Product> builder)
     {
         builder.OwnsMany(p => p.Reviews, rib =>
@@ -73,12 +87,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
             ob.HasKey("Id");
 
-            //ob.HasOne<Occasion>()
-            // .WithMany()
-            // .HasForeignKey("OccasionId")
-            // .IsRequired()
-            // .OnDelete(DeleteBehavior.Restrict);
-
             ob.Property(r => r.Value)
             .HasColumnName("OccasionId")
             .ValueGeneratedNever();
@@ -97,12 +105,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
             cb.HasKey("Id");
 
-            //cb.HasOne<Category>()
-            //  .WithMany()
-            //  .HasForeignKey("CategoryId")
-            //  .IsRequired()
-            //  .OnDelete(DeleteBehavior.Restrict);
-
             cb.Property(r => r.Value)
             .HasColumnName("CategoryId")
             .ValueGeneratedNever();
@@ -120,6 +122,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
             cvb.HasKey(cv => new { cv.Id, cv.ProductId });
 
+            cvb.Property(cv => cv.OnOrdering);
+
             cvb.Property(cv => cv.Id)
             .HasColumnName(nameof(ColorVariantId))
             .ValueGeneratedNever()
@@ -135,10 +139,10 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                   .HasMaxLength(50);
             });
 
-            // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
+            // Define the shadow property to enforce a unique constraint on Slug.Value
             cvb.Property<string>("Slug_Value")
                   .HasColumnName("Slug")
-                  .HasMaxLength(200)
+                  .HasMaxLength(300)
                   .IsRequired();
 
             // Set the unique constraint on the shadow property
@@ -149,9 +153,9 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 slb.Property(c => c.Value)
                   .HasColumnName("Slug")
                   .IsRequired()
-                  .HasMaxLength(200);
+                  .HasMaxLength(300);
             });
-            
+
 
             cvb.OwnsOne(cv => cv.Price, prb =>
             {
@@ -168,10 +172,18 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                   .HasColumnName("Quantity");
             });
 
+            cvb.OwnsOne(sv => sv.RestockThreshold, rb =>
+            {
+                rb.Property(r => r.Value)
+                  .HasColumnName("RestockThreshold");
+            });
+
             cvb.OwnsMany(cv => cv.Images, imsb =>
             {
                 imsb.ToTable("ColorVariantImages");
             });
+
+ 
 
             cvb.OwnsMany(cv => cv.SizeVariants, svb =>
             {
@@ -180,6 +192,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 svb.WithOwner().HasForeignKey(nameof(ColorVariantId), nameof(ProductId));
 
                 svb.HasKey(nameof(SizeVariant.Id), nameof(ColorVariantId), nameof(ProductId));
+
+                svb.Property(sv => sv.OnOrdering);
 
                 svb.Property(sv => sv.Id)
                 .HasColumnName(nameof(SizeVariantId))
@@ -200,9 +214,9 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 });
 
 
-                svb.OwnsOne(sv => sv.Size, qb =>
+                svb.OwnsOne(sv => sv.Size, sb =>
                 {
-                    qb.Property(q => q.Value)
+                    sb.Property(s => s.Value)
                       .HasColumnName("Size")
                       .HasMaxLength(5)
                       .IsRequired();
@@ -212,6 +226,13 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 {
                     qb.Property(q => q.Value)
                       .HasColumnName("Quantity")
+                      .IsRequired();
+                });
+
+                svb.OwnsOne(sv => sv.RestockThreshold, rb =>
+                {
+                    rb.Property(r => r.Value)
+                      .HasColumnName("RestockThreshold")
                       .IsRequired();
                 });
             });
@@ -240,39 +261,62 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             {
                 nb.Property(n => n.Value)
                     .HasColumnName(nameof(Product.Name))
-                    .HasMaxLength(100)
-                    .IsRequired()
-                    ;
+                    .HasMaxLength(200)
+                    .IsRequired();
             });
+
 
         // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
         builder.Property<string>("UrlFriendlyName_Value")
               .HasColumnName("UrlFriendlyName")
-              .HasMaxLength(100)
+              .HasMaxLength(300)
               .IsRequired();
 
         // Set the unique constraint on the shadow property
         builder.HasIndex("UrlFriendlyName_Value").IsUnique();
 
 
+        // Define the shadow property to enforce a unique constraint on Name.Value
+        builder.Property<string>("Name_Value")
+              .HasColumnName("Name")
+              .HasMaxLength(200)
+              .IsRequired();
+
+        // Set the unique constraint on the shadow property
+        builder.HasIndex("Name_Value").IsUnique();
+
+
+        // Define the shadow property to enforce a unique constraint on Code.Value
+        builder.Property<string>(nameof(Product.Code))
+              .HasColumnName(nameof(Product.Code))
+              .HasMaxLength(50)
+               .IsRequired();
+
+        // Set the unique constraint on the shadow property
+        builder.HasIndex(nameof(Product.Code)).IsUnique();
+
         builder.ComplexProperty(
             p => p.UrlFriendlyName, unb =>
             {
                 unb.Property(n => n.Value)
                 .HasColumnName(nameof(Product.UrlFriendlyName))
-                .HasMaxLength(100)
+                .HasMaxLength(300)
                 .IsRequired();
             });
 
+        builder.Property(p => p.ShippingAndReturns)
+            .HasColumnName(nameof(Product.ShippingAndReturns))
+            .HasMaxLength(500)
+            .IsRequired();
 
         builder.ComplexProperty(
-                p => p.Description, desb =>
-                {
-                    desb.Property(n => n.Value)
-                        .HasColumnName(nameof(Product.Description))
-                        .HasMaxLength(100)
-                        .IsRequired();
-                });
+            p => p.Description, desb =>
+            {
+                desb.Property(n => n.Value)
+                .HasColumnName(nameof(Product.Description))
+                .HasMaxLength(1000)
+                .IsRequired();
+            });
 
         builder.ComplexProperty(
           p => p.AverageRating, avb =>
@@ -299,14 +343,10 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.ProductType)
         .HasConversion(
             s => s.ToString(),
-            dbStatus => (ProductTypeEnum)Enum.Parse(typeof(ProductTypeEnum), dbStatus));
+            dbStatus => (ProductType)Enum.Parse(typeof(ProductType), dbStatus));
 
         builder.Property(p => p.IsHandmade);
-
-        builder.Property(p => p.ProductTypeId)
-            .ValueGeneratedNever().HasConversion(
-            id => id.Value,
-            dbId => ProductTypeId.Of(dbId));
+        builder.Property(p => p.OnReorder);
 
         builder.Property(p => p.MaterialId)
             .ValueGeneratedNever().HasConversion(
@@ -318,20 +358,31 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             id => id.Value,
             dbId => CollectionId.Of(dbId));
 
+        builder.Property(p => p.BrandId)
+            .ValueGeneratedNever().HasConversion(
+            id => id.Value,
+            dbId => BrandId.Of(dbId));
+
         builder.HasOne<Collection>()
             .WithMany()
             .HasForeignKey(p => p.CollectionId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<ProductType>()
+        builder.HasOne<Brand>()
             .WithMany()
-            .HasForeignKey(p => p.ProductTypeId)
+            .HasForeignKey(p => p.BrandId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne<Material>()
             .WithMany()
             .HasForeignKey(p => p.MaterialId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(o => o.Status)
+            .HasDefaultValue(ProductStatus.Draft) // Default value
+            .HasConversion(s => s.ToString(), // Converts enum to string before storing in the DB
+                dbStatus => (ProductStatus)Enum.Parse(typeof(ProductStatus), dbStatus)) // Converts string back to enum when reading from DB
+            .IsRequired(); // Ensure it's required
 
     }
 }

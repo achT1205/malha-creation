@@ -1,14 +1,5 @@
-﻿using BuildingBlocks.CQRS;
-using Catalog.Application.Interfaces;
-using Catalog.Domain.ValueObjects;
-using FluentValidation;
-
-namespace Catalog.Application.Occasions.Commands.CreateOccasion;
-
-
-public record CreateOccasionCommand(
-    string Name
-    )
+﻿namespace Catalog.Application.Occasions.Commands.CreateOccasion;
+public record CreateOccasionCommand(string Name, string Description)
     : ICommand<CreateOccasionResult>;
 public record CreateOccasionResult(Guid Id);
 
@@ -29,7 +20,7 @@ public class CreateOccasionCommandHandler : ICommandHandler<CreateOccasionComman
     }
     public async Task<CreateOccasionResult> Handle(CreateOccasionCommand command, CancellationToken cancellationToken)
     {
-        var occasion = Occasion.Create(OccasionName.Of(command.Name));
+        var occasion = Occasion.Create(OccasionId.Of(Guid.NewGuid()), OccasionName.Of(command.Name), command.Description);
         await _OccasionRepository.AddAsync(occasion);
         await _OccasionRepository.SaveChangesAsync();
         return new CreateOccasionResult(occasion.Id.Value);

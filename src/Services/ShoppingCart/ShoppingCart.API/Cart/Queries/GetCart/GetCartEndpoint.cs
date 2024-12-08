@@ -1,12 +1,12 @@
 ﻿namespace Cart.API.Cart.Queries.GetCart;
 
-public record GetCartResponse(ShoppingCart Cart);
+public record GetCartResponse(Basket Cart);
 
 public class GetCartEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/carts/{userId}", async (Guid userId, ISender sender) =>
+        app.MapGet("/api/cart-by-userid/{userId}", async (Guid userId, ISender sender) =>
         {
             var result = await sender.Send(new GetCartQuery(userId));
 

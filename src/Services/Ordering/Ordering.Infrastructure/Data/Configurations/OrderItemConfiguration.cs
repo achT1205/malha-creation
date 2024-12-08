@@ -30,10 +30,14 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
             .IsRequired();
         builder.Property(oi => oi.ProductName).IsRequired();
         builder.Property(oi => oi.Slug).IsRequired();
-        builder.Property(oi => oi.Color);
+        builder.Property(oi => oi.Color).IsRequired();
         builder.Property(oi => oi.Size);
-
-
-
+        builder.Property(oi => oi.CouponCode);
+        builder.Property(oi => oi.DiscountDescription);
+        builder.Property(oi => oi.OriginalPrice);
+        builder.Property(oi => oi.DiscountedPrice);
+        builder.Property(oi => oi.DiscountAmount);
+        builder.Property(oi => oi.DiscountType);
+        builder.Property(oi => oi.DiscountLabel);
     }
 }

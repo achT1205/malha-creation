@@ -1,25 +1,24 @@
-﻿using BuildingBlocks.Pagination;
-using Ordering.Application.Orders.Commands.CreateOrder;
-using Ordering.Application.Orders.Commands.DeleteOrder;
-using Ordering.Application.Orders.Commands.UpdateOrder;
+﻿using BuildingBlocks.Messaging.Events;
+using BuildingBlocks.Pagination;
+using Ordering.Application.Orders.Commands.CancelOrder;
+using Ordering.Application.Orders.Commands.CheckOrderPayment;
+using Ordering.Application.Orders.Commands.ConfirmOrder;
+using Ordering.Application.Orders.Commands.ShipOrder;
+using Ordering.Application.Orders.Commands.UpdateBillingAddress;
+using Ordering.Application.Orders.Commands.UpdatePayment;
+using Ordering.Application.Orders.Commands.UpdateShippingAddress;
 using Ordering.Application.Orders.Queries.GetOrders;
 using Ordering.Application.Orders.Queries.GetOrdersByCustomer;
+using Ordering.Application.Orders.Queries.GetOrdersById;
 using Ordering.Application.Orders.Queries.GetOrdersByOrderCode;
+using Ordering.Application.Orders.Queries.GetOrdersForStockValidation;
+using Ordering.Application.Orders.Queries.GetStripeSessionUrl;
 
 namespace Ordering.API.Endpoints;
 
 
 public static class OrderEndpoints
 {
-    public record CreateOrderRequest
-    {
-        public Guid CustomerId { get; set; }
-        public required AddressDto ShippingAddress { get; set; }
-        public required AddressDto BillingAddress { get; set; }
-        public required PaymentDto Payment { get; set; }
-        public required List<OrderItemDto> OrderItems { get; set; }
-    };
-    public record CreateOrderResponse(Guid Id);
     public record UpdateOrderRequest
     {
         public Guid Id { get; set; }
@@ -28,62 +27,117 @@ public static class OrderEndpoints
         public required PaymentDto Payment { get; set; }
     };
     public record UpdateOrderResponse(bool IsSuccess);
-
     public record DeleteOrderResponse(bool IsSuccess);
-
     public record GetOrdersResponse(PaginatedResult<OrderDto> Orders);
-
     public record GetOrdersByCustomerResponse(IEnumerable<OrderDto> Orders);
-
     public record GetOrdersByCodeResponse(IEnumerable<OrderDto> Orders);
+    public record GetOrderForStockValidationResponse(OrderStockDto Order);
+    public record GetOrderByIdResponse(OrderDto Order);
     public static void MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/orders", async (CreateOrderRequest request, ISender sender) =>
+        app.MapPut("/api/orders/{id}/cancel", async (Guid Id, ISender sender) =>
         {
-            var command = request.Adapt<CreateOrderCommand>();
-
-            var result = await sender.Send(command);
-
-            var response = result.Adapt<CreateOrderResponse>();
-
-            return Results.Created($"/api/orders/{response.Id}", response);
+            var result = await sender.Send(new CancelOrderCommand(Id));
+            return Results.Ok(result);
         })
-       .WithName("CreateOrder")
-       .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
-       .ProducesProblem(StatusCodes.Status400BadRequest)
-       .WithSummary("Create Order")
-       .WithDescription("Create Order");
-
-        app.MapPut("/api/orders", async (UpdateOrderRequest request, ISender sender) =>
-        {
-            var command = request.Adapt<UpdateOrderCommand>();
-
-            var result = await sender.Send(command);
-
-            var response = result.Adapt<UpdateOrderResponse>();
-
-            return Results.Ok(response);
-        })
-       .WithName("UpdateOrder")
-       .Produces<UpdateOrderResponse>(StatusCodes.Status200OK)
-       .ProducesProblem(StatusCodes.Status400BadRequest)
-       .WithSummary("Update Order")
-       .WithDescription("Update Order");
-
-        app.MapDelete("/api/orders/{id}", async (Guid Id, ISender sender) =>
-        {
-            var result = await sender.Send(new DeleteOrderCommand(Id));
-
-            var response = result.Adapt<DeleteOrderResponse>();
-
-            return Results.Ok(response);
-        })
-        .WithName("DeleteOrder")
-        .Produces<DeleteOrderResponse>(StatusCodes.Status200OK)
+        .WithName("CancelOrder")
+        .Produces<CancelOrderResult>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithSummary("Delete Order")
-        .WithDescription("Delete Order");
+        .WithSummary("Cancel Order")
+        .WithDescription("Cancel Order");
+
+        app.MapPut("/api/orders/{id}/shipping-address", async (Guid Id, AddressDto address, ISender sender) =>
+        {
+            var result = await sender.Send(new UpdateShippingAddressCommand(Id, address));
+            return Results.Ok(result);
+        })
+        .WithName("UpdateShippingAddress")
+        .Produces<UpdateShippingAddressResult>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Update Shipping Address for the Order")
+        .WithDescription("Update Shipping Address for the Order");
+
+        app.MapPut("/api/orders/{id}/billing-address", async (Guid Id, AddressDto address, ISender sender) =>
+        {
+            var result = await sender.Send(new UpdateBillingAddressCommand(Id, address));
+            return Results.Ok(result);
+        })
+        .WithName("UpdateBillingAddress")
+        .Produces<UpdateShippingAddressResult>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Update Billing Address for the Order")
+        .WithDescription("Update Billing Address for the Order");
+
+        app.MapPut("/api/orders/{id}/payment", async (Guid Id, PaymentDto payment, ISender sender) =>
+        {
+            var result = await sender.Send(new UpdatePaymentCommand(Id, payment));
+            return Results.Ok(result);
+        })
+        .WithName("UpdatePayment")
+        .Produces<UpdatePaymentResult>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Update Payment for the Order")
+        .WithDescription("Update Payment for the Order");
+
+
+        app.MapPut("/api/orders/{id}/ship", async (Guid Id, ISender sender) =>
+        {
+            var result = await sender.Send(new ShipOrderCommad(Id));
+            return Results.Ok(result);
+        })
+        .WithName("ShipOrder")
+        .Produces<ShipOrderResult>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Ship Order")
+        .WithDescription("Ship Order");
+
+        app.MapPut("/api/orders/{id}/confirm-stock", async (Guid Id, ISender sender) =>
+        {
+            var result = await sender.Send(new ConfirmStockCommand(Id));
+            return Results.Ok(result);
+        })
+        .WithName("ConfirmedStock")
+        .Produces<ConfirmStockResult>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Confirmed Stock For the Order")
+        .WithDescription("Confirmed Stock For the Order");
+
+        app.MapGet("/api/order-by-code/{code}", async (string code, ISender sender) =>
+        {
+            var result = await sender.Send(new GetOrderByOrderCodeQuery(code));
+
+            var response = result.Adapt<GetOrdersByCodeResponse>();
+
+            return Results.Ok(response);
+        })
+        .WithName("GetOrdersByCode")
+        .Produces<GetOrdersByCodeResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Get Orders By Code")
+        .WithDescription("Get Orders By Code");
+
+        app.MapGet("/api/get-stock-order/{id}", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new GetOrderForStockValidationQuery(id));
+
+            var response = result.Adapt<GetOrderForStockValidationResponse>();
+
+            return Results.Ok(response);
+        })
+        .WithName("GetOrderForStockValidation")
+        .Produces<GetOrderForStockValidationResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Get Order For Stock Validation.")
+        .WithDescription("Get Order For Stock Validation.");
+
 
         app.MapGet("/api/orders", async ([AsParameters] PaginationRequest request, ISender sender) =>
         {
@@ -93,27 +147,14 @@ public static class OrderEndpoints
 
             return Results.Ok(response);
         })
-       .WithName("GetOrders")
-       .Produces<GetOrdersResponse>(StatusCodes.Status200OK)
-       .ProducesProblem(StatusCodes.Status400BadRequest)
-       .ProducesProblem(StatusCodes.Status404NotFound)
-       .WithSummary("Get Orders")
-       .WithDescription("Get Orders");
+        .WithName("GetOrders")
+        .Produces<GetOrdersResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Get Orders")
+        .WithDescription("Get Orders");
 
-        app.MapGet("/api/orders/{code}", async (string code, ISender sender) =>
-        {
-            var result = await sender.Send(new GetOrdersByOrderCodeQuery(code));
 
-            var response = result.Adapt<GetOrdersByCodeResponse>();
-
-            return Results.Ok(response);
-        })
-       .WithName("GetOrdersByName")
-       .Produces<GetOrdersByCodeResponse>(StatusCodes.Status200OK)
-       .ProducesProblem(StatusCodes.Status400BadRequest)
-       .ProducesProblem(StatusCodes.Status404NotFound)
-       .WithSummary("Get Orders By Name")
-       .WithDescription("Get Orders By Name");
 
         app.MapGet("/api/orders/customer/{customerId}", async (Guid customerId, ISender sender) =>
         {
@@ -130,6 +171,44 @@ public static class OrderEndpoints
        .WithSummary("Get Orders By Customer")
        .WithDescription("Get Orders By Customer");
 
+        app.MapGet("/api/orders/{id}", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new GetOrdersByIdQuery(id));
 
+            var response = result.Adapt<GetOrderByIdResponse>();
+
+            return Results.Ok(response);
+        })
+        .WithName("Get Order By Id")
+        .Produces<GetOrderByIdResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Get Order By Id")
+        .WithDescription("Get Order By Id");
+
+
+        app.MapGet("/api/orders/{id}/get-stripe-url", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new GetStripeSessionUrlQuery(id));
+            return Results.Ok(result);
+        })
+       .WithName("Get Stripe session Url for payment")
+       .Produces<GetStripeSessionUrlQueryResult>(StatusCodes.Status200OK)
+       .ProducesProblem(StatusCodes.Status400BadRequest)
+       .ProducesProblem(StatusCodes.Status404NotFound)
+       .WithSummary("Get Stripe session Url for payment")
+       .WithDescription("Get Stripe session Url for payment");
+
+        app.MapPost("/api/orders/{id}/validate-stripe-session", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new CheckOrderPaymentCommand(id));
+            return Results.Ok(result);
+        })
+      .WithName("validate-stripe-session")
+      .Produces<CheckOrderPaymentCommand>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status400BadRequest)
+      .ProducesProblem(StatusCodes.Status404NotFound)
+      .WithSummary("validate-stripe-session")
+      .WithDescription("validate-stripe-session");
     }
 }

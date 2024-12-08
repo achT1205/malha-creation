@@ -11,7 +11,7 @@
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("MaterialId cannot be empty.");
+            throw new CatalogDomainException("MaterialId cannot be empty.");
         }
 
         return new MaterialId(value);

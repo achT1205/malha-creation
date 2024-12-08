@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Ordering.Domain.ValueObjects;
-using Ordering.Domain.Orders.Enums;
 
 namespace Ordering.Infrastructure.Data.Configurations;
 
@@ -55,7 +54,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
            addressBuilder.Property(a => a.Country)
                .HasMaxLength(50);
 
-           addressBuilder.Property(a => a.State)
+           addressBuilder.Property(a => a.City)
                .HasMaxLength(50);
 
            addressBuilder.Property(a => a.ZipCode)
@@ -84,7 +83,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
               addressBuilder.Property(a => a.Country)
                   .HasMaxLength(50);
 
-              addressBuilder.Property(a => a.State)
+              addressBuilder.Property(a => a.City)
                   .HasMaxLength(50);
 
               addressBuilder.Property(a => a.ZipCode)
@@ -95,7 +94,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.ComplexProperty(
                o => o.Payment, paymentBuilder =>
                {
-                   paymentBuilder.Property(p => p.CardName)
+                   paymentBuilder.Property(p => p.CardHolderName)
                        .HasMaxLength(50);
 
                    paymentBuilder.Property(p => p.CardNumber)
@@ -121,6 +120,14 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.TotalPrice)
             .HasPrecision(18, 2)
             .IsRequired();
+
+        builder.Property(oi => oi.CouponCode);
+        builder.Property(oi => oi.DiscountDescription);
+        builder.Property(oi => oi.OriginalPrice);
+        builder.Property(oi => oi.DiscountedPrice);
+        builder.Property(oi => oi.DiscountAmount);
+        builder.Property(oi => oi.DiscountType);
+        builder.Property(oi => oi.DiscountLabel);
 
     }
 }

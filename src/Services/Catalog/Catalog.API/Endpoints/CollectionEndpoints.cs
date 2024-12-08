@@ -1,4 +1,5 @@
 ﻿using Catalog.Application.Collections.Commands.CreateCollection;
+using Catalog.Application.Collections.Commands.DeleteCollection;
 using Catalog.Application.Collections.Queries;
 
 namespace Catalog.API.Endpoints;
@@ -6,28 +7,18 @@ namespace Catalog.API.Endpoints;
 
 public static class CollectionEndpoints
 {
-
-    public record CreateCollectionRequest(
-    string Name,
-    string ImageSrc,
-    string AltText
-        );
+    public record CreateCollectionRequest(string Name, string Description, ImageDto CoverImage);
     public record CreateCollectionResponse(Guid Id);
+
+    public record DeleteCollectionResponse(bool IsSuccess);
 
     public static void MapCollectionEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/collections", async (CreateCollectionRequest request, ISender sender) =>
         {
-            // Adapter la requête en commande
             var command = request.Adapt<CreateCollectionCommand>();
-
-            // Envoyer la commande via MediatR
             var result = await sender.Send(command);
-
-            // Adapter le résultat en réponse
             var response = result.Adapt<CreateCollectionResponse>();
-
-            // Retourner la réponse avec un statut 201 Created
             return Results.Created($"/api/collections/{result.Id}", response);
         })
         .WithName("CreateCollection")
@@ -47,6 +38,19 @@ public static class CollectionEndpoints
        .ProducesProblem(StatusCodes.Status400BadRequest)
        .WithSummary("Get Collections")
        .WithDescription("Retrieve a list of all available Collections.");
+
+        app.MapDelete("/api/collections/{id}", async (Guid id, ISender sender) =>
+        {
+            var query = new DeleteCollectionCommand(id);
+            var result = await sender.Send(query);
+            var response = result.Adapt<DeleteCollectionResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("DeleteCollectionResponse")
+        .Produces<DeleteCollectionResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Delete Collection")
+        .WithDescription("Delete Collection.");
     }
 
 }

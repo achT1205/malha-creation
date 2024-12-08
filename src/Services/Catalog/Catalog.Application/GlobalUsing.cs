@@ -1,2 +1,16 @@
-﻿global using Catalog.Domain.Models;  
+﻿global using Catalog.Domain.Models;
 global using Microsoft.EntityFrameworkCore;
+global using Catalog.Domain.Events;
+global using MassTransit;
+global using MediatR;
+global using Microsoft.Extensions.Logging;
+global using Catalog.Application.Services;
+global using BuildingBlocks.Messaging.Events;
+global using Catalog.Application.Dtos;
+global using Catalog.Domain.ValueObjects;
+global using BuildingBlocks.CQRS;
+global using Catalog.Application.Interfaces;
+global using FluentValidation;
+global using BuildingBlocks.Exceptions;
+global using Catalog.Application.Extensions;
+global using Catalog.Domain.Enums;

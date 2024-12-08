@@ -15,6 +15,11 @@
     networks:
       - mc-network
 
+  mc-discountdb:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    networks:
+      - mc-network
+
   mc-messagebroker:
     image: rabbitmq:management
     networks:
@@ -34,6 +39,14 @@
     image: redis
     networks:
       - mc-network
+  
+  mc-catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
+    networks:
+      - mc-network
+    build:
+      context: .
+      dockerfile: Services/Catalog/Catalog.API/Dockerfile
 
   mc-discount.grpc:
     image: ${DOCKER_REGISTRY-}discountgrpc
@@ -43,13 +56,6 @@
       context: .
       dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
-  mc-catalog.api:
-    image: ${DOCKER_REGISTRY-}catalogapi
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: Services/Catalog/Catalog.API/Dockerfile
 
   mc-shoppingcart.api:
     image: ${DOCKER_REGISTRY-}shoppingcartapi
@@ -67,21 +73,21 @@
       context: .
       dockerfile: Services/Ordering/Ordering.API/Dockerfile
 
-  mc-ocelotapigateway:
-    image: ${DOCKER_REGISTRY-}ocelotapigateway
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
+  # mc-ocelotapigateway:
+  #   image: ${DOCKER_REGISTRY-}ocelotapigateway
+  #   networks:
+  #     - mc-network
+  #   build:
+  #     context: .
+  #     dockerfile: OcelotApiGateway/OcelotApiGateway/Dockerfile
 
-  mc-auth.api:
-    image: ${DOCKER_REGISTRY-}authapi
-    networks:
-      - mc-network
-    build:
-      context: .
-      dockerfile: Services/Auth/Auth.API/Dockerfile
+  # mc-auth.api:
+  #   image: ${DOCKER_REGISTRY-}authapi
+  #   networks:
+  #     - mc-network
+  #   build:
+  #     context: .
+  #     dockerfile: Services/Auth/Auth.API/Dockerfile
 
  networks:
   mc-network:
@@ -91,6 +97,7 @@
   postgres-mcidentity:
   mcsmtp4dev-data:
  
+
 
 
 

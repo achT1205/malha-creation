@@ -100,6 +100,16 @@ services:
     ports:
       - "1434:1433"
 
+
+  mc-discountdb:
+    container_name: mc-discountdb
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SwN12345678
+    restart: always
+    ports:
+      - "1435:1433"
+
   mc-identitydb:
     container_name: mc-identitydb
     environment:
@@ -123,13 +133,38 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  mc-catalog.api:
+    container_name: mc-catalog.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__Database=Server=mc-catalogdb;Database=MCCatalogDb;User Id=sa;Password=SwN12345678;Encrypt=False;TrustServerCertificate=True
+      - MessageBroker__Host=amqp://ecommerce-mq:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
+      - ExternalApiSettings__OrderApiUrl=http://mc-ordering.api:8080/api/get-stock-order
+      - FeatureManagement__OrderFullfilment=false
+    depends_on:
+      - mc-catalogdb
+      - mc-messagebroker
+    ports:
+      - "4000:8080"
+      - "4040:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
   mc-discount.grpc:
     container_name: mc-discount.grpc
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Data Source=discountdb
+      - ConnectionStrings__Database=Server=mc-discountdb;Database=MCDiscountDb;User Id=sa;Password=SwN12345678;Encrypt=False;TrustServerCertificate=True
+      - Stripe__SecretKey=sk_test_51QM8mdIRkSKoxtdPyUefgJUkDRgn63F7CNrEI33RTwpw4S4VqSNaJ1ZjnOqfwigoYhnWCL1guhOBdKYpcSnHTtoD00FxunoPv4
+    depends_on:
+      - mc-discountdb
     ports:
       - "4002:8080"
       - "4042:8081"
@@ -145,6 +180,7 @@ services:
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__Database=Server=mc-cartdb;Port=5432;Database=MCCartDb;user Id=postgres;Password=postgres;Include Error Detail=true
       - ConnectionStrings__Redis=mc-distributedcache:6379
+      - Stripe__SecretKey=sk_test_51QM8mdIRkSKoxtdPyUefgJUkDRgn63F7CNrEI33RTwpw4S4VqSNaJ1ZjnOqfwigoYhnWCL1guhOBdKYpcSnHTtoD00FxunoPv4
       - GrpcSettings__DiscountUrl=https://mc-discount.grpc:8081
       - ExternalApiSettings__ProductApiUrl=http://mc-catalog.api:8080/api/products/by-id
       - MessageBroker__Host=amqp://ecommerce-mq:5672
@@ -163,27 +199,6 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
-  mc-catalog.api:
-    container_name: mc-catalog.api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Server=mc-catalogdb;Database=MCCatalogDb;User Id=sa;Password=SwN12345678;Encrypt=False;TrustServerCertificate=True
-      - MessageBroker__Host=amqp://ecommerce-mq:5672
-      - MessageBroker__UserName=guest
-      - MessageBroker__Password=guest
-      - FeatureManagement__OrderFullfilment=false
-    depends_on:
-      - mc-catalogdb
-      - mc-messagebroker
-    ports:
-      - "4000:8080"
-      - "4040:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-
   mc-ordering.api:
     container_name: mc-ordering.api
     environment:
@@ -195,7 +210,11 @@ services:
       - MessageBroker__Host=amqp://ecommerce-mq:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
-      - FeatureManagement__OrderFullfilment=false
+      - Stripe__SecretKey=sk_test_51QM8mdIRkSKoxtdPyUefgJUkDRgn63F7CNrEI33RTwpw4S4VqSNaJ1ZjnOqfwigoYhnWCL1guhOBdKYpcSnHTtoD00FxunoPv4
+      - BackgroundTaskOptions__GracePeriodTime=60
+      - BackgroundTaskOptions__PaymentCheckTime=60
+      - BackgroundTaskOptions__ProcessTime=60
+      - BackgroundTaskOptions__PackingTime=60
     depends_on:
       - mc-orderdb
       - mc-messagebroker
@@ -207,38 +226,38 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
-  mc-ocelotapigateway:
-    container_name: mc-ocelotapigateway
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - Ocelot__Path=ocelot.prod.json
-    depends_on:
-      - mc-catalog.api
-      - mc-shoppingcart.api
-      - mc-discount.grpc
-      - mc-ordering.api
-      - mc-auth.api
-    ports:
-      - "5001:8080"
-      - "5051:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  # mc-ocelotapigateway:
+  #   container_name: mc-ocelotapigateway
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #     - ASPNETCORE_HTTPS_PORTS=8081
+  #     - Ocelot__Path=ocelot.prod.json
+  #   depends_on:
+  #     - mc-catalog.api
+  #     - mc-shoppingcart.api
+  #     - mc-discount.grpc
+  #     - mc-ordering.api
+  #     - mc-auth.api
+  #   ports:
+  #     - "5001:8080"
+  #     - "5051:8081"
+  #   volumes:
+  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
 
-  mc-auth.api:
-    container_name: mc-auth.api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Server=mc-identitydb;Port=5432;Database=MCIdentityDb;user Id=postgres;Password=postgres;Include Error Detail=true
-    depends_on:
-      - mc-identitydb
-    ports:
-      - "4005:8080"
-      - "4045:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  # mc-auth.api:
+  #   container_name: mc-auth.api
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #     - ASPNETCORE_HTTPS_PORTS=8081
+  #     - ConnectionStrings__Database=Server=mc-identitydb;Port=5432;Database=MCIdentityDb;user Id=postgres;Password=postgres;Include Error Detail=true
+  #   depends_on:
+  #     - mc-identitydb
+  #   ports:
+  #     - "4005:8080"
+  #     - "4045:8081"
+  #   volumes:
+  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro

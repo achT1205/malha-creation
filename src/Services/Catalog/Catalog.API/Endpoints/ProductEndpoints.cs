@@ -1,24 +1,27 @@
-﻿using BuildingBlocks.Enums;
-using Catalog.Application.Dtos;
+﻿using BuildingBlocks.Pagination;
 using Catalog.Application.Products.Commands.DeleteProduct;
 using Catalog.Application.Products.Commands.UpdateProduct;
 using Catalog.Application.Products.Queries.GetProductById;
 using Catalog.Application.Products.Queries.GetProductBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
+using Catalog.Domain.Enums;
 
 namespace Catalog.API.Endpoints;
 
 public static class ProductEndpoints
 {
-
     public record CreateProductRequest(
     string Name,
     string UrlFriendlyName,
     string Description,
+    string ShippingAndReturns,
+    string? Code,
     bool IsHandmade,
+    bool OnReorder,
     ImageDto CoverImage,
-    Guid ProductTypeId,
+    ProductType ProductType,
     Guid MaterialId,
+    Guid BrandId,
     Guid CollectionId,
     List<Guid> OccasionIds,
     List<Guid> CategoryIds,
@@ -26,40 +29,35 @@ public static class ProductEndpoints
 );
 
     public record UpdateProductRequest(
-        Guid Id,
-        string Name,
-        string UrlFriendlyName,
-        string Description,
-        bool IsHandmade,
-        ImageDto CoverImage,
-        Guid ProductTypeId,
-        ProductTypeEnum ProductType,
-        Guid MaterialId,
-        Guid CollectionId,
-        List<Guid> OccasionIds,
-        List<Guid> CategoryIds,
-        List<ColorVariantDto> ColorVariants,
-        RemovedItems? RemovedItems
-       );
+    Guid Id,
+    string Name,
+    string UrlFriendlyName,
+    string Description,
+    ProductStatus Status,
+    ProductType ProductType,
+    string ShippingAndReturns,
+    string? Code,
+    bool IsHandmade,
+    ImageDto CoverImage,
+    Guid MaterialId,
+    Guid BrandId,
+    Guid CollectionId,
+    List<Guid> OccasionIds,
+    List<Guid> CategoryIds,
+    List<ColorVariantDto> ColorVariants
+   );
+
     public record UpdateProductResponse(bool IsSuccess);
     public record DeleteProductResponse(bool IsSuccess);
     public record CreateProductResponse(Guid Id);
-    public record AddProductVariantResponse(Guid Id);
 
     public static void MapProductEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/products", async (CreateProductRequest request, ISender sender) =>
         {
-            // Adapter la requête en commande
             var command = request.Adapt<CreateProductCommand>();
-
-            // Envoyer la commande via MediatR
             var result = await sender.Send(command);
-
-            // Adapter le résultat en réponse
             var response = result.Adapt<CreateProductResponse>();
-
-            // Retourner la réponse avec un statut 201 Created
             return Results.Created($"/api/products/{command.UrlFriendlyName}", response);
         })
         .WithName("CreateProduct")
@@ -68,26 +66,31 @@ public static class ProductEndpoints
         .WithSummary("Create Product")
         .WithDescription("Create a new product.");
 
-
-        app.MapPut("/api/products", async (UpdateProductRequest request, ISender sender) =>
+        app.MapPut("/api/products/{id}", async (Guid Id, UpdateProductRequest request, ISender sender) =>
         {
-            // Adapter la requête en commande
             var command = request.Adapt<UpdateProductCommand>();
-
-            // Envoyer la commande via MediatR
             var result = await sender.Send(command);
-
-            // Adapter le résultat en réponse
-            var response = result.Adapt<UpdateProductResult>();
-
-            // Retourner la réponse avec un statut 201 Created
+            var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })
-        .WithName("UpdateProduct")
+        .WithName("Update Product")
         .Produces<UpdateProductResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Update Product")
-        .WithDescription("Update an existing product.");
+        .WithSummary("Update Product.")
+        .WithDescription("Update Product.");
+
+        app.MapDelete("/api/products/{id}", async (Guid id, ISender sender) =>
+        {
+            var query = new DeleteProductCommand(id);
+            var result = await sender.Send(query);
+            var response = result.Adapt<DeleteProductResponse>();
+            return Results.Ok(response);
+        })
+        .WithName("DeleteProductResponse")
+        .Produces<DeleteProductResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Delete Product")
+        .WithDescription("Delete Product.");
 
         app.MapGet("/api/products/by-slug/{slug:regex(^[a-zA-Z0-9_-]+$)}", async (string slug, ISender sender) =>
         {
@@ -115,30 +118,14 @@ public static class ProductEndpoints
        .WithDescription("Retrieve product details by Id.")
        .WithOrder(2);
 
-
-
-        app.MapDelete("/api/products/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("/api/products", async ([AsParameters] PaginationRequest request, ISender sender) =>
         {
-            var query = new DeleteProductCommand(id);
-            var result = await sender.Send(query);
-            var response = result.Adapt<DeleteProductResponse>();
-            return Results.Ok(response);
-        })
-        .WithName("DeleteProductResponse")
-        .Produces<DeleteProductResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithSummary("Delete Product")
-        .WithDescription("Delete Product.");
-
-
-        app.MapGet("/api/products", async (ISender sender) =>
-        {
-            var query = new GetProductsQuery();
+            var query = new GetProductsQuery(request);
             var result = await sender.Send(query);
             return Results.Ok(result);
         })
         .WithName("GetProducts")
-        .Produces<List<ProductDto>>(StatusCodes.Status200OK)
+        .Produces<GetProductsQueryResult>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Get Products")
         .WithDescription("Retrieve a list of all available products.");

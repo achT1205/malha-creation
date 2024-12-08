@@ -3,26 +3,26 @@
 public class Collection : Entity<CollectionId>
 {
     public string Name { get; private set; } = default!;
-    public Image Image { get; private set; } = default!;
+    public string Description { get; private set; } = default!; 
+    public Image CoverImage { get; private set; } = default!;
 
     private Collection()
     {
-        
     }
-    private Collection(CollectionId id, string name, Image image)
+
+    private Collection(CollectionId id, string name, string description, Image image)
     {
         Id = id;
-        Name = name ?? throw new ArgumentNullException(nameof(name));
-        Image = image ?? throw new ArgumentNullException(nameof(image));
+        SetName(name);
+        Description = description ?? string.Empty;
+        CoverImage = image ?? throw new ArgumentNullException(nameof(image));
     }
 
-    // Méthode statique de création pour encapsuler la logique de création
-    public static Collection Create(string name, Image image)
+    public static Collection Create(CollectionId collectionId, string name, string description, Image image)
     {
-        return new Collection(CollectionId.Of(Guid.NewGuid()), name, image);
+        return new Collection(collectionId, name, description, image);
     }
 
-    // Méthode privée pour valider et définir le nom
     private void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -38,16 +38,21 @@ public class Collection : Entity<CollectionId>
         Name = name;
     }
 
-    // Méthode pour mettre à jour le nom de la collection
     public void UpdateName(string newName)
     {
         if (!Name.Equals(newName, StringComparison.OrdinalIgnoreCase))
         {
             SetName(newName);
+            LastModified = DateTime.UtcNow;
         }
     }
 
-    // Méthode pour mettre à jour l'image associée à la collection
+    public void UpdateDescription(string newDescription)
+    {
+        Description = newDescription ?? string.Empty;
+        LastModified = DateTime.UtcNow;
+    }
+
     public void UpdateImage(Image newImage)
     {
         if (newImage == null)
@@ -55,9 +60,10 @@ public class Collection : Entity<CollectionId>
             throw new ArgumentNullException(nameof(newImage));
         }
 
-        if (!Image.Equals(newImage))
+        if (!CoverImage.Equals(newImage))
         {
-            Image = newImage;
+            CoverImage = newImage;
+            LastModified = DateTime.UtcNow;
         }
     }
 }

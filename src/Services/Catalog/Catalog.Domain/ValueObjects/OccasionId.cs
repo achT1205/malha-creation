@@ -14,7 +14,7 @@ public record OccasionId
         ArgumentNullException.ThrowIfNull(value);
         if (value == Guid.Empty)
         {
-            throw new DomainException("OccasionId cannot be empty.");
+            throw new CatalogDomainException("OccasionId cannot be empty.");
         }
 
         return new OccasionId(value);
