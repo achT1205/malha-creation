@@ -2,7 +2,7 @@
 
 public record SizeVariantDto
     (
-    Guid Id,
+    Guid? Id,
     string Size,
     decimal Price,
     string Currency,

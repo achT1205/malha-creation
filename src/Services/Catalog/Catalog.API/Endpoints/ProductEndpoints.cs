@@ -33,6 +33,8 @@ public static class ProductEndpoints
     string Name,
     string UrlFriendlyName,
     string Description,
+    ProductStatus Status,
+    ProductType ProductType,
     string ShippingAndReturns,
     string? Code,
     bool IsHandmade,
@@ -64,9 +66,10 @@ public static class ProductEndpoints
         .WithSummary("Create Product")
         .WithDescription("Create a new product.");
 
-        app.MapPut("/api/products/{id}", async (Guid Id, UpdateProductCommand request, ISender sender) =>
+        app.MapPut("/api/products/{id}", async (Guid Id, UpdateProductRequest request, ISender sender) =>
         {
-            var result = await sender.Send(request);
+            var command = request.Adapt<UpdateProductCommand>();
+            var result = await sender.Send(command);
             var response = result.Adapt<UpdateProductResponse>();
             return Results.Ok(response);
         })

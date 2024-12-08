@@ -1,4 +1,6 @@
-﻿namespace Catalog.Domain.Models;
+﻿using Catalog.Domain.ValueObjects;
+
+namespace Catalog.Domain.Models;
 
 public class SizeVariant : Entity<SizeVariantId>
 {
@@ -30,18 +32,23 @@ public class SizeVariant : Entity<SizeVariantId>
         return new SizeVariant(colorVariantId, size, price, quantity, restockThreshold);
     }
 
-    public void UpdatePrice(Price newPrice)
+    public void Update(Size newSize, Price newPrice, Quantity newQuantity, Quantity newRestockThreshold)
     {
+        if (!Size.Equals(newSize))
+        {
+            Size = newSize ?? throw new ArgumentNullException(nameof(newSize));
+        }
         if (!Price.Equals(newPrice))
         {
             Price = newPrice ?? throw new ArgumentNullException(nameof(newPrice));
         }
-    }
-    public void UpdateQuantity(Quantity newQuantity)
-    {
         if (!Quantity.Equals(newQuantity))
         {
             Quantity = newQuantity ?? throw new ArgumentNullException(nameof(newQuantity));
+        }
+        if (!RestockThreshold.Equals(newRestockThreshold))
+        {
+            RestockThreshold = newRestockThreshold ?? throw new ArgumentNullException(nameof(newRestockThreshold));
         }
     }
     public void AddStock(int newQuantity)

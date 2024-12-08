@@ -33,7 +33,7 @@ export const useProductStore = defineStore('productStore', () => {
                 });
             }
         } catch (err) {
-            error.value = err.message;
+            error.value = err.response.data.detail;
         } finally {
             isLoading.value = false;
         }
@@ -48,7 +48,7 @@ export const useProductStore = defineStore('productStore', () => {
             window.localStorage.removeItem('newProduct');
             successed.value = true
         } catch (err) {
-            error.value = err.message;
+            error.value = err.response.data.detail;
             successed.value = false
         } finally {
             isLoading.value = false;
@@ -64,7 +64,7 @@ export const useProductStore = defineStore('productStore', () => {
             window.localStorage.removeItem('editProduct');
             successed.value = true
         } catch (err) {
-            error.value = err.message;
+            error.value = err.response.data.detail;
             successed.value = false
         } finally {
             isLoading.value = false;
@@ -80,7 +80,7 @@ export const useProductStore = defineStore('productStore', () => {
             successed.value = true
             await fetchProducts();
         } catch (err) {
-            error.value = err.message;
+            error.value = err.response.data.detail;
             successed.value = false
         } finally {
             isLoading.value = false;
@@ -95,7 +95,7 @@ export const useProductStore = defineStore('productStore', () => {
             product.value = response.data.product;
             await fetchProducts();
         } catch (err) {
-            error.value = err.message;
+            error.value = err.response.data.detail;
         } finally {
             isLoading.value = false;
         }

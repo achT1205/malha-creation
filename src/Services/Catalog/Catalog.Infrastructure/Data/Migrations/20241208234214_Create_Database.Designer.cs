@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241204125649_Create_Database")]
+    [Migration("20241208234214_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -298,8 +298,8 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<string>("Name_Value")
                         .IsRequired()
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
                         .HasColumnName("Name");
 
                     b.Property<bool>("OnReorder")
@@ -324,8 +324,8 @@ namespace Catalog.Infrastructure.Data.Migrations
                     b.Property<string>("UrlFriendlyName_Value")
                         .IsRequired()
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)")
                         .HasColumnName("UrlFriendlyName");
 
                     b.ComplexProperty<Dictionary<string, object>>("AverageRating", "Product.AverageRating#AverageRating", b1 =>
@@ -374,8 +374,8 @@ namespace Catalog.Infrastructure.Data.Migrations
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .ValueGeneratedOnUpdateSometimes()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
                                 .HasColumnName("Name");
                         });
 
@@ -386,14 +386,17 @@ namespace Catalog.Infrastructure.Data.Migrations
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .ValueGeneratedOnUpdateSometimes()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasMaxLength(300)
+                                .HasColumnType("nvarchar(300)")
                                 .HasColumnName("UrlFriendlyName");
                         });
 
                     b.HasKey("Id");
 
                     b.HasIndex("BrandId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.HasIndex("CollectionId");
 
@@ -455,8 +458,8 @@ namespace Catalog.Infrastructure.Data.Migrations
                             b1.Property<string>("Slug_Value")
                                 .IsRequired()
                                 .ValueGeneratedOnUpdateSometimes()
-                                .HasMaxLength(200)
-                                .HasColumnType("nvarchar(200)")
+                                .HasMaxLength(300)
+                                .HasColumnType("nvarchar(300)")
                                 .HasColumnName("Slug");
 
                             b1.HasKey("Id", "ProductId");
@@ -624,8 +627,8 @@ namespace Catalog.Infrastructure.Data.Migrations
                                     b2.Property<string>("Value")
                                         .IsRequired()
                                         .ValueGeneratedOnUpdateSometimes()
-                                        .HasMaxLength(200)
-                                        .HasColumnType("nvarchar(200)")
+                                        .HasMaxLength(300)
+                                        .HasColumnType("nvarchar(300)")
                                         .HasColumnName("Slug");
 
                                     b2.HasKey("ColorVariantId", "ColorVariantProductId");

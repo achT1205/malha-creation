@@ -117,8 +117,8 @@ namespace Catalog.Infrastructure.Data.Migrations
                     BrandId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Draft"),
                     CollectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    UrlFriendlyName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    UrlFriendlyName = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     TotalRatingsCount = table.Column<int>(type: "int", nullable: false),
                     AverageRating = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     AltText = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -159,7 +159,7 @@ namespace Catalog.Infrastructure.Data.Migrations
                     ColorVariantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Color = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Slug = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Slug = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     OnOrdering = table.Column<bool>(type: "bit", nullable: false),
                     RestockThreshold = table.Column<int>(type: "int", nullable: true),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -344,6 +344,12 @@ namespace Catalog.Infrastructure.Data.Migrations
                 name: "IX_Products_BrandId",
                 table: "Products",
                 column: "BrandId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_Code",
+                table: "Products",
+                column: "Code",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_CollectionId",

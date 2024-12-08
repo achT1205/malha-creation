@@ -24,7 +24,7 @@ public class ColorVariant : Entity<ColorVariantId>
     {
 
     }
-    private ColorVariant(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold, List<ColorVariantId> outfits)
+    private ColorVariant(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold)
     {
         Id = ColorVariantId.Of(Guid.NewGuid());
         Price = price;
@@ -33,33 +33,37 @@ public class ColorVariant : Entity<ColorVariantId>
         Color = color ?? throw new ArgumentNullException(nameof(color));
         Slug = slug ?? throw new ArgumentNullException(nameof(slug));
         RestockThreshold = restockThreshold;
-        if (outfits.Any())
-        {
-            foreach (var outfit in outfits)
-            {
-                AddOutfit(outfit);
-            }
-        }
     }
 
-    public static ColorVariant Create(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold, List<ColorVariantId> outfits)
+    public static ColorVariant Create(ProductId productId, Color color, Slug slug, ColorVariantPrice price, ColorVariantQuantity quantity, ColorVariantQuantity restockThreshold)
     {
-        return new ColorVariant(productId, color, slug, price, quantity, restockThreshold, outfits);
+        return new ColorVariant(productId, color, slug, price, quantity, restockThreshold);
     }
-    public void UpdatePrice(ColorVariantPrice newPrice)
+
+    public void Update(Color newColor, Slug newSlug, ColorVariantPrice newPrice, ColorVariantQuantity newQuantity, ColorVariantQuantity newRestockThreshold)
     {
+        if (!Color.Equals(newColor))
+        {
+            Color = newColor ?? throw new ArgumentNullException(nameof(newColor));
+        }
+        if (!Slug.Equals(newSlug))
+        {
+            Slug = newSlug ?? throw new ArgumentNullException(nameof(newSlug));
+        }
         if (!Price.Equals(newPrice))
         {
             Price = newPrice ?? throw new ArgumentNullException(nameof(newPrice));
         }
-    }
-    public void UpdateQuantity(ColorVariantQuantity newQuantity)
-    {
         if (!Quantity.Equals(newQuantity))
         {
             Quantity = newQuantity ?? throw new ArgumentNullException(nameof(newQuantity));
         }
+        if (!RestockThreshold.Equals(newRestockThreshold))
+        {
+            RestockThreshold = newRestockThreshold ?? throw new ArgumentNullException(nameof(newRestockThreshold));
+        }
     }
+
     public void AddStock(int newQuantity)
     {
 
@@ -138,15 +142,5 @@ public class ColorVariant : Entity<ColorVariantId>
         {
             _images.Remove(image);
         }
-    }
-    internal void UpdateSizeVariantPrice(SizeVariantId sizeVariantId, Price price)
-    {
-        var sv = _sizeVariants.FirstOrDefault(_ => _.Id == sizeVariantId);
-        if (sv == null)
-        {
-            throw new CatalogDomainException($"The SizeVariant {sizeVariantId} was not found");
-        }
-        var oldPrice = sv.Price;
-        sv.UpdatePrice(price);
     }
 }

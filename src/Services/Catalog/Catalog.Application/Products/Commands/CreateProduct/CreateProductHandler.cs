@@ -21,37 +21,109 @@ public record CreateProductCommand(
 
 public record CreateProductResult(Guid Id);
 
+
 public class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
     public CreateProductCommandValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
-        RuleFor(x => x.UrlFriendlyName).NotEmpty().WithMessage("UrlFriendlyName is required.");
-        RuleFor(x => x.Description).NotEmpty().WithMessage("Product Description  is required");
-        RuleFor(x => x.MaterialId).NotEmpty().WithMessage("Product Material is required");
-        RuleFor(x => x.BrandId).NotEmpty().WithMessage("Product Brand  is required");
-        RuleFor(x => x.CollectionId).NotEmpty().WithMessage("Product Collection is required");
-        RuleFor(x => x.ProductType).IsInEnum().WithMessage("The ProductType is required.");
-        RuleFor(x => x.ProductType == ProductType.Clothing || x.ProductType == ProductType.Accessory).NotEmpty().WithMessage("The ProductType can only have value betwen accessory and clothing.");
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Name is required.")
+            .MinimumLength(1).WithMessage("Name must have at least 1 character.");
+
         RuleFor(x => x.UrlFriendlyName)
-            .Matches(@"^[a-zA-Z0-9 \-]*$")
-            .WithMessage("The field must not contain special characters.");
-        RuleFor(x => x.ProductTypeId).IsInEnum().WithMessage("The ProductTypeId is required.");
-        RuleFor(x => x.CategoryIds).NotEmpty().WithMessage("The CategoryIds are required.");
-        RuleFor(x => x.CoverImage).NotEmpty().WithMessage("The CoverImage is required.");
-        RuleFor(x => x.ColorVariants.Count()).GreaterThan(0).WithMessage("ColorVariants is required.");
-        RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Color).NotEmpty().WithMessage("The Color name is required."));
-        RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Images.Count()).GreaterThan(0).WithMessage("The number of Images must be greater than 0."));
-        When(x => x.ProductType == ProductType.Clothing, () =>
-        {
-            RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.sizeVariants).NotNull().WithMessage("The Sizes can not be null."));
-            RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleForEach(x => x.sizeVariants).ChildRules(size => size.RuleFor(x => x.Size).NotEmpty().WithMessage("Size is required for clothing products.")));
-            RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleForEach(x => x.sizeVariants).ChildRules(size => size.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero.")));
-        });
-        When(x => x.ProductType == ProductType.Accessory, () =>
-        {
-            RuleForEach(x => x.ColorVariants).ChildRules(color => color.RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than zero."));
-        });
+            .NotEmpty().WithMessage("URL-friendly name is required.")
+            .MinimumLength(1).WithMessage("URL-friendly name must have at least 1 character.");
+
+        RuleFor(x => x.Description)
+            .NotEmpty().WithMessage("Product description is required.");
+
+        RuleFor(x => x.CoverImage)
+            .NotNull().WithMessage("Cover image is required.")
+            .ChildRules(coverImage =>
+            {
+                coverImage.RuleFor(ci => ci.ImageSrc)
+                    .NotEmpty().WithMessage("Image source is required.")
+                    .Must(IsValidUrl).WithMessage("Image source must be a valid URL.");
+
+                coverImage.RuleFor(ci => ci.AltText)
+                    .NotEmpty().WithMessage("Alt text is required.");
+            });
+
+        RuleFor(x => x.OccasionIds)
+            .NotEmpty().WithMessage("At least one occasion is required.");
+
+        RuleFor(x => x.CategoryIds)
+            .NotEmpty().WithMessage("At least one category is required.");
+
+        RuleFor(x => x.ColorVariants)
+            .NotEmpty().WithMessage("At least one color variant is required.")
+            .ForEach(variant =>
+            {
+                variant.ChildRules(colorVariant =>
+                {
+                    colorVariant.RuleFor(cv => cv.Color)
+                        .NotEmpty().WithMessage("Color is required.");
+
+                    colorVariant.RuleForEach(cv => cv.Images)
+                        .ChildRules(image =>
+                        {
+                            image.RuleFor(img => img.ImageSrc)
+                                .NotEmpty().WithMessage("Image source is required.")
+                                .Must(IsValidUrl).WithMessage("Image source must be a valid URL.");
+
+                            image.RuleFor(img => img.AltText)
+                                .NotEmpty().WithMessage("Alt text is required.");
+                        });
+                });
+
+                When(product => product.ProductType ==  ProductType.Clothing, () => // Clothing
+                {
+                    variant.ChildRules(colorVariant =>
+                    {
+                        colorVariant.RuleForEach(cv => cv.SizeVariants)
+                            .ChildRules(sizeVariant =>
+                            {
+                                sizeVariant.RuleFor(sv => sv.Size)
+                                    .NotEmpty().WithMessage("Size is required.");
+
+                                sizeVariant.RuleFor(sv => sv.Price)
+                                    .GreaterThan(0).WithMessage("Price must be greater than 0.");
+
+                                sizeVariant.RuleFor(sv => sv.Currency)
+                                    .NotEmpty().WithMessage("Currency is required.");
+
+                                sizeVariant.RuleFor(sv => sv.Quantity)
+                                    .GreaterThanOrEqualTo(0).WithMessage("Quantity must be a non-negative integer.");
+
+                                sizeVariant.RuleFor(sv => sv.RestockThreshold)
+                                    .GreaterThanOrEqualTo(0).WithMessage("Restock threshold must be a non-negative integer.");
+                            });
+                    });
+                });
+
+                When(product => product.ProductType ==  ProductType.Accessory, () => // Accessory
+                {
+                    variant.ChildRules(colorVariant =>
+                    {
+                        colorVariant.RuleFor(cv => cv.Price)
+                            .GreaterThan(0).WithMessage("Price must be greater than 0.");
+
+                        colorVariant.RuleFor(cv => cv.Currency)
+                            .NotEmpty().WithMessage("Currency is required.");
+
+                        colorVariant.RuleFor(cv => cv.Quantity)
+                            .GreaterThanOrEqualTo(0).WithMessage("Quantity must be a non-negative integer.");
+
+                        colorVariant.RuleFor(cv => cv.RestockThreshold)
+                            .GreaterThanOrEqualTo(0).WithMessage("Restock threshold must be a non-negative integer.");
+                    });
+                });
+            });
+    }
+
+    private bool IsValidUrl(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out _);
     }
 }
 public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, CreateProductResult>
@@ -129,8 +201,15 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                         product.ProductType == ProductType.Clothing ? null : "USD",
                         colorVariant.Price),
                     ColorVariantQuantity.Of(colorVariant.Quantity),
-                    ColorVariantQuantity.Of(colorVariant.RestockThreshold),
-                    colorVariant.OutfitIds.Select(id=> ColorVariantId.Of(id)).ToList());
+                    ColorVariantQuantity.Of(colorVariant.RestockThreshold));
+
+            if (colorVariant.OutfitIds.Any())
+            {
+                foreach (var id in colorVariant.OutfitIds)
+                {
+                    newColorVariant.AddOutfit(ColorVariantId.Of(id));
+                }
+            }
 
             foreach (var image in colorVariant.Images)
             {
@@ -139,10 +218,10 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
             }
 
             if (product.ProductType == ProductType.Clothing)
-            { 
-                if (!colorVariant.sizeVariants.Any())
+            {
+                if (!colorVariant.SizeVariants.Any())
                     throw new ArgumentException("sizeVariants are required for Clothing product.", nameof(Quantity));
-                foreach (var sizeVariant in colorVariant.sizeVariants)
+                foreach (var sizeVariant in colorVariant.SizeVariants)
                 {
                     var newSizeVariant = SizeVariant.Create(
                         newColorVariant.Id,

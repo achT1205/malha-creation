@@ -12,6 +12,7 @@
         "format:check": "prettier --check \"**/*.{js,vue,d.ts}\""
     },
     "dependencies": {
+        "@primevue/forms": "^4.2.4",
         "@primevue/themes": "^4.1.0",
         "axios": "^1.7.8",
         "chart.js": "^4.3.0",
@@ -20,8 +21,11 @@
         "primeicons": "^7.0.0",
         "primevue": "^4.1.0",
         "quill": "^1.3.7",
+        "valibot": "^1.0.0-beta.9",
         "vue": "^3.4.29",
-        "vue-router": "^4.3.3"
+        "vue-router": "^4.3.3",
+        "yup": "^1.5.0",
+        "zod": "^3.23.8"
     },
     "devDependencies": {
         "@primevue/auto-import-resolver": "^4.0.1",

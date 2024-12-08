@@ -27,8 +27,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             });
 
         });
-        //builder.Metadata.FindNavigation(nameof(ColorVariant.Outfits))!
-        //    .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 
     private void ConfigureProductReviewsTable(EntityTypeBuilder<Product> builder)
@@ -89,12 +87,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
             ob.HasKey("Id");
 
-            //ob.HasOne<Occasion>()
-            // .WithMany()
-            // .HasForeignKey("OccasionId")
-            // .IsRequired()
-            // .OnDelete(DeleteBehavior.Restrict);
-
             ob.Property(r => r.Value)
             .HasColumnName("OccasionId")
             .ValueGeneratedNever();
@@ -112,12 +104,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             cb.WithOwner().HasForeignKey("ProductId");
 
             cb.HasKey("Id");
-
-            //cb.HasOne<Category>()
-            //  .WithMany()
-            //  .HasForeignKey("CategoryId")
-            //  .IsRequired()
-            //  .OnDelete(DeleteBehavior.Restrict);
 
             cb.Property(r => r.Value)
             .HasColumnName("CategoryId")
@@ -153,10 +139,10 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                   .HasMaxLength(50);
             });
 
-            // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
+            // Define the shadow property to enforce a unique constraint on Slug.Value
             cvb.Property<string>("Slug_Value")
                   .HasColumnName("Slug")
-                  .HasMaxLength(200)
+                  .HasMaxLength(300)
                   .IsRequired();
 
             // Set the unique constraint on the shadow property
@@ -167,7 +153,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 slb.Property(c => c.Value)
                   .HasColumnName("Slug")
                   .IsRequired()
-                  .HasMaxLength(200);
+                  .HasMaxLength(300);
             });
 
 
@@ -275,36 +261,46 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             {
                 nb.Property(n => n.Value)
                     .HasColumnName(nameof(Product.Name))
-                    .HasMaxLength(100)
+                    .HasMaxLength(200)
                     .IsRequired();
             });
+
 
         // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
         builder.Property<string>("UrlFriendlyName_Value")
               .HasColumnName("UrlFriendlyName")
-              .HasMaxLength(100)
+              .HasMaxLength(300)
               .IsRequired();
 
         // Set the unique constraint on the shadow property
         builder.HasIndex("UrlFriendlyName_Value").IsUnique();
 
-        // Define the shadow property to enforce a unique constraint on UrlFriendlyName.Value
+
+        // Define the shadow property to enforce a unique constraint on Name.Value
         builder.Property<string>("Name_Value")
               .HasColumnName("Name")
-              .HasMaxLength(100)
+              .HasMaxLength(200)
               .IsRequired();
 
         // Set the unique constraint on the shadow property
         builder.HasIndex("Name_Value").IsUnique();
 
 
+        // Define the shadow property to enforce a unique constraint on Code.Value
+        builder.Property<string>(nameof(Product.Code))
+              .HasColumnName(nameof(Product.Code))
+              .HasMaxLength(50)
+               .IsRequired();
+
+        // Set the unique constraint on the shadow property
+        builder.HasIndex(nameof(Product.Code)).IsUnique();
 
         builder.ComplexProperty(
             p => p.UrlFriendlyName, unb =>
             {
                 unb.Property(n => n.Value)
                 .HasColumnName(nameof(Product.UrlFriendlyName))
-                .HasMaxLength(100)
+                .HasMaxLength(300)
                 .IsRequired();
             });
 
@@ -312,11 +308,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasColumnName(nameof(Product.ShippingAndReturns))
             .HasMaxLength(500)
             .IsRequired();
-
-        builder.Property(p => p.Code)
-            .HasColumnName(nameof(Product.Code))
-            .HasMaxLength(50);
-
 
         builder.ComplexProperty(
             p => p.Description, desb =>

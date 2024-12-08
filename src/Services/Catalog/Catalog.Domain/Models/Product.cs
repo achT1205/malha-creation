@@ -290,87 +290,8 @@ public class Product : Aggregate<ProductId>
         BrandId = brandId ?? throw new ArgumentNullException(nameof(brandId));
     }
 
-    public void AddSizeVariant(ColorVariantId colorVariantId, SizeVariant sizeVariant)
-    {
-        var cv = _colorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
-        if (cv == null)
-        {
-            throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
-        }
-        cv.AddSizeVariant(sizeVariant);
-    }
-
-    public void RemoveSizeVariant(ColorVariantId colorVariantId, SizeVariantId sizeVariantId)
-    {
-        var cv = _colorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
-        if (cv == null)
-        {
-            throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
-        }
-        cv.RemoveSizeVariant(sizeVariantId);
-    }
-
-    public void UpdateColorVariantPrice(ColorVariantId colorVariantId, ColorVariantPrice price)
-    {
-        if (ProductType == ProductType.Clothing)
-        {
-            throw new CatalogDomainException($"Only Size varaiant price can be changed for this product.");
-        }
-        var cv = _colorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
-        if (cv == null)
-        {
-            throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
-        }
-        var oldPrice = cv.Price;
-        cv.UpdatePrice(price);
-        AddDomainEvent(new ProductColorVariantPriceChangedDomainEvent(Id.Value, colorVariantId.Value, price.Amount.Value, oldPrice.Amount.Value, price.Currency));
-    }
-
-
-    public void AddOutfit(ColorVariantId colorVariantId, ColorVariantId outfitId)
-    {
-        var cv = _colorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
-        if (cv == null)
-        {
-            throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
-        }
-        cv.AddOutfit(outfitId);
-    }
-
-    public void RemoveOutfit(ColorVariantId colorVariantId, ColorVariantId outfitId)
-    {
-        var cv = _colorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
-        if (cv == null)
-        {
-            throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
-        }
-
-        var outfit = cv.Outfits.FirstOrDefault(_ => _ == outfitId);
-        if (outfit == null)
-        {
-            throw new CatalogDomainException($"No outfit {outfitId} was not found");
-        }
-        cv.RemoveOutfit(outfit);
-    }
-
     public void ToogleOnReorder()
     {
         OnReorder = !OnReorder;
     }
-
-    public void UpdateSizeVariantPrice(ColorVariantId colorVariantId, SizeVariantId sizeVariantId, Price price)
-    {
-        if (ProductType != ProductType.Clothing)
-        {
-            throw new CatalogDomainException($"Not Clothing product.");
-        }
-        var cv = _colorVariants.FirstOrDefault(_ => _.Id == colorVariantId);
-        if (cv == null)
-        {
-            throw new CatalogDomainException($"The ColorVariant {colorVariantId} was not found");
-        }
-        cv.UpdateSizeVariantPrice(sizeVariantId, price);
-        AddDomainEvent(new ProductSizeVariantPriceChangedDomainEvent(Id.Value, colorVariantId.Value, price.Amount));
-    }
-
 }

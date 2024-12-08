@@ -6,9 +6,10 @@ public class ColorVariantDto
     public List<ImageDto> Images { get; set; } = new();
     public decimal? Price { get; set; }
     public int? Quantity { get; set; }
-    public List<SizeVariantDto>? sizeVariants { get; set; } = new();
+    public List<SizeVariantDto>? SizeVariants { get; set; } = new();
     public int? RestockThreshold { get; set; }
     public List<Guid>? OutfitIds { get; set; } = new();
+    public string Currency { get; set; } = default!;
 }
 
 

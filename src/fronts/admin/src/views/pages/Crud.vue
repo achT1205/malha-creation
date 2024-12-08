@@ -1,290 +1,142 @@
-<script setup>
-import { ProductService } from '@/service/ProductService';
-import { FilterMatchMode } from '@primevue/core/api';
-import { useToast } from 'primevue/usetoast';
-import { onMounted, ref } from 'vue';
+<template>
+  <form @submit.prevent="submitForm">
+    <div class="col-span-12">
+      <label for="productName">Product Name</label>
+      <InputText id="productName" v-model="product.name" />
+      <p v-if="errors.name" class="error">{{ errors.name }}</p>
+    </div>
+    <div class="col-span-12">
+      <label for="urlFriendlyName">Product Url Friendly Name</label>
+      <InputText id="urlFriendlyName" v-model="product.urlFriendlyName" />
+      <p v-if="errors.urlFriendlyName" class="error">{{ errors.urlFriendlyName }}</p>
+    </div>
+    <!-- Ajoutez les champs nécessaires ici -->
+    <button type="submit">Submit</button>
+  </form>
+</template>
 
-onMounted(() => {
-    ProductService.getProducts().then((data) => (products.value = data));
+<script>
+import { ref, reactive } from "vue";
+import { z } from "zod";
+
+// Schéma pour les images
+const imageSchema = z.object({
+  imageSrc: z.string().url("Image source must be a valid URL"),
+  altText: z.string().min(1, "Alt text is required"),
 });
 
-const toast = useToast();
-const dt = ref();
-const products = ref();
-const productDialog = ref(false);
-const deleteProductDialog = ref(false);
-const deleteProductsDialog = ref(false);
-const product = ref({});
-const selectedProducts = ref();
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+// Schéma pour les variantes de taille
+const sizeVariantSchema = z.object({
+  size: z.string().min(1, "Size is required"),
+  price: z.number().positive("Price must be greater than 0"),
+  currency: z.string().min(1, "Currency is required"),
+  quantity: z.number().int().nonnegative("Quantity must be a non-negative integer"),
+  restockThreshold: z.number().int().nonnegative("Restock threshold must be a non-negative integer"),
 });
-const submitted = ref(false);
-const statuses = ref([
-    { label: 'INSTOCK', value: 'instock' },
-    { label: 'LOWSTOCK', value: 'lowstock' },
-    { label: 'OUTOFSTOCK', value: 'outofstock' }
-]);
 
-function formatCurrency(value) {
-    if (value) return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    return;
-}
+// Schéma pour les variantes de couleur
+const colorVariantSchema = z.object({
+  color: z.string().min(1, "Color is required"),
+  background: z.string().min(1, "Background is required"),
+  images: z.array(imageSchema).min(1, "At least one image is required"),
+  sizeVariants: z.array(sizeVariantSchema).min(1, "At least one size variant is required"),
+});
 
-function openNew() {
-    product.value = {};
-    submitted.value = false;
-    productDialog.value = true;
-}
+// Schéma principal pour le produit
+const productSchema = z.object({
+  name: z.string().min(1, "Product name is required"),
+  urlFriendlyName: z.string().min(1, "URL-friendly name is required"),
+  description: z.string().optional(),
+  shippingAndReturns: z.string().optional(),
+  code: z.string().min(1, "Product code is required"),
+  status: z.number().int(),
+  isHandmade: z.boolean(),
+  onReorder: z.boolean(),
+  coverImage: imageSchema.optional(),
+  productType: z.number().int(),
+  materialId: z.string().uuid("Material ID must be a valid UUID"),
+  brandId: z.string().uuid("Brand ID must be a valid UUID"),
+  collectionId: z.string().uuid("Collection ID must be a valid UUID"),
+  occasionIds: z.array(z.string().uuid("Occasion ID must be a valid UUID")),
+  categoryIds: z.array(z.string().uuid("Category ID must be a valid UUID")),
+  colorVariants: z.array(colorVariantSchema).min(1, "At least one color variant is required"),
+});
 
-function hideDialog() {
-    productDialog.value = false;
-    submitted.value = false;
-}
 
-function saveProduct() {
-    submitted.value = true;
 
-    if (product?.value.name?.trim()) {
-        if (product.value.id) {
-            product.value.inventoryStatus = product.value.inventoryStatus.value ? product.value.inventoryStatus.value : product.value.inventoryStatus;
-            products.value[findIndexById(product.value.id)] = product.value;
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-        } else {
-            product.value.id = createId();
-            product.value.code = createId();
-            product.value.image = 'product-placeholder.svg';
-            product.value.inventoryStatus = product.value.inventoryStatus ? product.value.inventoryStatus.value : 'INSTOCK';
-            products.value.push(product.value);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+export default {
+  setup() {
+    const product = ref({
+      name: "Slim Fit Chino Pants",
+      urlFriendlyName: "slim-fit-chino-pants",
+      description: "Chino pants with a modern slim fit, versatile and stylish.",
+      shippingAndReturns: "Chino pants with a modern slim fit, versatile and stylish.",
+      code: "CODE1",
+      status: 0,
+      isHandmade: false,
+      onReorder: true,
+      coverImage: {
+        imageSrc: "https://placehold.co/300",
+        altText: "Slim Fit Chino Pants",
+      },
+      productType: 0,
+      materialId: "a3addcb2-ce9c-4ca3-9068-6a8b8eccf711",
+      brandId: "b7bcda18-05cc-450b-b99a-3c5eafe111a4",
+      collectionId: "e6ef95a7-29f7-4ec4-8984-0d8602c94b27",
+      occasionIds: ["b3c6c410-d05a-4426-a6a6-2f086901d411"],
+      categoryIds: ["6cbe22ca-900f-4b38-9030-368e0f89bc74"],
+      colorVariants: [
+        {
+          color: "Red",
+          background: "bg-red-500",
+          images: [
+            {
+              imageSrc: "https://placehold.co/300",
+              altText: "Red Chino Pants Front",
+            },
+          ],
+          sizeVariants: [
+            {
+              size: "S",
+              price: 35,
+              currency: "$",
+              quantity: 10,
+              restockThreshold: 5,
+            },
+          ],
+        },
+      ],
+    });
+
+    const errors = reactive({});
+
+    const submitForm = () => {
+
+      for (const key in errors) {
+        delete errors[key];
+      }
+
+
+      try {
+        productSchema.parse(product.value);
+        alert("Product is valid!");
+      } catch (e) {
+        if (e.errors) {
+          e.errors.forEach((err) => {
+            errors[err.path.join(".")] = err.message;
+          });
         }
+      }
+    };
 
-        productDialog.value = false;
-        product.value = {};
-    }
-}
-
-function editProduct(prod) {
-    product.value = { ...prod };
-    productDialog.value = true;
-}
-
-function confirmDeleteProduct(prod) {
-    product.value = prod;
-    deleteProductDialog.value = true;
-}
-
-function deleteProduct() {
-    products.value = products.value.filter((val) => val.id !== product.value.id);
-    deleteProductDialog.value = false;
-    product.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
-}
-
-function findIndexById(id) {
-    let index = -1;
-    for (let i = 0; i < products.value.length; i++) {
-        if (products.value[i].id === id) {
-            index = i;
-            break;
-        }
-    }
-
-    return index;
-}
-
-function createId() {
-    let id = '';
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 5; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-}
-
-function exportCSV() {
-    dt.value.exportCSV();
-}
-
-function confirmDeleteSelected() {
-    deleteProductsDialog.value = true;
-}
-
-function deleteSelectedProducts() {
-    products.value = products.value.filter((val) => !selectedProducts.value.includes(val));
-    deleteProductsDialog.value = false;
-    selectedProducts.value = null;
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
-}
-
-function getStatusLabel(status) {
-    switch (status) {
-        case 'INSTOCK':
-            return 'success';
-
-        case 'LOWSTOCK':
-            return 'warn';
-
-        case 'OUTOFSTOCK':
-            return 'danger';
-
-        default:
-            return null;
-    }
-}
+    return { product, errors, submitForm };
+  },
+};
 </script>
 
-<template>
-    <div>
-        <div class="card">
-            <Toolbar class="mb-6">
-                <template #start>
-                    <Button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
-                    <Button label="Delete" icon="pi pi-trash" severity="secondary" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
-                </template>
-
-                <template #end>
-                    <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
-                </template>
-            </Toolbar>
-
-            <DataTable
-                ref="dt"
-                v-model:selection="selectedProducts"
-                :value="products"
-                dataKey="id"
-                :paginator="true"
-                :rows="10"
-                :filters="filters"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                :rowsPerPageOptions="[5, 10, 25]"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-            >
-                <template #header>
-                    <div class="flex flex-wrap gap-2 items-center justify-between">
-                        <h4 class="m-0">Manage Products</h4>
-                        <IconField>
-                            <InputIcon>
-                                <i class="pi pi-search" />
-                            </InputIcon>
-                            <InputText v-model="filters['global'].value" placeholder="Search..." />
-                        </IconField>
-                    </div>
-                </template>
-
-                <Column selectionMode="multiple" style="width: 3rem" :exportable="false" />
-                <Column field="code" header="Code" sortable style="min-width: 12rem" />
-                <Column field="name" header="Name" sortable style="min-width: 16rem" />
-                <Column header="Image">
-                    <template #body="slotProps">
-                        <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="rounded" style="width: 64px" />
-                    </template>
-                </Column>
-                <Column field="price" header="Price" sortable style="min-width: 8rem">
-                    <template #body="slotProps">
-                        {{ formatCurrency(slotProps.data.price) }}
-                    </template>
-                </Column>
-                <Column field="category" header="Category" sortable style="min-width: 10rem" />
-                <Column field="rating" header="Reviews" sortable style="min-width: 12rem">
-                    <template #body="slotProps">
-                        <Rating :modelValue="slotProps.data.rating" :readonly="true" />
-                    </template>
-                </Column>
-                <Column field="inventoryStatus" header="Status" sortable style="min-width: 12rem">
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.inventoryStatus" :severity="getStatusLabel(slotProps.data.inventoryStatus)" />
-                    </template>
-                </Column>
-                <Column :exportable="false" style="min-width: 12rem">
-                    <template #body="slotProps">
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editProduct(slotProps.data)" />
-                        <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
-                    </template>
-                </Column>
-            </DataTable>
-        </div>
-
-        <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details" :modal="true">
-            <div class="flex flex-col gap-6">
-                <img v-if="product.image" :src="`https://primefaces.org/cdn/primevue/images/product/${product.image}`" :alt="product.image" class="block m-auto pb-4" />
-                <div>
-                    <label for="name" class="block font-bold mb-3">Name</label>
-                    <InputText id="name" v-model.trim="product.name" required="true" autofocus :invalid="submitted && !product.name" fluid />
-                    <small v-if="submitted && !product.name" class="text-red-500">Name is required.</small>
-                </div>
-                <div>
-                    <label for="description" class="block font-bold mb-3">Description</label>
-                    <Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" fluid />
-                </div>
-                <div>
-                    <label for="inventoryStatus" class="block font-bold mb-3">Inventory Status</label>
-                    <Select id="inventoryStatus" v-model="product.inventoryStatus" :options="statuses" optionLabel="label" placeholder="Select a Status" fluid />
-                </div>
-
-                <div>
-                    <span class="block font-bold mb-4">Category</span>
-                    <div class="grid grid-cols-12 gap-4">
-                        <div class="flex items-center gap-2 col-span-6">
-                            <RadioButton id="category1" v-model="product.category" name="category" value="Accessories" />
-                            <label for="category1">Accessories</label>
-                        </div>
-                        <div class="flex items-center gap-2 col-span-6">
-                            <RadioButton id="category2" v-model="product.category" name="category" value="Clothing" />
-                            <label for="category2">Clothing</label>
-                        </div>
-                        <div class="flex items-center gap-2 col-span-6">
-                            <RadioButton id="category3" v-model="product.category" name="category" value="Electronics" />
-                            <label for="category3">Electronics</label>
-                        </div>
-                        <div class="flex items-center gap-2 col-span-6">
-                            <RadioButton id="category4" v-model="product.category" name="category" value="Fitness" />
-                            <label for="category4">Fitness</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-6">
-                        <label for="price" class="block font-bold mb-3">Price</label>
-                        <InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" fluid />
-                    </div>
-                    <div class="col-span-6">
-                        <label for="quantity" class="block font-bold mb-3">Quantity</label>
-                        <InputNumber id="quantity" v-model="product.quantity" integeronly fluid />
-                    </div>
-                </div>
-            </div>
-
-            <template #footer>
-                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" @click="saveProduct" />
-            </template>
-        </Dialog>
-
-        <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span v-if="product"
-                    >Are you sure you want to delete <b>{{ product.name }}</b
-                    >?</span
-                >
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
-                <Button label="Yes" icon="pi pi-check" @click="deleteProduct" />
-            </template>
-        </Dialog>
-
-        <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="flex items-center gap-4">
-                <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span v-if="product">Are you sure you want to delete the selected products?</span>
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
-            </template>
-        </Dialog>
-    </div>
-</template>
+<style>
+.error {
+  color: red;
+  font-size: 0.8rem;
+}
+</style>
