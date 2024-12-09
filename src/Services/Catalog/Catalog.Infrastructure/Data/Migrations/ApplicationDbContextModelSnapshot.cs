@@ -308,8 +308,8 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                     b.Property<string>("ShippingAndReturns")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
                         .HasColumnName("ShippingAndReturns");
 
                     b.Property<string>("Status")
@@ -359,8 +359,8 @@ namespace Catalog.Infrastructure.Data.Migrations
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasMaxLength(1000)
-                                .HasColumnType("nvarchar(1000)")
+                                .HasMaxLength(2000)
+                                .HasColumnType("nvarchar(2000)")
                                 .HasColumnName("Description");
                         });
 

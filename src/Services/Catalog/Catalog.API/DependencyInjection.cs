@@ -16,12 +16,27 @@ public static class DependencyInjection
         {
             options.AddPolicy("AllowSpecificOrigins", policy =>
             {
-                policy.WithOrigins("http://localhost:5173") // Replace with your frontend origin
+                policy.WithOrigins("http://localhost:5173", "http://localhost:5175")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials(); // Optional, only if cookies or credentials are needed
             });
         });
+
+        //Grpc Services
+        //services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
+        //{
+        //    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+        //})
+        //.ConfigurePrimaryHttpMessageHandler(() =>
+        //{
+        //    var handler = new HttpClientHandler
+        //    {
+        //        ServerCertificateCustomValidationCallback =
+        //       HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        //    };
+        //    return handler;
+        //});
 
 
         return services;

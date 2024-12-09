@@ -84,63 +84,24 @@ const colorVariantIndex = ref(null)
 const errors = reactive({});
 const product = useLocalStorage(
     {
-        "name": "Slim Fit Chino Pants",
-        "urlFriendlyName": "slim-fit-chino-pants",
-        "description": "Chino pants with a modern slim fit, versatile and stylish.",
-        "shippingAndReturns": "Chino pants with a modern slim fit, versatile and stylish.",
-        "code": "CODE1",
+        "name": "",
+        "urlFriendlyName": "",
+        "description": "",
+        "shippingAndReturns": "",
+        "code": "",
         "status": 0,
         "isHandmade": false,
-        "onReorder": true,
         "coverImage": {
-            "imageSrc": "https://placehold.co/300",
-            "altText": "Slim Fit Chino Pants"
+            "imageSrc": "",
+            "altText": ""
         },
         "productType": 0,
-        "materialId": "a3addcb2-ce9c-4ca3-9068-6a8b8eccf711",
-        "brandId": "b7bcda18-05cc-450b-b99a-3c5eafe111a4",
-        "collectionId": "e6ef95a7-29f7-4ec4-8984-0d8602c94b27",
-        "occasionIds": [
-            "b3c6c410-d05a-4426-a6a6-2f086901d411"
-        ],
-        "categoryIds": [
-            "6cbe22ca-900f-4b38-9030-368e0f89bc74"
-        ],
-        "colorVariants": [
-            {
-                "color": "Red",
-                background: 'bg-red-500',
-                "images": [
-                    {
-                        "imageSrc": "https://placehold.co/300",
-                        "altText": "Red Chino Pants Front"
-                    }
-                ],
-                "sizeVariants": [
-                    {
-                        "size": "S",
-                        "price": 35,
-                        "currency": "$",
-                        "quantity": 10,
-                        "restockThreshold": 5
-                    },
-                    {
-                        "size": "M",
-                        "price": 35,
-                        "currency": "$",
-                        "quantity": 7,
-                        "restockThreshold": 5
-                    },
-                    {
-                        "size": "L",
-                        "price": 35,
-                        "currency": "$",
-                        "quantity": 5,
-                        "restockThreshold": 5
-                    }
-                ]
-            }
-        ]
+        "materialId": null,
+        "brandId": null,
+        "collectionId": null,
+        "occasionIds": [],
+        "categoryIds": [],
+        "colorVariants": []
     },
     'newProduct'
 );

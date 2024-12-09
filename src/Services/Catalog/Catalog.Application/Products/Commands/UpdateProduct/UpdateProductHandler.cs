@@ -151,7 +151,7 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
         try
         {
             product.UpdateStatus(command.Status);
-            product.UpdateCode(product.Code);
+            product.UpdateCode(command.Code);
             product.UpdateNames(ProductName.Of(command.Name), UrlFriendlyName.Of(command.UrlFriendlyName));
             product.UpdateDescription(ProductDescription.Of(command.Description));
             product.UpdateShippingAndReturns(command.ShippingAndReturns);
@@ -177,8 +177,8 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
 
     private void UpdateImages(ColorVariantDto cv, ColorVariant colorVariant)
     {
-        var deleteImgs = colorVariant.Images.Select(im => im.ImageSrc).Except(cv.Images.Select(im => im.ImageSrc));
-        var newImgs = cv.Images.Select(im => im.ImageSrc).Except(colorVariant.Images.Select(im => im.ImageSrc));
+        var deleteImgs = colorVariant.Images.Select(im => im.ImageSrc).Except(cv.Images.Select(im => im.ImageSrc)).ToList();
+        var newImgs = cv.Images.Select(im => im.ImageSrc).Except(colorVariant.Images.Select(im => im.ImageSrc)).ToList();
 
         if (deleteImgs.Any())
         {
@@ -200,8 +200,8 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
 
     private void UpdateOutfits(ColorVariantDto cv, ColorVariant colorVariant)
     {
-        var outfitdeleteCvIds = colorVariant.Outfits.Except(cv.OutfitIds.Select(id => ColorVariantId.Of(id)));
-        var outfitToBeAddIds = cv.OutfitIds.Select(id => ColorVariantId.Of(id)).Except(colorVariant.Outfits);
+        var outfitdeleteCvIds = colorVariant.Outfits.Except(cv.OutfitIds.Select(id => ColorVariantId.Of(id))).ToList();
+        var outfitToBeAddIds = cv.OutfitIds.Select(id => ColorVariantId.Of(id)).Except(colorVariant.Outfits).ToList();
 
         if (outfitdeleteCvIds.Any())
         {
@@ -252,16 +252,16 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
     }
     private void UpdateColorVanriants(UpdateProductCommand command, Product product)
     {
-        var newCvs = command.ColorVariants.Where(cv => cv.Id == null);
+        var newCvs = command.ColorVariants.Where(cv => cv.Id == null).ToList();
 
-        var updateCvs = command.ColorVariants.Where((cv) => cv.Id != null);
+        var updateCvs = command.ColorVariants.Where((cv) => cv.Id != null).ToList();
 
         var oldCvIds = product.ColorVariants.Select(cv => cv.Id).ToList();
 
         var inComingCvIds = command.ColorVariants.Where(cv => cv.Id != null)
             .Select(cv => ColorVariantId.Of(cv.Id.Value));
 
-        var deleteCvIds = oldCvIds.Except(inComingCvIds);
+        var deleteCvIds = oldCvIds.Except(inComingCvIds).ToList();
 
 
         foreach (var cv in updateCvs)

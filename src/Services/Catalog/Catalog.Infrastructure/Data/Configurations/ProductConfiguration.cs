@@ -306,7 +306,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.ShippingAndReturns)
             .HasColumnName(nameof(Product.ShippingAndReturns))
-            .HasMaxLength(500)
+            .HasMaxLength(2000)
             .IsRequired();
 
         builder.ComplexProperty(
@@ -314,7 +314,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             {
                 desb.Property(n => n.Value)
                 .HasColumnName(nameof(Product.Description))
-                .HasMaxLength(1000)
+                .HasMaxLength(2000)
                 .IsRequired();
             });
 

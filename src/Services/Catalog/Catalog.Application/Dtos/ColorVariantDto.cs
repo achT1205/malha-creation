@@ -17,14 +17,14 @@ public record OutputColorVariantDto(
     Guid Id,
     string Color,
     string Background,
+    string Class,
     List<ImageDto> Images,
-    PriceDto Price,
+    decimal? Price,
     int? Quantity,
     int? RestockThreshold,
     string Slug,
     List<SizeVariantDto> SizeVariants,
-    List<Guid>? OutfitIds
-    );
+    List<Guid>? OutfitIds);
 
 
 public record StockColorVariantDto(

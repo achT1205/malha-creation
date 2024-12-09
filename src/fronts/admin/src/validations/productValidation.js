@@ -10,7 +10,7 @@ const imageSchema = z.object({
 const sizeVariantSchema = z.object({
     size: z.string().min(1, "Size is required"),
     price: z.number().positive("Price must be greater than 0"),
-    currency: z.string().min(1, "Currency is required"),
+    //currency: z.string().min(1, "Currency is required"),
     quantity: z.number().int().nonnegative("Quantity must be a non-negative integer"),
     restockThreshold: z.number().int().nonnegative("Restock threshold must be a non-negative integer"),
 });
@@ -29,7 +29,7 @@ const accessoryColorVariantSchema = z.object({
     background: z.string().min(1, "Background is required"),
     images: z.array(imageSchema).min(1, "At least one image is required"),
     price: z.number().positive("Price must be greater than 0"),
-    currency: z.string().min(1, "Currency is required"),
+    //currency: z.string().min(1, "Currency is required"),
     quantity: z.number().int().nonnegative("Quantity must be a non-negative integer"),
     restockThreshold: z.number().int().nonnegative("Restock threshold must be a non-negative integer"),
 });

@@ -1,4 +1,4 @@
-﻿using Catalog.Domain.ValueObjects;
+﻿using System.Linq;
 
 namespace Catalog.Application.Extensions;
 
@@ -87,10 +87,11 @@ public static class ProductExtensions
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,
                 Background: $"bg-{cv.Color.Value.ToLower()}-500",
+                Class: $"text-{cv.Color.Value.ToLower()}-500",
                 Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
                 Price:
                 product.ProductType == ProductType.Clothing ? null
-                : new PriceDto(cv.Price.Currency, cv.Price.Amount),
+                : cv.Price.Amount,
                 Quantity:
                 product.ProductType == ProductType.Clothing ? null
                 : cv.Quantity.Value,
@@ -133,10 +134,11 @@ public static class ProductExtensions
                 Id: cv.Id.Value,
                 Color: cv.Color.Value,
                 Background: $"bg-{cv.Color.Value.ToLower()}-500",
+                Class: $"text-{cv.Color.Value.ToLower()}-500",
                 Images: cv.Images.Select(im => new ImageDto(im.ImageSrc, im.AltText)).ToList(),
                 Price:
                 product.ProductType == ProductType.Clothing ? null
-                : new PriceDto(cv.Price.Currency, cv.Price.Amount),
+                : cv.Price.Amount,
                 Quantity:
                 product.ProductType == ProductType.Clothing ? null
                 : cv.Quantity.Value,
