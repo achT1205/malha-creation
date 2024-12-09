@@ -174,6 +174,30 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
 
         return new UpdateProductResult(true);
     }
+
+    private void UpdateImages(ColorVariantDto cv, ColorVariant colorVariant)
+    {
+        var deleteImgs = colorVariant.Images.Select(im => im.ImageSrc).Except(cv.Images.Select(im => im.ImageSrc));
+        var newImgs = cv.Images.Select(im => im.ImageSrc).Except(colorVariant.Images.Select(im => im.ImageSrc));
+
+        if (deleteImgs.Any())
+        {
+            foreach (var src in deleteImgs)
+            {
+                colorVariant.RemoveImage(src);
+            }
+        }
+
+        if (newImgs.Any())
+        {
+            foreach (var src in newImgs)
+            {
+                string altText = cv.Images.First(im => im.ImageSrc == src).AltText;
+                colorVariant.AddImage(Image.Of(src, altText));
+            }
+        }
+    }
+
     private void UpdateOutfits(ColorVariantDto cv, ColorVariant colorVariant)
     {
         var outfitdeleteCvIds = colorVariant.Outfits.Except(cv.OutfitIds.Select(id => ColorVariantId.Of(id)));
@@ -269,7 +293,7 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
             ColorVariantQuantity.Of(cv.Quantity),
             ColorVariantQuantity.Of(cv.RestockThreshold)
             );
-
+        UpdateImages(cv, colorVariant);
         UpdateOutfits(cv, colorVariant);
         if (product.ProductType == ProductType.Clothing)
             UpdateSizeVariants(cv, colorVariant);

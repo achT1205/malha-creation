@@ -63,7 +63,6 @@ public class ColorVariant : Entity<ColorVariantId>
             RestockThreshold = newRestockThreshold ?? throw new ArgumentNullException(nameof(newRestockThreshold));
         }
     }
-
     public void AddStock(int newQuantity)
     {
 
