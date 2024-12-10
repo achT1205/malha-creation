@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Exceptions.Handler;
+using Discount.Grpc;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
@@ -16,7 +17,7 @@ public static class DependencyInjection
         {
             options.AddPolicy("AllowSpecificOrigins", policy =>
             {
-                policy.WithOrigins("http://localhost:5173", "http://localhost:5175")
+                policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:5175")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials(); // Optional, only if cookies or credentials are needed
@@ -24,19 +25,19 @@ public static class DependencyInjection
         });
 
         //Grpc Services
-        //services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
-        //{
-        //    options.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
-        //})
-        //.ConfigurePrimaryHttpMessageHandler(() =>
-        //{
-        //    var handler = new HttpClientHandler
-        //    {
-        //        ServerCertificateCustomValidationCallback =
-        //       HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-        //    };
-        //    return handler;
-        //});
+        services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
+        {
+            options.Address = new Uri(configuration["GrpcSettings:DiscountUrl"]!);
+        })
+        .ConfigurePrimaryHttpMessageHandler(() =>
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+               HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+            return handler;
+        });
 
 
         return services;

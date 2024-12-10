@@ -86,7 +86,7 @@ onMounted(() => {
       <div class="relative">
         <!-- Decorative image and overlay -->
         <div aria-hidden="true" class="absolute inset-0 overflow-hidden">
-          <img src="@/assets/images/hero2.png" alt="" class="h-full w-full object-cover object-center" />
+          <img src="https://placehold.co/1792x1024" alt="" class="h-full w-full object-cover object-center" />
         </div>
 
         <div class="relative px-6 py-32 sm:py-40 lg:px-8 lg:py-56 lg:pr-0">
@@ -151,7 +151,7 @@ onMounted(() => {
                     class="inline-flex w-64 flex-col text-center lg:w-auto">
                     <div class="group relative">
                       <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden bg-gray-200">
-                        <img :src="`/images/categories/${collection.value}.png`" :alt="collection.name"
+                        <img :src="`https://placehold.co/1024x1792`" :alt="collection.name"
                           class="h-full w-full object-cover object-center group-hover:opacity-75" />
                       </div>
                       <div
@@ -162,7 +162,7 @@ onMounted(() => {
                           </h2>
                           <router-link
                             class="mt-8 inline-block border bg-white px-8 py-3 text-base font-medium text-gray-900 hover:bg-gray-100"
-                            :to="`/collections/${collection.value}`">
+                            :to="`https://placehold.co/1024x1792`">
                             DECOUVRIR
                           </router-link>
                         </div>
@@ -178,7 +178,7 @@ onMounted(() => {
         <div class="relative">
           <!-- Decorative image and overlay -->
           <div aria-hidden="true" class="absolute inset-0 overflow-hidden">
-            <img src="@/assets/images/hero.png" alt="" class="h-full w-full object-cover object-center" />
+            <img src="https://placehold.co/1792x1024" alt="" class="h-full w-full object-cover object-center" />
           </div>
 
           <div class="relative px-6 py-32 sm:py-40 lg:px-8 lg:py-56 lg:pr-0">
@@ -208,7 +208,7 @@ onMounted(() => {
                     class="inline-flex w-64 flex-col text-center lg:w-auto">
                     <div class="group relative">
                       <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden bg-gray-200">
-                        <img :src="`/images/accessories/${accessory.value}.png`" :alt="accessory.name"
+                        <img :src="`https://placehold.co/1024x1792`" :alt="accessory.name"
                           class="h-full w-full object-cover object-center group-hover:opacity-75" />
                       </div>
                       <div

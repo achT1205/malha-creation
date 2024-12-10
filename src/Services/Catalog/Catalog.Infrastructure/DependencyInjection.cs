@@ -5,6 +5,7 @@ using Catalog.Infrastructure.Interceptors;
 using Catalog.Infrastructure.Repositories;
 using Catalog.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Discount.Grpc;
 
 namespace Catalog.Infrastructure;
 
@@ -33,6 +34,23 @@ public static class DependencyInjection
         //services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
         services.AddScoped<IBrandRepository, BrandRepository>();
         services.AddScoped<IOrderingService, OrderingService>();
+
+
+        //Grpc Services
+        services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(options =>
+        {
+            options.Address = new Uri(configuration["GrpcSettings:DiscountUrl"]!);
+        })
+        .ConfigurePrimaryHttpMessageHandler(() =>
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+               HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+            return handler;
+        });
+
 
         // Bind the ExternalApiSettings from appsettings.json
         services.Configure<ExternalApiSettings>(configuration.GetSection("ExternalApiSettings"));

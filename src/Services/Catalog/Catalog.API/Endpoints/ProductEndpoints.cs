@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Pagination;
 using Catalog.Application.Products.Commands.DeleteProduct;
 using Catalog.Application.Products.Commands.UpdateProduct;
+using Catalog.Application.Products.Queries.GetLiteProducts;
 using Catalog.Application.Products.Queries.GetProductById;
 using Catalog.Application.Products.Queries.GetProductBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
@@ -128,6 +129,18 @@ public static class ProductEndpoints
         .Produces<GetProductsQueryResult>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Get Products")
+        .WithDescription("Retrieve a list of all available products.");
+
+        app.MapGet("/api/lite-products", async ([AsParameters] PaginationRequest request, ISender sender) =>
+        {
+            var query = new GetLiteProductsQuery(request);
+            var result = await sender.Send(query);
+            return Results.Ok(result);
+        })
+        .WithName("GetProducts with discount.")
+        .Produces<GetLiteProductsQueryResult>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("GetProducts with discount.")
         .WithDescription("Retrieve a list of all available products.");
     }
 }

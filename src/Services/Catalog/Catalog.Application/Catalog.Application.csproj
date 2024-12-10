@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,5 +16,11 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
     <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
   </ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="..\..\Discount\Discount.Grpc\Protos\discount.proto" GrpcServices="Client">
+			<Link>Services\Protos\discount.proto</Link>
+		</Protobuf>
+	</ItemGroup>
 
 </Project>

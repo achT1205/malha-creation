@@ -9,6 +9,7 @@ package discount;
 // The discount service definition.
 service DiscountProtoService {
   rpc GetCouponForProduct (GetCouponForProductRequest) returns (GetCouponForProductResponse);
+  rpc GetCouponByProductId (GetCouponByProductIdRequest) returns (GetCouponByProductIdResponse);
   rpc GetBasketDiscount (GetBasketDiscountRequest) returns (GetBasketDiscountResponse);
   rpc GetCoupon (GetCouponRequest) returns (Coupon);
   rpc GetCoupons (GetCouponsRequest) returns (GetCouponsResponse);
@@ -197,8 +198,26 @@ message GetCouponRequest{
   string Id = 1;
 }
 
+message  GetCouponByProductIdRequest{
+  string ProductId = 1;
+}
+
+message GetCouponByProductIdResponse {
+  LiteCoupon Coupon = 1;
+}
+
 message GetCouponResponse {
   Coupon Coupon = 1;
+}
+
+
+message LiteCoupon {
+    string Id = 1;
+	string Code = 2;
+    string Name = 3;
+    string Description = 4;
+    double FlatAmount = 5;  
+    int32 Percentage = 6;
 }
 
 message Coupon {

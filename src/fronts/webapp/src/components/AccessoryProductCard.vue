@@ -42,8 +42,8 @@ const onProductSelect = () => {
   <div class="group relative cursor-pointer" v-if="selectedColor">
     <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden bg-gray-200">
       <img
-        :src="selectedColor.images[0].imageSrc"
-        :alt="`${props.product.name}_${selectedColor.color}`"
+        :src="selectedColor.image.imageSrc"
+        :alt="selectedColor.image.altText"
         class="h-full w-full object-cover object-center group-hover:opacity-75"
       />
     </div>
@@ -51,32 +51,19 @@ const onProductSelect = () => {
       class="absolute inset-x-0 top-0 flex h-4/5 items-end justify-start overflow-hidden rounded-lg p-4"
       @click="onProductSelect()"
     >
-      <span
-        :class="[
-          'inline-flex items-center rounded-full  px-1.5 py-0.5 text-xs font-medium  group-hover:hidden transition-all',
-          selectedColor.isNewArrival === true
-            ? 'text-gray-600 bg-gray-100'
-            : selectedColor.discount
+    <span :class="[
+        'inline-flex items-center rounded-full  px-1.5 py-0.5 text-xs font-medium  group-hover:hidden transition-all',
+        selectedColor.isNewArrival === true
+          ? 'text-gray-600 bg-gray-100'
+          : product.discount && product.discount.code
             ? 'text-red-700 bg-red-100'
             : ''
-        ]"
-      >
+      ]">
         <span v-if="selectedColor.isNewArrival === true">NOUVEAU</span>
-        <span v-else-if="selectedColor.discount && selectedColor.discount.multiple === 1">{{
-          `${selectedColor.discount.rate} % OFF`
+        <span v-else-if="product.discount && product.discount.code">{{
+          product.discount.name
         }}</span>
-        <span
-          v-else-if="
-            selectedColor.discount &&
-            selectedColor.discount.multiple === 2 &&
-            selectedColor.discount.rate === 50
-          "
-        >
-          BUY ONE GET ONE FOR FREE
-        </span>
-        <span v-else-if="selectedColor.discount && selectedColor.discount.multiple > 1">
-          {{ `${selectedColor.discount.multiple} FOR ${selectedColor.discount.rate} % OFF` }}
-        </span>
+        <span v-else></span>
       </span>
 
       <div
@@ -89,19 +76,16 @@ const onProductSelect = () => {
             <div class="mt-4 grid grid-cols-6 gap-2">
               <div
                   :class="[
-                      selectedColor.quantity > 0
+                       selectedColor.inventoryStatus !== 'OUTOFSTOCK'
                       ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
                       : 'cursor-not-allowed bg-gray-50 text-gray-200',
-                    active ? 'ring-2 ring-black' : '',
                     'group relative flex items-center justify-center rounded-md border h-5  px-4 py-3 text-sm font-medium uppercase hover:bg-black hover:text-white focus:outline-none sm:flex-1',
                   ]"
                 >
                   <span>ADD</span>
                   <span
-                    v-if="selectedColor.quantity > 0"
+                    v-if=" selectedColor.inventoryStatus !== 'OUTOFSTOCK'"
                     :class="[
-                      active ? 'border' : 'border-2',
-                      checked ? 'border-black' : 'border-transparent',
                       'pointer-events-none absolute -inset-px rounded-md'
                     ]"
                     aria-hidden="true"
@@ -161,23 +145,13 @@ const onProductSelect = () => {
       </RadioGroup>
 
       <p class="text-gray-900 mt-auto flex items-center justify-center space-x-3 pt-6">
-        <span
-          :class="
-            selectedColor.discount && selectedColor.discount.multiple === 1
-              ? 'line-through text-red-600'
-              : ''
-          "
-          >{{ selectedColor.price }} €
+        <span :class="product.discount
+            ? 'line-through text-red-600'
+            : ''
+          ">{{ selectedColor.price }} €
         </span>
-        <span v-if="selectedColor.discount && selectedColor.discount.multiple === 1">
-          {{ selectedColor.price - (selectedColor.price * selectedColor.discount.rate) / 100 }} €
-        </span>
-        <span
-          v-else-if="selectedColor.discount && selectedColor.discount.multiple > 1"
-          class="text-red-600"
-        >
-          {{ selectedColor.price - (selectedColor.price * selectedColor.discount.rate) / 100 }} €
-          (MULTIBUY )
+        <span v-if="product.discount">
+          {{ selectedColor.discountedPrice }} €
         </span>
       </p>
     </div>

@@ -3,6 +3,7 @@ using Discount.Application.Coupons.Queries;
 using Grpc.Core;
 using Mapster;
 using MediatR;
+using System;
 
 namespace Discount.Grpc.Services
 {
@@ -74,10 +75,17 @@ namespace Discount.Grpc.Services
 
         public override async Task<Coupon> GetCoupon(GetCouponRequest request, ServerCallContext context)
         {
-            var command = request.Adapt<GetCouponQuery>();
-            var result = await sender.Send(command);
-            logger.LogInformation("Coupon is retrieved for Id : {id}", command.Id);
-            return MapCoupon(result.Coupon);
+            try
+            {
+                var command = new GetCouponQuery(new Guid(request.Id));
+                var result = await sender.Send(command);
+                logger.LogInformation("Coupon is retrieved for Id : {id}", command.Id);
+                return MapCoupon(result.Coupon);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public override async Task<GetCouponsResponse> GetCoupons(GetCouponsRequest request, ServerCallContext context)
@@ -98,6 +106,33 @@ namespace Discount.Grpc.Services
                 }
             }
             return response;
+        }
+
+        public override async Task<GetCouponByProductIdResponse> GetCouponByProductId(GetCouponByProductIdRequest request, ServerCallContext context)
+        {
+            try
+            {
+                var command = new GetCouponByProductIdQuery(new Guid(request.ProductId));
+                var result = await sender.Send(command);
+                logger.LogInformation("Coupon is retrieved for ProductId : {ProductId}, CouponCode : {amount}", command.ProductId, result.Coupon?.Code);
+
+                LiteCoupon coupon = new LiteCoupon();
+                if (result.Coupon != null)
+                {
+                    coupon.Id = result.Coupon.Id.ToString();
+                    coupon.Code = result.Coupon.Code.Value;
+                    coupon.Name = result.Coupon.Name;
+                    coupon.Description = result.Coupon.Description;
+                    coupon.FlatAmount = result.Coupon.Discountable.FlatAmount.HasValue ?  (double)result.Coupon.Discountable.FlatAmount.Value : 0;
+                    coupon.Percentage = result.Coupon.Discountable.Percentage.HasValue ? result.Coupon.Discountable.Percentage.Value : 0;
+                }
+
+                return new GetCouponByProductIdResponse() { Coupon = coupon };
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         private static Coupon MapCoupon(Domain.Models.Coupon coupon)

@@ -17,7 +17,7 @@ export const useProductStore = defineStore('productStore', () => {
         error.value = null;
         colorVariants.value = []
         try {
-            const response = await catalogApiClient.get('/api/products');
+            const response = await catalogApiClient.get('/api/lite-products');
             products.value = response.data.products;
             if (response.data.products && response.data.products.count > 0) {
                 response.data.products.data.forEach(p => {
@@ -25,15 +25,15 @@ export const useProductStore = defineStore('productStore', () => {
                         colorVariants.value.push({
                             id: c.id,
                             slug: c.slug,
-                            imageSrc: c.images[0].imageSrc,
-                            altText: c.images[0].altText
+                            imageSrc: c.image.imageSrc,
+                            altText: c.image.altText
                         })
 
                     });
                 });
             }
         } catch (err) {
-            error.value = err.response.data.detail;
+            error.value = err?.response?.data?.detail;
         } finally {
             isLoading.value = false;
         }
