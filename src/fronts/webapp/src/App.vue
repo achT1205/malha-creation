@@ -1,16 +1,9 @@
 <script setup>
-import AppHeader from '@/components/AppHeader.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div class="bg-white">
-   <!-- <AppHeader />-->
-    <router-view v-slot="{ Component }">
-      <keep-alive>
-        <component :is="Component" />
-      </keep-alive>
-    </router-view>
-    <AppFooter />
-  </div>
+  <RouterView />
 </template>
+
+
