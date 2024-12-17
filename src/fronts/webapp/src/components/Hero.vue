@@ -12,10 +12,10 @@
                         <div class="container">
                             <h1 class="fade-item fade-item-1 text-white heading">{{ slide.title }}</h1>
                             <p class="fade-item fade-item-2 text-white">{{ slide.description }}</p>
-                            <a :href="slide.link"
+                            <router-link :to="`collections/${slide.slug}`"
                                 class="fade-item fade-item-3 tf-btn btn-light-icon animate-hover-btn btn-xl radius-3">
                                 <span>Shop collection</span><i class="icon icon-arrow-right"></i>
-                            </a>
+                            </router-link>
                         </div>
                     </div>
                 </div>
@@ -32,31 +32,33 @@
 import { ref } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Autoplay, Pagination } from 'swiper/modules';
+import { RouterLink } from 'vue-router'
 
 
 const slides = ref([
     {
-        imgSrc: "/images/slider/fashion-slideshow-10.jpg",
-        alt: "fashion-slideshow-01",
-        title: "Effortless Elegance",
-        description: "From casual to formal, we've got you covered",
-        link: "shop-collection-list.html",
+        imgSrc: "https://placehold.co/2000x1125",
+        alt: "Elegant Kabil Dresses for Women",
+        title: "Graceful Kabil Dresses",
+        description: "Discover our exclusive collection of Kabil dresses for women, perfect for every occasion.",
+        slug: "kabil-dresses-women",
     },
     {
-        imgSrc: "/images/slider/fashion-slideshow-11.jpg",
-        alt: "fashion-slideshow-02",
-        title: "The mystery behind",
-        description: "From casual to formal, we've got you covered",
-        link: "shop-collection-list.html",
+        imgSrc: "https://placehold.co/2000x1125",
+        alt: "Traditional Burno for Men",
+        title: "Classic Burno for Men",
+        description: "Explore our timeless Burno attire for men, crafted with premium fabrics and elegant designs.",
+        slug: "burno-men",
     },
     {
-        imgSrc: "/images/slider/fashion-slideshow-12.jpg",
-        alt: "fashion-slideshow-03",
-        title: "Multi-faceted Beauty",
-        description: "From casual to formal, we've got you covered",
-        link: "shop-collection-list.html",
-    },
+        imgSrc: "https://placehold.co/2000x1125",
+        alt: "Kabil Dresses & Burno for Kids",
+        title: "Stylish Attire for Children",
+        description: "Shop our adorable Kabil dresses and Burno for children, combining comfort and style.",
+        slug: "kabil-burno-children",
+    }
 ]);
+
 
 const speed = ref(1000);
 const slidesPerView = ref(1);
